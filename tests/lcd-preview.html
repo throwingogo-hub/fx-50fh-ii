@@ -4,31 +4,40 @@
 <meta charset="utf-8">
 <title>LCD preview</title>
 <style>
-  body { margin:0; background:#333; display:grid; gap:18px; padding:18px; justify-items:center; }
-  canvas { width: 1274px; height: 498px; image-rendering: auto; }
+  body { margin:0; background:#2a2d2e; display:grid; gap:10px; padding:14px; justify-items:start; }
+  canvas { width: 956px; height: 374px; }
+  p { color:#9aa; font:12px system-ui; margin:0; }
 </style>
 </head>
 <body>
-<canvas id="a"></canvas>
-<canvas id="b"></canvas>
 <script type="module">
 import { LCD } from '../js/lcd.js';
-const a = new LCD(document.getElementById('a'));
-a.render({
-  indicators: new Set(['S', 'D', 'M']),
-  line1: '1234567890ABCDEF',
-  cursor: -1,
-  line2: '-8.86419205',
-  exp: '-03'
-});
-const b = new LCD(document.getElementById('b'));
-b.render({
-  indicators: new Set(['D']),
-  line1: '2⌐20⌐30+0⌐39⌐30',
-  cursor: 15,
-  blinkOn: true,
-  line2: '4⌐11⌐12'
-});
+
+// Each pair is a caption and a screen to draw. The first reproduces the very
+// screen the product photograph shows, so the two can be laid side by side.
+const screens = [
+  ['as photographed', { indicators: new Set(['D']), line1: '17:Doppler', cursor: -1, line2: '5984599571', left: 'f' }],
+  ['digits and punctuation', { indicators: new Set(['D']), line1: '0123456789 .,:;!?', cursor: -1, line2: '-8.86419205', exp: '-03' }],
+  ['upper case', { indicators: new Set(), line1: 'ABCDEFGHIJKLMNOP', cursor: -1, line2: '' }],
+  ['upper case', { indicators: new Set(), line1: 'QRSTUVWXYZ', cursor: -1, line2: '' }],
+  ['lower case', { indicators: new Set(), line1: 'abcdefghijklmnop', cursor: -1, line2: '' }],
+  ['lower case', { indicators: new Set(), line1: 'qrstuvwxyz', cursor: -1, line2: '' }],
+  ['symbols', { indicators: new Set(), line1: '×÷−√π°′″⌐∠→←⇔◢≠≤', cursor: -1, line2: '' }],
+  ['greek', { indicators: new Set(), line1: 'Σσθεμρλγαφ Ω¹²³', cursor: -1, line2: '' }],
+  ['a real entry', { indicators: new Set(['D', 'M']), line1: '2×(5+4)−2×−3', cursor: 12, blinkOn: true, line2: '24' }],
+  ['the mode menu', { indicators: new Set(['D']), line1: 'COMP CMPLX BASE ', cursor: -1, line2: ' 1   2  3' }],
+  ['fractions', { indicators: new Set(['D']), line1: '3⌐1⌐4+1⌐2⌐3', cursor: -1, line2: '4⌐11⌐12' }],
+  ['sexagesimal', { indicators: new Set(['D']), line1: '2°20°30°×3.5', cursor: -1, line2: '8°10°0' }],
+  ['an error', { indicators: new Set(['D']), line1: 'Math ERROR', cursor: -1, line2: '' }]
+];
+
+for (const [caption, view] of screens) {
+  const p = document.createElement('p');
+  p.textContent = caption;
+  const c = document.createElement('canvas');
+  document.body.append(p, c);
+  new LCD(c).render(view);
+}
 </script>
 </body>
 </html>

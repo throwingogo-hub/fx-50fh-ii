@@ -11,11 +11,15 @@ const M = {
   // indicator strip
   indY: 279, indDot: 3.0, indH: 21,
   // upper dot-matrix line
-  l1X: 156, l1Y: 311, l1Cell: 33.4, l1DotW: 6.2, l1DotH: 8.72, l1Cols: 16,
+  // measured off the photograph: cells on a 33.7 px pitch, dots on a 6.05 x 8.9
+  // grid, so the dots are noticeably taller than they are wide
+  l1X: 156, l1Y: 310.5, l1Cell: 33.7, l1DotW: 6.05, l1DotH: 8.9, l1Cols: 16,
   // lower segment line: 37 x 91 digits on a 48.3 px pitch, as measured
   l2X: 172, l2Y: 387, l2Pitch: 48.3, l2W: 37, l2H: 91, l2Cells: 10,
   labX: 116, labW: 52,
-  expX: 655, expPitch: 30, expW: 24, expH: 52, expY: 404
+  // exponent field: a fixed "x10" legend with raised small digits above it
+  expX: 648, expY: 394, expDot: 4.6, expDigitX: 6,
+  expLegendY: 438, expLegendDot: 4.6
 };
 
 const ON = '#22282b';
@@ -168,11 +172,16 @@ export class LCD {
       this.#cell(x, y, M.l2W, M.l2H, cells[i]);
     }
 
+    // The exponent is not a bare number. The glass carries a fixed "x10"
+    // legend low on the right, with the exponent's own digits set small and
+    // raised above it, so a result reads as 1.672621777 x10^-27.
     if (v.exp) {
       const e = v.exp;
-      for (let i = 0; i < e.length; i++) {
-        const x = (M.expX - GLASS.x) + i * M.expPitch;
-        this.#cell(x, M.expY - GLASS.y, M.expW, M.expH, { ch: e[i], dp: false }, true);
+      const ex = M.expX - GLASS.x;
+      this.#smallText(ex, M.expLegendY - GLASS.y, '×10', true, M.expLegendDot);
+      let dx = ex + M.expDigitX;
+      for (const ch of e) {
+        dx += this.#smallText(dx, M.expY - GLASS.y, ch, true, M.expDot) + M.expDot;
       }
     }
   }

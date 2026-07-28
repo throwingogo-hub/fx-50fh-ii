@@ -16,6 +16,11 @@ const VAR_KEYS = { NEG: 'A', DMS: 'B', HYP: 'C', SIN: 'D', RPAR: 'X', COMMA: 'Y'
 const HEX_KEYS = { NEG: 'A', DMS: 'B', HYP: 'C', SIN: 'D', COS: 'E', TAN: 'F' };
 const INPUT_BYTES = 99;
 
+// Glass geometry, measured off the unit, used to line a menu's numbers up
+// under its labels. Kept in step with the same constants in lcd.js.
+const L1_X = 156, L1_CELL = 33.7;
+const L2_X = 172, L2_PITCH = 48.3, L2_W = 37;
+
 export class Machine {
   constructor() {
     this.setup = {
@@ -1339,21 +1344,38 @@ export class Machine {
     };
   }
 
+  // A menu puts its labels across the 16 dot-matrix columns and the number you
+  // press under each one, on the large lower line. The two lines are different
+  // displays on different pitches, so a label's number is placed at whichever
+  // of the ten lower cells sits closest to the middle of that label.
   menuView() {
     const m = this.menu;
     const page = m.pages[m.page];
-    let l1 = '';
-    let l2 = '';
-    const cols = page.items.length;
-    const width = Math.floor(16 / Math.max(1, cols));
+    if (page.title) {
+      return { line1: page.title.slice(0, 16), line2: '' };
+    }
+
+    const items = page.items;
+    const n = items.length;
     const base = m.numbersFrom ? m.numbersFrom(m.page) : 1;
-    page.items.forEach((it, i) => {
-      l1 += it.label.slice(0, width).padEnd(width, ' ');
-      const num = String(base + i);
-      l2 += num.padStart(Math.ceil(width / 2), ' ').padEnd(width, ' ');
+    const row1 = new Array(16).fill(' ');
+    const row2 = new Array(10).fill(' ');
+
+    items.forEach((it, i) => {
+      const label = it.label.slice(0, Math.floor(16 / n));
+      let start = Math.round((i * 16) / n);
+      start = Math.min(start, 16 - label.length);
+      for (let c = 0; c < label.length; c++) row1[start + c] = label[c];
+
+      // centre of the label, in dot-matrix columns, converted to a lower cell
+      const midCol = start + label.length / 2;
+      const midX = L1_X + midCol * L1_CELL;
+      const cell = Math.round((midX - L2_X - L2_W / 2) / L2_PITCH);
+      const digit = String(base + i);
+      row2[Math.max(0, Math.min(9, cell))] = digit;
     });
-    if (page.title) l1 = page.title.padEnd(16, ' ');
-    return { line1: l1.slice(0, 16), line2: l2.trimEnd().slice(0, 10) };
+
+    return { line1: row1.join(''), line2: row2.join('').replace(/\s+$/, '') };
   }
 
   statView() {
