@@ -50,10 +50,23 @@ function tap(id) {
   dirty = true;
 }
 
+// Pointer down gives the key its tactile feel. The click listener is the
+// fallback that makes the keys reachable by Tab and Enter, and by anything
+// that synthesises a click without a pointer event; it stands down whenever a
+// pointer gesture has just handled the same press.
+let lastPointer = 0;
+
 shell.addEventListener('pointerdown', (e) => {
   const b = e.target.closest('.key');
   if (!b) return;
   e.preventDefault();
+  lastPointer = performance.now();
+  tap(b.dataset.id);
+});
+
+shell.addEventListener('click', (e) => {
+  const b = e.target.closest('.key');
+  if (!b || performance.now() - lastPointer < 700) return;
   tap(b.dataset.id);
 });
 
