@@ -1,0 +1,10 @@
+{
+  "name": "fx-50fh-ii",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A 1:1 working web recreation of the CASIO fx-50FH II programmable scientific calculator.",
+  "scripts": {
+    "test": "node tests/run.js"
+  }
+}

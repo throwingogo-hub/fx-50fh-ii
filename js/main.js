@@ -1,0 +1,93 @@
+// main.js — wires the machine to the photographic shell: one transparent
+// hotspot per real key, a canvas laid exactly over the glass, and the physical
+// keyboard mapped onto the same key ids.
+
+import { KEYS, SHELL_W, SHELL_H, PC_KEYS } from './keymap.js';
+import { LCD, GLASS } from './lcd.js';
+import { Machine } from './machine.js';
+
+const shell = document.getElementById('shell');
+const canvas = document.getElementById('lcd');
+const machine = new Machine();
+const lcd = new LCD(canvas);
+
+const pct = (v, total) => (v / total) * 100 + '%';
+
+// ---- glass -----------------------------------------------------------------
+Object.assign(canvas.style, {
+  left: pct(GLASS.x, SHELL_W), top: pct(GLASS.y, SHELL_H),
+  width: pct(GLASS.w, SHELL_W), height: pct(GLASS.h, SHELL_H)
+});
+
+// ---- hotspots --------------------------------------------------------------
+const buttons = new Map();
+for (const k of KEYS) {
+  const b = document.createElement('button');
+  b.className = 'key' + (k.pad ? ' pad' : '') + (k.orange ? ' orange' : '');
+  b.type = 'button';
+  b.dataset.id = k.id;
+  b.setAttribute('aria-label', k.base);
+  Object.assign(b.style, {
+    left: pct(k.x, SHELL_W), top: pct(k.y, SHELL_H),
+    width: pct(k.w, SHELL_W), height: pct(k.h, SHELL_H)
+  });
+  shell.appendChild(b);
+  buttons.set(k.id, b);
+}
+
+let blink = true;
+let dirty = true;
+
+function tap(id) {
+  const b = buttons.get(id);
+  if (b) {
+    b.classList.add('down');
+    setTimeout(() => b.classList.remove('down'), 90);
+  }
+  machine.press(id);
+  blink = true;
+  lastBlink = performance.now();
+  dirty = true;
+}
+
+shell.addEventListener('pointerdown', (e) => {
+  const b = e.target.closest('.key');
+  if (!b) return;
+  e.preventDefault();
+  tap(b.dataset.id);
+});
+
+// ---- physical keyboard ------------------------------------------------------
+window.addEventListener('keydown', (e) => {
+  if (e.metaKey || e.ctrlKey) return;
+  let m = PC_KEYS[e.key];
+  if (m === undefined && e.key.length === 1) m = PC_KEYS[e.key.toLowerCase()];
+  if (m === undefined) return;
+  e.preventDefault();
+  if (m.startsWith('!')) { tap('SHIFT'); tap(m.slice(1)); }
+  else tap(m);
+});
+
+// ---- render loop ------------------------------------------------------------
+let lastBlink = performance.now();
+function frame(now) {
+  if (now - lastBlink > 480) { blink = !blink; lastBlink = now; dirty = true; }
+  if (dirty) {
+    const v = machine.view();
+    v.blinkOn = blink;
+    lcd.render(v);
+    document.body.classList.toggle('shifted', machine.shift);
+    document.body.classList.toggle('alphaed', machine.alpha);
+    dirty = false;
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+// ---- help panel -------------------------------------------------------------
+const help = document.getElementById('help');
+document.getElementById('help-toggle').addEventListener('click', () => {
+  help.hidden = !help.hidden;
+});
+
+window.fx = machine;   // handy for poking at state from the console

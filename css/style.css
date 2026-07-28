@@ -1,0 +1,118 @@
+/* style.css — the page is a stage for one object; everything else stays out of
+   the way. The shell is the product photograph at its native 846x1710 ratio,
+   so every hotspot can be placed as a percentage and stay aligned at any size. */
+
+:root {
+  --shell-w: 846;
+  --shell-h: 1710;
+  color-scheme: light dark;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #e9eaec;
+  color: #1c1d20;
+}
+
+@media (prefers-color-scheme: dark) {
+  html, body { background: #17181b; color: #d8d9dd; }
+}
+
+main {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 40px;
+  gap: 14px;
+}
+
+#stage {
+  width: min(392px, 86vw, calc((100vh - 120px) * 846 / 1710));
+}
+
+#shell {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 846 / 1710;
+  background: url('../assets/fx-50fh-ii.png') center / 100% 100% no-repeat;
+  filter: drop-shadow(0 18px 30px rgba(0, 0, 0, .28));
+  touch-action: manipulation;
+  user-select: none;
+}
+
+#lcd {
+  position: absolute;
+  display: block;
+  border-radius: 2px;
+}
+
+/* Transparent hotspots sitting exactly on the photographed keys. */
+.key {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  border-radius: 34% / 40%;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color .07s linear, transform .07s ease-out;
+}
+
+.key:focus-visible {
+  outline: 2px solid #2f7fe0;
+  outline-offset: 1px;
+}
+
+.key.down {
+  background: rgba(0, 0, 0, .34);
+  transform: translateY(1px) scale(.97);
+}
+
+.key.orange.down { background: rgba(120, 40, 0, .38); }
+.key.pad.down { background: rgba(0, 0, 0, .22); border-radius: 40%; }
+
+/* SHIFT / ALPHA latched state gets a soft glow on the matching cap. */
+body.shifted .key[data-id="SHIFT"],
+body.alphaed .key[data-id="ALPHA"] {
+  background: rgba(255, 255, 255, .38);
+  box-shadow: 0 0 0 2px rgba(255, 190, 60, .75) inset;
+}
+body.alphaed .key[data-id="ALPHA"] {
+  box-shadow: 0 0 0 2px rgba(230, 90, 60, .8) inset;
+}
+
+#help-toggle {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  opacity: .55;
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+#help-toggle:hover { opacity: 1; }
+
+#help {
+  max-width: 620px;
+  font-size: 14px;
+  line-height: 1.65;
+}
+#help h1 { font-size: 18px; margin: 0 0 .4em; }
+#help h2 { font-size: 15px; margin: 1.4em 0 .3em; }
+#help table { border-collapse: collapse; margin: .4em 0 1em; }
+#help td { padding: 1px 14px 1px 0; vertical-align: top; }
+#help code {
+  font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: rgba(128, 128, 128, .16);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+#help ul { padding-left: 1.1em; }
+#help li { margin: .3em 0; }
+#help .fine { opacity: .65; font-size: 13px; margin-top: 1.4em; }

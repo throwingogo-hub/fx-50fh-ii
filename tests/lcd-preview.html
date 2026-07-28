@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>LCD preview</title>
+<style>
+  body { margin:0; background:#333; display:grid; gap:18px; padding:18px; justify-items:center; }
+  canvas { width: 1274px; height: 498px; image-rendering: auto; }
+</style>
+</head>
+<body>
+<canvas id="a"></canvas>
+<canvas id="b"></canvas>
+<script type="module">
+import { LCD } from '../js/lcd.js';
+const a = new LCD(document.getElementById('a'));
+a.render({
+  indicators: new Set(['S', 'D', 'M']),
+  line1: '1234567890ABCDEF',
+  cursor: -1,
+  line2: '-8.86419205',
+  exp: '-03'
+});
+const b = new LCD(document.getElementById('b'));
+b.render({
+  indicators: new Set(['D']),
+  line1: '2⌐20⌐30+0⌐39⌐30',
+  cursor: 15,
+  blinkOn: true,
+  line2: '4⌐11⌐12'
+});
+</script>
+</body>
+</html>

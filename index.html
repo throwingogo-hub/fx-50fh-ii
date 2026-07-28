@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CASIO fx-50FH II — web</title>
+<meta name="description" content="A 1:1 working web recreation of the CASIO fx-50FH II (H.K.E.A.A. approved) programmable scientific calculator: all six modes, 23 built-in formulas, 40 scientific constants, base-n, statistics and the BASIC-like program mode.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<main>
+  <div id="stage">
+    <div id="shell">
+      <canvas id="lcd"></canvas>
+    </div>
+  </div>
+
+  <button id="help-toggle" type="button">keyboard &amp; notes</button>
+
+  <section id="help" hidden>
+    <h1>fx-50FH II — web edition</h1>
+    <p>Click the keys, or use the computer keyboard:</p>
+    <table>
+      <tr><td><code>0-9 . + - * / ( ) , ^ =</code></td><td>the matching key</td></tr>
+      <tr><td><code>Enter</code></td><td>EXE</td></tr>
+      <tr><td><code>Backspace</code></td><td>DEL</td></tr>
+      <tr><td><code>Esc</code></td><td>AC</td></tr>
+      <tr><td><code>Space</code> / <code>Tab</code></td><td>SHIFT / ALPHA</td></tr>
+      <tr><td><code>arrows</code></td><td>REPLAY pad</td></tr>
+      <tr><td><code>s c t l n r x</code></td><td>sin cos tan log ln √ x²</td></tr>
+      <tr><td><code>e p m a</code></td><td>EXP, π, M+, Ans</td></tr>
+      <tr><td><code>F1 F2 F3</code></td><td>MODE, Prog, FMLA</td></tr>
+    </table>
+    <h2>Quick reference</h2>
+    <ul>
+      <li><b>MODE</b> → 1 COMP · 2 CMPLX · 3 BASE · 4 SD · 5 REG · 6 PRGM</li>
+      <li><b>SHIFT MODE</b> (SETUP) → six screens: angle unit, Fix/Sci/Norm,
+        a b/c ÷ d/c, a+bi ÷ r∠θ, FreqOn/FreqOff, contrast. Use ◀ ▶ to page.</li>
+      <li><b>SHIFT 7</b> (CONST) → ten pages of four scientific constants.</li>
+      <li><b>FMLA</b> → type a two-digit formula number 01–23, or scroll with
+        ▼ ▲, then EXE. <b>SHIFT FMLA</b> (LOOK) shows the formula itself.</li>
+      <li><b>Prog</b> → run a stored program. In PRGM mode it opens
+        EDIT / RUN / DEL.</li>
+      <li>In BASE mode: x² = DEC, ^ = HEX, log = BIN, ln = OCT, and x⁻¹ opens
+        the LOGIC menu.</li>
+      <li>In SD/REG: M+ is DT, SHIFT M+ is CL, SHIFT 1 is S-SUM,
+        SHIFT 2 is S-VAR, and ▼ browses the entered samples.</li>
+    </ul>
+    <p class="fine">
+      Behaviour follows the published fx-50F PLUS / fx-50FH II user's guide:
+      the same six modes, 10+2 digit display, 15-digit internal precision,
+      99-byte input line, 680 bytes of program memory across four areas,
+      23 built-in formulas and 40 CODATA-2000 constants. The shell is the
+      manufacturer's product photograph; the display and every key are live.
+    </p>
+  </section>
+</main>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
