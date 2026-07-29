@@ -5,11 +5,12 @@
 
 import { Machine } from '../js/machine.js';
 import { Program } from '../js/program.js';
-import { tok } from '../js/tokens.js';
+import { K, TOK, tok } from '../js/tokens.js';
 import { CONSTANTS } from '../js/consts.js';
 import { StatStore } from '../js/stats.js';
 import { KEYS, SHELL_W, SHELL_H } from '../js/keymap.js';
-import { hasGlyph } from '../js/font.js';
+import { glyphLayers, hasGlyph, lcdTextCells } from '../js/font.js';
+import { formatProgramText, parseProgramText } from '../js/program-codec.js';
 
 // ---- key sequence DSL -------------------------------------------------------
 // digits and operators are literal; @ prefixes SHIFT, # prefixes ALPHA,
@@ -166,6 +167,15 @@ check('every hotspot stays inside the fitted shell', KEYS.every((key) =>
   check('every menu page preserves all ten lower LCD cells', layoutsValid, true);
   check('every multi-page menu exposes both paging arrows', pagedArrowsValid, true);
   check('every menu symbol has a real LCD glyph instead of fallback square', glyphsValid, true);
+}
+{
+  const m = new Machine();
+  m.mode = 'SD';
+  m.openSVar();
+  const cells = lcdTextCells(m.view().line1);
+  check('S-VAR x-bar occupies one physical LCD cell', cells[0], 'x̄');
+  check('S-VAR still fills exactly sixteen upper LCD cells', cells.length, 16);
+  check('combined LCD marks draw as an overlay rather than a second character', glyphLayers(cells[0]).length, 2);
 }
 
 // ---- ON / power reset ------------------------------------------------------
@@ -542,6 +552,50 @@ for (let i = 0; i < CONSTANTS.length; i++) {
 }
 
 // ---- program mode -----------------------------------------------------------
+{
+  const source = '?→A\nA×2.54◢';
+  const parsed = parseProgramText(source, 'COMP');
+  check('Program Studio parses copyable calculator notation', parsed.errors.length, 0);
+  check('Program Studio preserves the guide example token sequence', parsed.tokenIds.join(','),
+    'pIn,pAsg,varA,:,varA,mul,2,.,5,4,pOut');
+  check('Program Studio text round-trips', formatProgramText(parsed.tokens), source);
+}
+{
+  const parsed = parseProgramText('For 1->A To 5\nA M+\nNext', 'COMP');
+  check('Program Studio accepts ASCII assignment arrows', parsed.errors.length, 0);
+  check('Program Studio recognizes loop commands', parsed.tokenIds.includes('pFor') && parsed.tokenIds.includes('pNext'), true);
+}
+{
+  const commandsRoundTrip = Object.entries(TOK)
+    .filter(([, spec]) => spec.k === K.PROG)
+    .every(([id, spec]) => {
+      const text = formatProgramText([{ ...spec, id }]);
+      const parsed = parseProgramText(text, 'COMP');
+      return parsed.errors.length === 0 && parsed.tokenIds.length === 1 && parsed.tokenIds[0] === id;
+    });
+  check('every program command survives copy and paste', commandsRoundTrip, true);
+}
+{
+  const parsed = parseProgramText('For 1→A', 'COMP');
+  check('Program Studio preserves structurally incomplete drafts as tokens', parsed.errors.length, 0);
+}
+{
+  const m = new Machine();
+  send(m, '[MODE]6' + '1' + '1' + '1' + '12');
+  const snapshot = m.programSnapshot();
+  const restored = new Machine();
+  check('autosave snapshot includes the active unsaved editor', snapshot.slots[0].tokens.join(','), '1,2');
+  check('autosave snapshot restores successfully', restored.restoreProgramSnapshot(snapshot), true);
+  check('restored draft remains available in P1', restored.programs[0].tokens.map((token) => token.id).join(','), '1,2');
+}
+{
+  const m = new Machine();
+  m.setStudioProgram(0, 'COMP', Array(400).fill('1'));
+  let rejected = false;
+  try { m.setStudioProgram(1, 'COMP', Array(281).fill('2')); }
+  catch { rejected = true; }
+  check('Program Studio enforces the shared 680-byte memory', rejected, true);
+}
 {
   // ? -> A : A x 2.54     (the inches-to-centimetres example from the guide)
   const m = new Machine();

@@ -8,6 +8,7 @@ import { CONSTANTS, CONST_BY_KEY, CONST_PAGES } from './consts.js';
 import { FORMULAS, formulaTitle } from './formulas.js';
 import { StatStore, REG_TYPES } from './stats.js';
 import { Program, PROGRAM_MEMORY } from './program.js';
+import { lcdTextCells } from './font.js';
 
 registerConstants(CONSTANTS);
 
@@ -800,7 +801,7 @@ export class Machine {
       this.openMenu({
         page: 0,
         pages: [
-          { items: [{ label: 'x‾', run: push('xbar') }, { label: 'xσn', run: push('xsn') }, { label: 'xσn-1', run: push('xsn1') }] },
+          { items: [{ label: 'x̄', run: push('xbar') }, { label: 'xσn', run: push('xsn') }, { label: 'xσn-1', run: push('xsn1') }] },
           { items: [{ label: 'minX', run: push('minX') }, { label: 'maxX', run: push('maxX') }] }
         ]
       });
@@ -824,8 +825,8 @@ export class Machine {
     this.openMenu({
       page,
       pages: [
-        { items: [{ label: 'x‾', run: push('xbar') }, { label: 'xσn', run: push('xsn') }, { label: 'xσn-1', run: push('xsn1') }] },
-        { items: [{ label: 'y‾', run: push('ybar') }, { label: 'yσn', run: push('ysn') }, { label: 'yσn-1', run: push('ysn1') }] },
+        { items: [{ label: 'x̄', run: push('xbar') }, { label: 'xσn', run: push('xsn') }, { label: 'xσn-1', run: push('xsn1') }] },
+        { items: [{ label: 'ȳ', run: push('ybar') }, { label: 'yσn', run: push('ysn') }, { label: 'yσn-1', run: push('ysn1') }] },
         quad
           ? { items: [{ label: 'a', run: push('regA') }, { label: 'b', run: push('regB') }, { label: 'c', run: push('regC') }] }
           : { items: [{ label: 'a', run: push('regA') }, { label: 'b', run: push('regB') }, { label: 'r', run: push('regR') }] },
@@ -1244,6 +1245,72 @@ export class Machine {
     }
   }
 
+  /** Serializable program state. An active editor is included on every autosave. */
+  programSnapshot() {
+    const slots = this.programs.map((program) => program
+      ? { mode: program.mode, tokens: program.tokens.map((token) => token.id) }
+      : null);
+    if (this.prog?.stage === 'edit') {
+      const stored = this.programs[this.prog.slot];
+      slots[this.prog.slot] = {
+        mode: stored?.mode || 'COMP',
+        tokens: this.prog.tokens.map((token) => token.id)
+      };
+    }
+    return { version: 1, updatedAt: Date.now(), slots };
+  }
+
+  restoreProgramSnapshot(snapshot) {
+    const modes = new Set(['COMP', 'CMPLX', 'BASE', 'SD', 'REG']);
+    if (!snapshot || snapshot.version !== 1 || !Array.isArray(snapshot.slots)) return false;
+    const restored = [null, null, null, null];
+    try {
+      for (let i = 0; i < restored.length; i++) {
+        const saved = snapshot.slots[i];
+        if (!saved) continue;
+        const mode = modes.has(saved.mode) ? saved.mode : 'COMP';
+        restored[i] = new Program(mode, saved.tokens.map(tok));
+      }
+    } catch {
+      return false;
+    }
+    this.programs = restored;
+    return true;
+  }
+
+  setStudioProgram(slot, mode, tokenIds) {
+    if (slot < 0 || slot > 3) throw new Error('invalid program slot');
+    const tokens = tokenIds.map(tok);
+    const otherBytes = this.programs.reduce((sum, program, index) =>
+      sum + (index !== slot && program ? bytesOf(program.tokens) : 0), 0);
+    if (otherBytes + bytesOf(tokens) > PROGRAM_MEMORY) throw new Error('program memory exceeded');
+    this.programs[slot] = new Program(mode, tokens);
+    if (this.prog?.stage === 'edit' && this.prog.slot === slot) {
+      this.prog.tokens = tokens.slice();
+      this.prog.cursor = Math.min(this.prog.cursor, tokens.length);
+    }
+  }
+
+  clearStudioProgram(slot) {
+    if (slot < 0 || slot > 3) return;
+    this.programs[slot] = null;
+    if (this.prog?.slot === slot) {
+      this.prog = null;
+      this.clearEntry();
+    }
+  }
+
+  editProgramSlot(slot) {
+    if (!this.programs[slot]) this.programs[slot] = new Program('COMP', []);
+    this.mode = 'PRGM';
+    this.prog = {
+      stage: 'edit', slot,
+      tokens: this.programs[slot].tokens.slice(),
+      cursor: this.programs[slot].tokens.length
+    };
+    this.screen = 'prog';
+  }
+
   runProgram(slot) {
     const prog = this.programs[slot];
     if (!prog) return;
@@ -1366,20 +1433,21 @@ export class Machine {
 
   cursorChar() {
     let n = 0;
-    for (let i = 0; i < this.cursor; i++) n += this.tokens[i].s.length;
+    for (let i = 0; i < this.cursor; i++) n += lcdTextCells(this.tokens[i].s).length;
     return n;
   }
 
   window(text, cursor) {
     const W = 16;
-    if (text.length <= W) return { text, cursor: Math.min(cursor, W - 1), left: false, right: false };
-    let start = Math.max(0, Math.min(cursor - W + 1, text.length - W));
+    const cells = lcdTextCells(text);
+    if (cells.length <= W) return { text, cursor: Math.min(cursor, W - 1), left: false, right: false };
+    let start = Math.max(0, Math.min(cursor - W + 1, cells.length - W));
     if (cursor < start) start = cursor;
     return {
-      text: text.substr(start, W),
+      text: cells.slice(start, start + W).join(''),
       cursor: cursor - start,
       left: start > 0,
-      right: start + W < text.length
+      right: start + W < cells.length
     };
   }
 
@@ -1401,7 +1469,7 @@ export class Machine {
     const row2 = new Array(10).fill(' ');
 
     items.forEach((it, i) => {
-      const label = it.label.slice(0, Math.floor(16 / slots));
+      const label = lcdTextCells(it.label).slice(0, Math.floor(16 / slots));
       let start = Math.round((i * 16) / slots);
       start = Math.min(start, 16 - label.length);
       for (let c = 0; c < label.length; c++) row1[start + c] = label[c];

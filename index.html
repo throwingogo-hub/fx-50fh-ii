@@ -10,14 +10,80 @@
 <body>
 
 <main>
-  <div id="stage">
-    <div id="shell">
-      <canvas id="lcd" aria-hidden="true"></canvas>
-      <output id="lcd-accessible" class="sr-only" aria-live="polite" aria-atomic="true"></output>
-    </div>
-  </div>
+  <div id="workspace">
+    <div id="calculator-column">
+      <div id="stage">
+        <div id="shell">
+          <canvas id="lcd" aria-hidden="true"></canvas>
+          <output id="lcd-accessible" class="sr-only" aria-live="polite" aria-atomic="true"></output>
+        </div>
+      </div>
 
-  <button id="help-toggle" type="button" aria-controls="help" aria-expanded="false">keyboard &amp; notes</button>
+      <nav id="utility-nav" aria-label="Calculator tools">
+        <button id="studio-toggle" type="button" aria-controls="studio" aria-expanded="false">Program Studio</button>
+        <button id="help-toggle" type="button" aria-controls="help" aria-expanded="false">keyboard &amp; notes</button>
+      </nav>
+    </div>
+
+    <section id="studio" hidden aria-labelledby="studio-title">
+      <header class="studio-head">
+        <div>
+          <p class="studio-kicker">PROGRAM WORKBENCH · 680 BYTE MEMORY</p>
+          <h1 id="studio-title">Program Studio</h1>
+          <p class="studio-intro">Write normally. Every change is saved on this device.</p>
+        </div>
+        <span id="studio-save-state" class="save-state" role="status">saved</span>
+      </header>
+
+      <div id="program-slots" class="program-slots" role="tablist" aria-label="Program slots">
+        <button type="button" role="tab" data-slot="0" aria-selected="true"><b>P1</b><span>empty</span></button>
+        <button type="button" role="tab" data-slot="1" aria-selected="false"><b>P2</b><span>empty</span></button>
+        <button type="button" role="tab" data-slot="2" aria-selected="false"><b>P3</b><span>empty</span></button>
+        <button type="button" role="tab" data-slot="3" aria-selected="false"><b>P4</b><span>empty</span></button>
+      </div>
+
+      <div class="studio-editor-card">
+        <div class="editor-topline">
+          <label for="studio-mode">Run mode
+            <select id="studio-mode">
+              <option>COMP</option><option>CMPLX</option><option>BASE</option>
+              <option>SD</option><option>REG</option>
+            </select>
+          </label>
+          <div class="copy-tools">
+            <button type="button" data-studio-action="copy">Copy</button>
+            <button type="button" data-studio-action="paste">Paste</button>
+          </div>
+        </div>
+
+        <label class="editor-label" for="program-source">P1 source</label>
+        <textarea id="program-source" rows="10" spellcheck="false" autocapitalize="off"
+          placeholder="?→A&#10;A×2.54◢" aria-describedby="program-feedback"></textarea>
+
+        <div class="editor-status">
+          <output id="program-feedback" aria-live="polite">Empty program — ready.</output>
+          <span id="program-bytes">0 / 680 bytes</span>
+        </div>
+        <div class="byte-track" aria-hidden="true"><i id="byte-fill"></i></div>
+
+        <div class="studio-primary-actions">
+          <button type="button" class="run-program" data-studio-action="run">Run on calculator</button>
+          <button type="button" data-studio-action="edit-calculator">Edit with keys</button>
+          <button type="button" class="danger-link" data-studio-action="clear">Clear P1</button>
+        </div>
+      </div>
+
+      <div class="command-drawer">
+        <div class="drawer-heading">
+          <h2>Command shelf</h2>
+          <span>inserts at cursor</span>
+        </div>
+        <div id="command-palette"></div>
+      </div>
+
+      <p class="studio-footnote"><b>Recovery:</b> calculator-key edits and Studio edits are autosaved. Copy important programs elsewhere before clearing browser data.</p>
+    </section>
+  </div>
 
   <section id="help" hidden>
     <h1>fx-50FH II — web edition</h1>
@@ -43,6 +109,9 @@
         ▼ ▲, then EXE. <b>SHIFT FMLA</b> (LOOK) shows the formula itself.</li>
       <li><b>Prog</b> → run a stored program. In PRGM mode it opens
         EDIT / RUN / DEL.</li>
+      <li><b>Program Studio</b> → write or paste normal program text, insert
+        commands, see shared byte usage, and run or continue editing with the calculator keys.
+        All four slots and active drafts are autosaved on this device.</li>
       <li>In BASE mode: x² = DEC, ^ = HEX, log = BIN, ln = OCT, and x⁻¹ opens
         the LOGIC menu.</li>
       <li>In SD/REG: M+ is DT, SHIFT M+ is CL, SHIFT 1 is S-SUM,

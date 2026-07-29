@@ -3,7 +3,7 @@
 // the upper line is a 16-character 5x7 dot matrix with tall, non-square dots,
 // the lower line is ten 7-segment cells plus a two-digit exponent field.
 
-import { glyph, SEG } from './font.js';
+import { glyph, glyphLayers, lcdTextCells, SEG } from './font.js';
 
 export const GLASS = { x: 145, y: 288, w: 588, h: 245 };
 
@@ -110,7 +110,8 @@ export class LCD {
   // ---- upper dot-matrix line ---------------------------------------------
   #line1(v) {
     const c = this.ctx;
-    const text = (v.line1 || '').padEnd(M.l1Cols, ' ').slice(0, M.l1Cols);
+    const text = lcdTextCells(v.line1 || '').slice(0, M.l1Cols);
+    while (text.length < M.l1Cols) text.push(' ');
     const y0 = M.l1Y - GLASS.y;
     const x0 = M.l1X - GLASS.x;
     const blink = v.blinkOn !== false;
@@ -118,7 +119,7 @@ export class LCD {
     for (let col = 0; col < M.l1Cols; col++) {
       const cx = x0 + col * M.l1Cell;
       const isCursor = col === v.cursor;
-      const cols = glyph(text[col]);
+      const layers = glyphLayers(text[col]);
       const kind = v.cursorKind || 'insert';
 
       // cursor rendering: a vertical bar sits between cells (insert mode),
@@ -130,11 +131,13 @@ export class LCD {
       }
 
       c.fillStyle = ON;
-      for (let i = 0; i < 5; i++) {
-        for (let r = 0; r < 7; r++) {
-          if (cols[i] & (1 << r)) {
-            c.fillRect(cx + i * M.l1DotW, y0 + r * M.l1DotH,
-              M.l1DotW, M.l1DotH);
+      for (const cols of layers) {
+        for (let i = 0; i < 5; i++) {
+          for (let r = 0; r < 7; r++) {
+            if (cols[i] & (1 << r)) {
+              c.fillRect(cx + i * M.l1DotW, y0 + r * M.l1DotH,
+                M.l1DotW, M.l1DotH);
+            }
           }
         }
       }

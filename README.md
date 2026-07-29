@@ -48,7 +48,9 @@ Everything the keyboard is printed with is implemented:
 - **Programs** — `?`, `→`, `:`, `◢`, `Goto`/`Lbl`, `If`/`Then`/`Else`/`IfEnd`,
   `For`/`To`/`Step`/`Next`, `While`/`WhileEnd`, `Break`, the six relational
   operators, the setup commands, `ClrMemory`, `ClrStat`, `M+`, `M−`, `Rnd(`,
-  `Dec`/`Hex`/`Bin`/`Oct` and `DT`.
+  `Dec`/`Hex`/`Bin`/`Oct` and `DT`. Program Studio adds normal copy/paste text,
+  command insertion, byte and structure checks, direct run/edit controls, and
+  automatic on-device recovery for all four slots—including active key-editor drafts.
 - **Errors** — `Math`, `Syntax`, `Stack`, `Arg`, `Go`, `Nesting`, `Memory` and
   `Data Full`,
   and pressing `◄` or `►` on an error jumps the cursor to the character that
@@ -77,7 +79,7 @@ Then open `http://localhost:8000/`.
 
 ## Tests
 
-250 checks, including worked examples, operating limits, and exhaustive LCD menu-layout/glyph
+264 checks, including worked examples, operating limits, Program Studio text/recovery, and exhaustive LCD menu-layout/glyph
 coverage derived from the user's guide, driven
 through the machine by key sequence rather than by calling the maths directly —
 so they exercise input, evaluation and formatting the way a person does.

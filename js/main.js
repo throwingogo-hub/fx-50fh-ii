@@ -5,6 +5,7 @@
 import { KEYS, SHELL_W, SHELL_H, PC_KEYS } from './keymap.js';
 import { LCD, GLASS } from './lcd.js';
 import { Machine } from './machine.js';
+import { setupProgramStudio } from './studio.js';
 
 const shell = document.getElementById('shell');
 const canvas = document.getElementById('lcd');
@@ -50,6 +51,12 @@ for (const k of KEYS) {
 let blink = true;
 let dirty = true;
 
+const studioController = setupProgramStudio(machine, () => {
+  blink = true;
+  lastBlink = performance.now();
+  dirty = true;
+});
+
 function tap(id) {
   const b = buttons.get(id);
   if (b) {
@@ -57,6 +64,7 @@ function tap(id) {
     setTimeout(() => b.classList.remove('down'), 90);
   }
   machine.press(id);
+  studioController.syncFromMachine();
   blink = true;
   lastBlink = performance.now();
   dirty = true;
@@ -84,6 +92,7 @@ shell.addEventListener('click', (e) => {
 
 // ---- physical keyboard ------------------------------------------------------
 window.addEventListener('keydown', (e) => {
+  if (e.target.closest('textarea, input, select, [contenteditable="true"]')) return;
   if (e.metaKey || e.ctrlKey) return;
   let m = PC_KEYS[e.key];
   if (m === undefined && e.key.length === 1) m = PC_KEYS[e.key.toLowerCase()];
