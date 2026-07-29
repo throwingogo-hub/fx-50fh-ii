@@ -313,6 +313,10 @@ None duplicates an existing program or a one-button calculator feature:
 | B | circle through three points | P3 starts from a completed general equation |
 | C | growth and decay unknowns | solves for final value, time, rate or starting value |
 | D | combined population statistics | combines summary data without the original observations |
+| E | line–circle intersections | finds tangent/secant points, not just circle properties |
+| F | first sequence sum reaching a target | P2 requires `n` to be known already |
+| G | bearings and 3D displacement | handles quadrant corrections and spatial components |
+| H | cubic synthetic division | reduces a cubic from one known root and finds the others |
 
 ### Suggested four-slot combinations
 
@@ -322,6 +326,7 @@ None duplicates an existing program or a one-button calculator feature:
 | Algebra and growth | Quadratic | Extra A | Sequences | Extra C | 509B |
 | Coordinate geometry | Coordinate | Extra B | Extra A | Trig | 647B |
 | Statistics and algebra | Sequences | Extra D | Extra A | Trig | 560B |
+| Advanced Section B / MCQ | Extra E | Extra F | Extra G | Extra H | 680B |
 
 ## Extra A — Simultaneous 2×2 Solver (74B)
 
@@ -525,6 +530,291 @@ M◢
 √((A×(C²+B²)+D×(Y²+X²))÷(A+D)-M²)◢
 ```
 
+## Advanced Section B / MCQ library
+
+These four programs target longer Paper 1 Section B calculations and the
+non-foundation-style questions found in Paper 2 Section B. They automate the
+arithmetic after you have formed the correct equation or model; they do not
+replace the working that Paper 1 requires.
+
+All four advanced programs occupy exactly `680B`, so install them only as a
+complete alternative to the earlier packs. There is no spare byte for editing.
+
+## Extra E — Line–Circle Intersections (169B)
+
+Finds the intersection points of a circle and a non-vertical straight line.
+Write the two equations as
+
+```text
+x² + y² + Ax + By + C = 0
+y = Xx + Y
+```
+
+Here `X` is the line's slope and `Y` is its y-intercept.
+
+### Inputs
+
+| Prompt | Enter |
+|---|---|
+| `A?`, `B?`, `C?` | coefficients of the circle equation |
+| `X?` | slope of the line |
+| `Y?` | y-intercept of the line |
+
+### Outputs
+
+1. Intersection discriminant
+2. First point `x₁`, then `y₁`
+3. Second point `x₂`, then `y₂`
+
+If the discriminant is negative, there is no intersection. If it is zero, the
+line is tangent and only one point is shown. A vertical line `x=k` must first be
+handled algebraically because it cannot be written as `y=Xx+Y`.
+
+### Examples
+
+For `x²+y²−4x−2y−4=0` and `y=1`:
+
+```text
+TYPE  A=-4, B=-2, C=-4, X=0, Y=1
+GET   discriminant 36, points (5,1) and (-1,1)
+```
+
+For the same circle and tangent `y=4`:
+
+```text
+TYPE  A=-4, B=-2, C=-4, X=0, Y=4
+GET   discriminant 0, tangent point (2,4)
+```
+
+### Copy this program
+
+```text
+?→A
+?→B
+?→C
+?→X
+?→Y
+(2×X×Y+A+B×X)²-4×(1+X²)×(Y²+B×Y+C)→M
+M◢
+M<0⇒Goto 9
+(-(2×X×Y+A+B×X)+√(M))÷(2×(1+X²))→C
+C◢
+X×C+Y◢
+M=0⇒Goto 9
+(-(2×X×Y+A+B×X)-√(M))÷(2×(1+X²))→C
+C◢
+X×C+Y◢
+Lbl 9
+```
+
+## Extra F — Sequence Target Solver (202B)
+
+Finds the **smallest positive integer `n`** for which a partial sum reaches or
+exceeds a target. This is useful when a Section B question asks “after how many
+terms/months…” rather than giving `n`.
+
+### Inputs
+
+| Prompt | Enter |
+|---|---|
+| `M?` | `1` for AP or `2` for GP |
+| `A?` | first term |
+| `B?` | common difference for AP, or common ratio for GP |
+| `C?` | target sum |
+
+### Outputs
+
+1. Smallest qualifying `n`
+2. The corresponding sum `Sₙ`, useful for checking the inequality
+
+Use a sequence with increasing positive partial sums and a reachable target.
+Otherwise the search can end in `Time ERROR`.
+
+### Examples
+
+For an AP with `a=3`, `d=2`, find the first `Sₙ≥100`:
+
+```text
+TYPE  M=1, A=3, B=2, C=100
+GET   n=10, S₁₀=120
+```
+
+For a GP with `a=2`, `r=1.5`, find the first `Sₙ≥50`:
+
+```text
+TYPE  M=2, A=2, B=1.5, C=50
+GET   n=7, S₇=64.34375
+```
+
+### Copy this program
+
+```text
+?→M
+?→A
+?→B
+?→C
+1→X
+M=1⇒Goto 1
+M=2⇒Goto 2
+Goto 9
+Lbl 1
+While X×(2×A+(X-1)×B)÷2<C
+X+1→X
+WhileEnd
+X◢
+X×(2×A+(X-1)×B)÷2◢
+Goto 9
+Lbl 2
+B=1⇒Goto 3
+While A×(1-B^(X))÷(1-B)<C
+X+1→X
+WhileEnd
+X◢
+A×(1-B^(X))÷(1-B)◢
+Goto 9
+Lbl 3
+While A×X<C
+X+1→X
+WhileEnd
+X◢
+A×X◢
+Lbl 9
+```
+
+## Extra G — Bearings and 3D Displacement (184B)
+
+Puts two common geometry calculations behind one selector and switches to
+degrees automatically.
+
+### Mode 1 — plan distance and bearing
+
+At `M?`, enter `1`. Then enter east/west displacement at `A?` and north/south
+displacement at `B?`:
+
+- east and north are positive;
+- west and south are negative.
+
+Outputs: plan distance, then the three-figure bearing measured clockwise from
+north. The displacement must not be `(0,0)`.
+
+Example: travel `3` units east and `4` units north.
+
+```text
+TYPE  M=1, A=3, B=4
+GET   distance 5, bearing 36.86989765°
+```
+
+### Mode 2 — 3D segment
+
+At `M?`, enter `2`. Enter two perpendicular horizontal components at `A?` and
+`B?`, then the vertical component at `C?`.
+
+Outputs: horizontal projection, spatial length, then the acute angle of
+elevation/depression to the horizontal. The horizontal projection must be
+non-zero.
+
+```text
+TYPE  M=2, A=3, B=4, C=12
+GET   horizontal 5, spatial length 13, angle 67.38013505°
+```
+
+### Copy this program
+
+```text
+Deg
+?→M
+M=1⇒Goto 1
+M=2⇒Goto 2
+Goto 9
+Lbl 1
+?→A
+?→B
+√(A²+B²)◢
+B=0⇒Goto 3
+tan^-1(A÷B)→X
+B<0⇒X+180→X
+X<0⇒X+360→X
+X◢
+Goto 9
+Lbl 3
+A>0⇒Goto 4
+270◢
+Goto 9
+Lbl 4
+90◢
+Goto 9
+Lbl 2
+?→A
+?→B
+?→C
+√(A²+B²)→X
+X◢
+√(X²+C²)◢
+tan^-1(Abs(C)÷X)◢
+Lbl 9
+```
+
+## Extra H — Cubic Synthetic Division (125B)
+
+Reduces a cubic polynomial when one root is already known, checks the remainder,
+then solves the remaining quadratic factor.
+
+Write the polynomial as
+
+```text
+Ax³ + Bx² + Cx + D
+```
+
+### Inputs
+
+| Prompt | Enter |
+|---|---|
+| `A?`, `B?`, `C?`, `D?` | cubic coefficients, including any zero coefficient |
+| `X?` | known root |
+
+### Outputs
+
+1. New `B` and new `C`, giving quotient `Ax²+Bx+C`
+2. Remainder
+3. If the remainder is zero: discriminant of the quotient
+4. Remaining distinct real roots
+
+A non-zero remainder means the supplied `X` is not a root. A negative
+discriminant means the quadratic factor has no additional real roots.
+
+### Example
+
+For `x³−6x²+11x−6` with known root `1`:
+
+```text
+TYPE  A=1, B=-6, C=11, D=-6, X=1
+GET   quotient x²−5x+6, remainder 0, discriminant 1, roots 3 and 2
+```
+
+The three adjacent `◢` commands below still pause separately; keeping them on
+one source line saves the final three bytes needed for the 680B advanced pack.
+
+### Copy this program
+
+```text
+?→A
+?→B
+?→C
+?→D
+?→X
+B+A×X→B
+C+B×X→C
+D+C×X→D
+B◢C◢D◢D≠0⇒Goto 9
+B²-4×A×C→M
+M◢
+M<0⇒Goto 9
+(-B+√(M))÷(2×A)◢
+M=0⇒Goto 9
+(-B-√(M))÷(2×A)◢
+Lbl 9
+```
+
 ## Syllabus basis
 
 The program choices come from the Education Bureau's
@@ -532,3 +822,7 @@ The program choices come from the Education Bureau's
 especially quadratics, equations, exponential growth and decay, arithmetic and
 geometric sequences, coordinate geometry, circle equations, trigonometric
 equations and measures of dispersion.
+
+The [HKEAA Mathematics assessment framework](https://www.hkeaa.edu.hk/DocLibrary/HKDSE/Subject_Information/math/2026hkdse-e-math.pdf)
+explains the examination structure and the broader Compulsory Part coverage in
+the later sections of the papers.
