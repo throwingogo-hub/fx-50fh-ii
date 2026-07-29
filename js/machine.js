@@ -13,6 +13,7 @@ import { lcdTextCells } from './font.js';
 registerConstants(CONSTANTS);
 
 const MODES = ['COMP', 'CMPLX', 'BASE', 'SD', 'REG', 'PRGM'];
+const HISTORY_MODES = new Set(['COMP', 'CMPLX', 'BASE']);
 const VAR_KEYS = { NEG: 'A', DMS: 'B', HYP: 'C', SIN: 'D', RPAR: 'X', COMMA: 'Y', MPLUS: 'M' };
 const HEX_KEYS = { NEG: 'A', DMS: 'B', HYP: 'C', SIN: 'D', COS: 'E', TAN: 'F' };
 const INPUT_BYTES = 99;
@@ -47,6 +48,7 @@ export class Machine {
     this.error = null;
     this.history = [];
     this.histIndex = -1;
+    this.historyReturn = null;
     this.statBrowse = null;
     this.formula = null;
     this.prog = null;
@@ -137,6 +139,7 @@ export class Machine {
     this.prog = null;
     this.message = null;
     this.clearEntry();
+    this.history = [];
   }
 
   dispatch(id, shift, alpha) {
@@ -344,6 +347,7 @@ export class Machine {
     this.hyp = 0;
     this.screen = 'input';
     this.histIndex = -1;
+    this.historyReturn = null;
   }
 
   // A new operator typed straight after a result silently takes Ans as its
@@ -358,7 +362,12 @@ export class Machine {
   }
 
   deleteToken() {
-    if (this.screen === 'result') { this.screen = 'input'; return; }
+    if (this.screen === 'result') {
+      this.screen = 'input';
+      this.histIndex = -1;
+      this.historyReturn = null;
+      return;
+    }
     if (this.insert) {
       if (this.cursor > 0) { this.tokens.splice(this.cursor - 1, 1); this.cursor--; }
     } else if (this.cursor < this.tokens.length) {
@@ -372,6 +381,7 @@ export class Machine {
     this.result = null;
     this.screen = 'input';
     this.histIndex = -1;
+    this.historyReturn = null;
     this.hyp = 0;
     this.message = null;
   }
@@ -380,6 +390,8 @@ export class Machine {
     if (this.screen === 'result' && (id === 'LEFT' || id === 'RIGHT')) {
       this.screen = 'input';
       this.cursor = id === 'LEFT' ? this.tokens.length : 0;
+      this.histIndex = -1;
+      this.historyReturn = null;
       return;
     }
     if (id === 'LEFT') { if (this.cursor > 0) this.cursor--; return; }
@@ -392,9 +404,23 @@ export class Machine {
     if ((this.mode === 'SD' || this.mode === 'REG') && this.stat.count && !this.tokens.length) {
       return this.openStatBrowse(this.stat.count - 1);
     }
-    if (!this.history.length) return;
-    if (this.histIndex < 0) this.histIndex = this.history.length - 1;
-    else if (this.histIndex > 0) this.histIndex--;
+    if (!this.supportsHistory() || !this.history.length) return;
+    if (this.histIndex < 0) {
+      const currentIsNewest = this.screen === 'result' &&
+        this.result === this.history[this.history.length - 1].result;
+      const newestIndex = this.history.length - (currentIsNewest ? 2 : 1);
+      if (newestIndex < 0) return;
+      this.historyReturn = {
+        tokens: this.tokens.map((t) => Object.assign({}, t)),
+        cursor: this.cursor,
+        result: this.result,
+        screen: this.screen,
+        newestIndex
+      };
+      this.histIndex = newestIndex;
+    } else if (this.histIndex > 0) {
+      this.histIndex--;
+    }
     this.loadHistory();
   }
 
@@ -402,10 +428,34 @@ export class Machine {
     if ((this.mode === 'SD' || this.mode === 'REG') && this.stat.count && !this.tokens.length) {
       return this.openStatBrowse(0);
     }
-    if (this.histIndex < 0) return;
-    if (this.histIndex < this.history.length - 1) this.histIndex++;
-    else { this.histIndex = -1; this.clearEntry(); return; }
-    this.loadHistory();
+    if (!this.supportsHistory() || this.histIndex < 0 || !this.historyReturn) return;
+    if (this.histIndex < this.historyReturn.newestIndex) {
+      this.histIndex++;
+      this.loadHistory();
+      return;
+    }
+    const back = this.historyReturn;
+    this.tokens = back.tokens;
+    this.cursor = back.cursor;
+    this.result = back.result;
+    this.screen = back.screen;
+    this.histIndex = -1;
+    this.historyReturn = null;
+  }
+
+  supportsHistory() {
+    return HISTORY_MODES.has(this.mode);
+  }
+
+  historyIndicators() {
+    if (!this.supportsHistory()) return { up: false, down: false };
+    if (this.histIndex >= 0 && this.historyReturn) {
+      return { up: this.histIndex > 0, down: true };
+    }
+    if (!this.history.length) return { up: false, down: false };
+    const currentIsNewest = this.screen === 'result' &&
+      this.result === this.history[this.history.length - 1].result;
+    return { up: currentIsNewest ? this.history.length > 1 : true, down: false };
   }
 
   loadHistory() {
@@ -445,9 +495,12 @@ export class Machine {
       this.result.view = 'normal';
     }
     if (this.result.view === 'dms' && !formatDms(z.re)) this.result.view = 'normal';
-    this.history.push({ tokens: this.tokens.map((t) => Object.assign({}, t)), result: this.result });
-    if (this.history.length > 30) this.history.shift();
+    if (this.supportsHistory()) {
+      this.history.push({ tokens: this.tokens.map((t) => Object.assign({}, t)), result: this.result });
+      if (this.history.length > 30) this.history.shift();
+    }
     this.histIndex = -1;
+    this.historyReturn = null;
     this.screen = 'result';
   }
 
@@ -717,6 +770,7 @@ export class Machine {
               };
               s.mode = 'COMP';
               s.clearEntry();
+              s.history = [];
             }
           },
           {
@@ -1412,13 +1466,15 @@ export class Machine {
 
     // input / result
     const text = textOf(this.tokens);
-    const win = this.window(text, this.cursorChar());
+    const win = this.window(text, this.cursorChar(), this.screen === 'input');
+    const historyIndicators = this.historyIndicators();
     const out = {
       line1: win.text,
       cursor: this.screen === 'input' ? win.cursor : -1,
       scrollLeft: win.left,
       scrollRight: win.right,
-      histUp: this.history.length > 0
+      histUp: historyIndicators.up,
+      histDown: historyIndicators.down
     };
     if (this.result) {
       const l2 = this.line2For(this.result);
@@ -1437,11 +1493,15 @@ export class Machine {
     return n;
   }
 
-  window(text, cursor) {
+  window(text, cursor, reserveCursor = false) {
     const W = 16;
     const cells = lcdTextCells(text);
-    if (cells.length <= W) return { text, cursor: Math.min(cursor, W - 1), left: false, right: false };
-    let start = Math.max(0, Math.min(cursor - W + 1, cells.length - W));
+    const cursorAtEnd = reserveCursor && cursor >= cells.length;
+    if (cells.length < W || (cells.length === W && !cursorAtEnd)) {
+      return { text, cursor: Math.min(cursor, W - 1), left: false, right: false };
+    }
+    const maxStart = cells.length - W + (cursorAtEnd ? 1 : 0);
+    let start = Math.max(0, Math.min(cursor - W + 1, maxStart));
     if (cursor < start) start = cursor;
     return {
       text: cells.slice(start, start + W).join(''),
@@ -1545,8 +1605,8 @@ export class Machine {
     if (p.stage === 'edit') {
       const text = textOf(p.tokens);
       let n = 0;
-      for (let i = 0; i < p.cursor; i++) n += p.tokens[i].s.length;
-      const win = this.window(text, n);
+      for (let i = 0; i < p.cursor; i++) n += lcdTextCells(p.tokens[i].s).length;
+      const win = this.window(text, n, true);
       return {
         line1: win.text,
         cursor: win.cursor,

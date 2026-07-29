@@ -79,7 +79,7 @@ Then open `http://localhost:8000/`.
 
 ## Tests
 
-264 checks, including worked examples, operating limits, Program Studio text/recovery, and exhaustive LCD menu-layout/glyph
+284 checks, including worked examples, operating limits, REPLAY/history navigation, Program Studio text/recovery, and exhaustive LCD menu-layout/glyph
 coverage derived from the user's guide, driven
 through the machine by key sequence rather than by calling the maths directly —
 so they exercise input, evaluation and formatting the way a person does.

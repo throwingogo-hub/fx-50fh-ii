@@ -185,6 +185,7 @@ check('every hotspot stays inside the fitted shell', KEYS.every((key) =>
   m.press('ON');
   check('ON clears a calculation at the home screen', m.view().line2, '0');
   check('ON clears entry and result state', m.tokens.length === 0 && m.result === null, true);
+  check('ON clears calculation history and its indicator', m.history.length === 0 && !m.view().histUp, true);
 }
 {
   const m = new Machine();
@@ -216,6 +217,43 @@ check('every hotspot stays inside the fitted shell', KEYS.every((key) =>
   send(m, '[MODE]6');
   m.press('ON');
   check('ON leaves the PRGM menu for the default calculation home', m.mode === 'COMP' && m.screen === 'input', true);
+}
+
+// ---- calculation history / REPLAY -----------------------------------------
+{
+  const m = new Machine();
+  send(m, '1+1=2+2=3+3=');
+  check('history indicator is available when an older calculation exists', m.view().histUp, true);
+  m.press('UP');
+  check('first REPLAY up skips the calculation already on screen', m.view().line1, '2+2');
+  check('history browse exposes the down/back indicator', m.view().histDown, true);
+  m.press('UP');
+  check('REPLAY up reaches the oldest calculation', m.view().line1, '1+1');
+  check('oldest history record has no older-record indicator', m.view().histUp, false);
+  m.press('DOWN');
+  check('REPLAY down moves forward through history', m.view().line1, '2+2');
+  m.press('DOWN');
+  check('REPLAY down returns to the calculation that was on screen', m.view().line1, '3+3');
+  check('returning from history exits browse state', m.histIndex === -1 && !m.view().histDown, true);
+}
+{
+  const m = new Machine();
+  send(m, '1+1=2+2=9');
+  m.press('UP');
+  m.press('DOWN');
+  check('REPLAY down restores the in-progress expression it left', m.view().line1, '9');
+}
+{
+  const m = new Machine();
+  m.mode = 'SD';
+  send(m, '2+2=');
+  check('calculation history is limited to COMP, CMPLX and BASE modes', m.history.length, 0);
+}
+{
+  const m = new Machine();
+  send(m, '1+1=2+2=');
+  send(m, '@[N9]2');
+  check('CLR Setup clears calculation history as a reset operation', m.history.length, 0);
 }
 
 // ---- basic arithmetic -------------------------------------------------------
@@ -552,6 +590,33 @@ for (let i = 0; i < CONSTANTS.length; i++) {
 }
 
 // ---- program mode -----------------------------------------------------------
+{
+  const m = new Machine();
+  m.setStudioProgram(0, 'COMP', '123456789012345678'.split(''));
+  m.editProgramSlot(0);
+  m.press('UP');
+  check('program REPLAY up jumps to the first token', m.prog.cursor, 0);
+  check('program start jump keeps the cursor visible', m.view().cursor, 0);
+  m.press('DOWN');
+  const end = m.view();
+  check('program REPLAY down jumps to the end', m.prog.cursor, 18);
+  check('long-program end jump reserves a visible LCD cursor cell', end.cursor, 15);
+  check('long-program end jump scrolls to the final text', end.scrollLeft && !end.scrollRight, true);
+}
+{
+  const m = new Machine();
+  m.setStudioProgram(0, 'COMP', '1234567890123456'.split(''));
+  m.editProgramSlot(0);
+  const end = m.view();
+  check('exactly full program line still reserves the end cursor', end.cursor, 15);
+  check('exactly full program line reveals the preceding-text arrow', end.scrollLeft, true);
+}
+{
+  const m = new Machine();
+  m.setStudioProgram(0, 'SD', ['xbar', '1']);
+  m.editProgramSlot(0);
+  check('program cursor counts a combining statistic glyph as one LCD cell', m.view().cursor, 2);
+}
 {
   const source = '?→A\nA×2.54◢';
   const parsed = parseProgramText(source, 'COMP');
