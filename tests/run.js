@@ -98,7 +98,7 @@ check('every hotspot stays inside the fitted shell', KEYS.every((key) =>
   const m = new Machine();
   m.openModeMenu();
   let v = m.view();
-  check('MODE page 1 keeps numbers in their physical LCD cells', v.line2Cells.join(''), ' 1   2  3 ');
+  check('MODE page 1 keeps numbers in their physical LCD cells', v.line2Cells.join(''), '1   2   3 ');
   check('MODE menu shows both paging arrows', v.scrollLeft && v.scrollRight, true);
   m.press('RIGHT');
   v = m.view();
@@ -106,12 +106,25 @@ check('every hotspot stays inside the fitted shell', KEYS.every((key) =>
 
   m.openConstMenu(0);
   v = m.view();
-  check('four-choice menus keep 1–4 under their labels', v.line2Cells.join(''), '1  2  3 4 ');
+  check('four-choice menus keep 1–4 under their labels', v.line2Cells.join(''), '1  2  3  4');
 
   m.openDrgMenu();
   v = m.view();
   check('DRG renders three choices rather than a title-only screen',
-    v.line1 === 'D    R     G    ' && v.line2Cells.join('') === '1  2   3  ', true);
+    v.line1 === 'D    R     G    ' && v.line2Cells.join('') === '1   2   3 ', true);
+
+  m.openSetup(2);
+  v = m.view();
+  check('two-item SETUP pages retain the three-slot family anchors', v.line2Cells.join(''), '1   2     ');
+
+  m.openRegTypeMenu();
+  m.press('RIGHT');
+  v = m.view();
+  check('short REG pages retain the four-slot family anchors', v.line2Cells.join(''), '1  2  3   ');
+
+  m.openPCmd(3);
+  v = m.view();
+  check('short P-CMD pages retain the four-slot family anchors', v.line2Cells.join(''), '1  2      ');
 }
 {
   const m = new Machine();

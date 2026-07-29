@@ -77,7 +77,7 @@ Then open `http://localhost:8000/`.
 
 ## Tests
 
-247 checks, including worked examples, operating limits, and exhaustive LCD menu-layout/glyph
+250 checks, including worked examples, operating limits, and exhaustive LCD menu-layout/glyph
 coverage derived from the user's guide, driven
 through the machine by key sequence rather than by calling the maths directly —
 so they exercise input, evaluation and formatting the way a person does.

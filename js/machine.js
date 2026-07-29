@@ -16,11 +16,6 @@ const VAR_KEYS = { NEG: 'A', DMS: 'B', HYP: 'C', SIN: 'D', RPAR: 'X', COMMA: 'Y'
 const HEX_KEYS = { NEG: 'A', DMS: 'B', HYP: 'C', SIN: 'D', COS: 'E', TAN: 'F' };
 const INPUT_BYTES = 99;
 
-// Glass geometry, measured off the unit, used to line a menu's numbers up
-// under its labels. Kept in step with the same constants in lcd.js.
-const L1_X = 191.15, L1_CELL = 31.11;
-const L2_X = 205.92, L2_PITCH = 44.59, L2_W = 34.15;
-
 export class Machine {
   constructor() {
     this.setup = {
@@ -1388,10 +1383,10 @@ export class Machine {
     };
   }
 
-  // A menu puts its labels across the 16 dot-matrix columns and the number you
-  // press under each one, on the large lower line. The two lines are different
-  // displays on different pitches, so a label's number is placed at whichever
-  // of the ten lower cells sits closest to the middle of that label.
+  // Casio menus keep a fixed slot grid across every page in a family. A
+  // four-slot family, for example, uses lower cells 0/3/6/9 even when a page
+  // contains only two or three choices. This is not label-centering: the upper
+  // and lower LCD rows have different physical pitches.
   menuView() {
     const m = this.menu;
     const page = m.pages[m.page];
@@ -1400,21 +1395,18 @@ export class Machine {
     }
 
     const items = page.items;
-    const n = items.length;
+    const slots = Math.max(1, ...m.pages.map((p) => p.items?.length || 0));
     const base = m.numbersFrom ? m.numbersFrom(m.page) : 1;
     const row1 = new Array(16).fill(' ');
     const row2 = new Array(10).fill(' ');
 
     items.forEach((it, i) => {
-      const label = it.label.slice(0, Math.floor(16 / n));
-      let start = Math.round((i * 16) / n);
+      const label = it.label.slice(0, Math.floor(16 / slots));
+      let start = Math.round((i * 16) / slots);
       start = Math.min(start, 16 - label.length);
       for (let c = 0; c < label.length; c++) row1[start + c] = label[c];
 
-      // centre of the label, in dot-matrix columns, converted to a lower cell
-      const midCol = start + label.length / 2;
-      const midX = L1_X + midCol * L1_CELL;
-      const cell = Math.round((midX - L2_X - L2_W / 2) / L2_PITCH);
+      const cell = slots === 1 ? 0 : i * (7 - slots);
       const digit = String(base + i);
       row2[Math.max(0, Math.min(9, cell))] = digit;
     });
