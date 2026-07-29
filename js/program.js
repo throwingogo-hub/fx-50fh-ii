@@ -54,12 +54,20 @@ export class Run {
       if (c === 'Lbl') {
         const d = s.toks[1];
         if (d && d.k === K.DIGIT) this.labels[d.s] = i;
-      } else if (c === 'If') ifs.push({ i, elseIdx: -1 });
-      else if (c === 'Else') { if (ifs.length) ifs[ifs.length - 1].elseIdx = i; }
+      } else if (c === 'If') ifs.push({ i, elseIdx: -1, hasThen: false });
+      else if (c === 'Then') {
+        if (!ifs.length || ifs[ifs.length - 1].hasThen) err('Syntax');
+        ifs[ifs.length - 1].hasThen = true;
+      }
+      else if (c === 'Else') {
+        if (!ifs.length || !ifs[ifs.length - 1].hasThen || ifs[ifs.length - 1].elseIdx >= 0) err('Syntax');
+        ifs[ifs.length - 1].elseIdx = i;
+      }
       else if (c === 'IfEnd') {
         const f = ifs.pop();
-        if (f) this.ifMap[f.i] = { elseIdx: f.elseIdx, endIdx: i };
-        if (f && f.elseIdx >= 0) this.ifMap[f.elseIdx] = { endIdx: i };
+        if (!f || !f.hasThen) err('Syntax');
+        this.ifMap[f.i] = { elseIdx: f.elseIdx, endIdx: i };
+        if (f.elseIdx >= 0) this.ifMap[f.elseIdx] = { endIdx: i };
       } else if (c === 'For') fors.push(i);
       else if (c === 'Next') {
         const f = fors.pop();
@@ -74,7 +82,16 @@ export class Run {
         this.loopMap[i] = w;
       }
     });
-    if (ifs.length || fors.length || whiles.length) err('Syntax');
+    // The guide explicitly permits a missing IfEnd (with a warning that it can
+    // make everything after the If part of the branch). Close such frames at
+    // end-of-program, but an If without Then is always a Syntax ERROR.
+    while (ifs.length) {
+      const f = ifs.pop();
+      if (!f.hasThen) err('Syntax');
+      this.ifMap[f.i] = { elseIdx: f.elseIdx, endIdx: this.stmts.length };
+      if (f.elseIdx >= 0) this.ifMap[f.elseIdx] = { endIdx: this.stmts.length };
+    }
+    if (fors.length || whiles.length) err('Syntax');
   }
 
   ctx() { return this.m.ctx(); }
@@ -126,6 +143,7 @@ export class Run {
     if (jumpAt >= 0 && !c) {
       const cond = this.evalTokens(toks.slice(0, jumpAt));
       this.last = cond;
+      this.m.ans = cond;
       if (cond.re !== 0) return this.exec({ toks: toks.slice(jumpAt + 1), pause: false });
       return null;
     }
@@ -140,6 +158,7 @@ export class Run {
       }
       case 'If': {
         const cond = this.evalTokens(toks.slice(1));
+        this.m.ans = cond;
         const map = this.ifMap[this.pc];
         if (!map) err('Syntax');
         // One frame is pushed on either path so that IfEnd always has exactly
@@ -171,6 +190,7 @@ export class Run {
       case 'Next': return this.forNext();
       case 'While': {
         const cond = this.evalTokens(toks.slice(1));
+        this.m.ans = cond;
         if (cond.re === 0) { this.pc = this.loopMap[this.pc]; return null; }
         this.loops.push({ kind: 'while', start: this.pc, exit: this.loopMap[this.pc] });
         return null;
@@ -235,7 +255,9 @@ export class Run {
     const tail = toks[toks.length - 1];
     if (tail && (tail.c === 'M+' || tail.c === 'M-')) {
       const v = this.evalTokens(toks.slice(0, -1));
-      this.m.vars.M = r15(this.m.vars.M + (tail.c === 'M+' ? 1 : -1) * v.re);
+      const next = this.m.vars.M + (tail.c === 'M+' ? 1 : -1) * v.re;
+      if (!Number.isFinite(next) || Math.abs(next) >= 1e100) err('Math');
+      this.m.vars.M = r15(next);
       this.last = v;
       return null;
     }

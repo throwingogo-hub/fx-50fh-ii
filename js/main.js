@@ -1,4 +1,4 @@
-// main.js — wires the machine to the photographic shell: one transparent
+// main.js — wires the machine to the reconstructed shell: one transparent
 // hotspot per real key, a canvas laid exactly over the glass, and the physical
 // keyboard mapped onto the same key ids.
 
@@ -8,6 +8,7 @@ import { Machine } from './machine.js';
 
 const shell = document.getElementById('shell');
 const canvas = document.getElementById('lcd');
+const accessibleDisplay = document.getElementById('lcd-accessible');
 const machine = new Machine();
 const lcd = new LCD(canvas);
 
@@ -26,7 +27,18 @@ for (const k of KEYS) {
   b.className = 'key' + (k.pad ? ' pad' : '') + (k.orange ? ' orange' : '');
   b.type = 'button';
   b.dataset.id = k.id;
-  b.setAttribute('aria-label', k.base);
+  const functions = [
+    k.shift && `SHIFT: ${k.shift}`,
+    k.alpha && `ALPHA: ${k.alpha}`,
+    k.basen && `BASE: ${k.basen}`,
+    k.cmplx && `CMPLX: ${k.cmplx}`,
+    k.stat && `statistics: ${k.stat}`,
+    k.statShift && `statistics SHIFT: ${k.statShift}`,
+    k.hex && `hexadecimal digit ${k.hex}`
+  ].filter(Boolean);
+  const keyLabel = `${k.base} key${functions.length ? `. ${functions.join('. ')}` : ''}`;
+  b.setAttribute('aria-label', keyLabel);
+  b.title = keyLabel;
   Object.assign(b.style, {
     left: pct(k.x, SHELL_W), top: pct(k.y, SHELL_H),
     width: pct(k.w, SHELL_W), height: pct(k.h, SHELL_H)
@@ -83,12 +95,29 @@ window.addEventListener('keydown', (e) => {
 
 // ---- render loop ------------------------------------------------------------
 let lastBlink = performance.now();
+let lastAnnouncement = '';
+
+function describeView(v) {
+  const parts = [];
+  const indicators = [...(v.indicators || [])];
+  if (indicators.length) parts.push(`Indicators: ${indicators.join(', ')}`);
+  if (v.line1 && v.line1.trim()) parts.push(`Upper display: ${v.line1.trim()}`);
+  const lower = [v.left, v.line2].filter(Boolean).join(' ');
+  if (lower) parts.push(`Lower display: ${lower}${v.exp ? ` times ten to ${v.exp}` : ''}`);
+  return parts.join('. ') || 'Display blank';
+}
+
 function frame(now) {
   if (now - lastBlink > 480) { blink = !blink; lastBlink = now; dirty = true; }
   if (dirty) {
     const v = machine.view();
     v.blinkOn = blink;
     lcd.render(v);
+    const announcement = describeView(v);
+    if (announcement !== lastAnnouncement) {
+      accessibleDisplay.textContent = announcement;
+      lastAnnouncement = announcement;
+    }
     document.body.classList.toggle('shifted', machine.shift);
     document.body.classList.toggle('alphaed', machine.alpha);
     dirty = false;
@@ -99,8 +128,10 @@ requestAnimationFrame(frame);
 
 // ---- help panel -------------------------------------------------------------
 const help = document.getElementById('help');
-document.getElementById('help-toggle').addEventListener('click', () => {
+const helpToggle = document.getElementById('help-toggle');
+helpToggle.addEventListener('click', () => {
   help.hidden = !help.hidden;
+  helpToggle.setAttribute('aria-expanded', String(!help.hidden));
 });
 
 window.fx = machine;   // handy for poking at state from the console

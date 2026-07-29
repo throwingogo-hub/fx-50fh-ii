@@ -12,11 +12,12 @@
 <main>
   <div id="stage">
     <div id="shell">
-      <canvas id="lcd"></canvas>
+      <canvas id="lcd" aria-hidden="true"></canvas>
+      <output id="lcd-accessible" class="sr-only" aria-live="polite" aria-atomic="true"></output>
     </div>
   </div>
 
-  <button id="help-toggle" type="button">keyboard &amp; notes</button>
+  <button id="help-toggle" type="button" aria-controls="help" aria-expanded="false">keyboard &amp; notes</button>
 
   <section id="help" hidden>
     <h1>fx-50FH II — web edition</h1>
@@ -52,7 +53,7 @@
       the same six modes, 10+2 digit display, 15-digit internal precision,
       99-byte input line, 680 bytes of program memory across four areas,
       23 built-in formulas and 40 CODATA-2000 constants. The shell is the
-      manufacturer's product photograph; the display and every key are live.
+      generated high-resolution reconstruction; the display and every key are live.
     </p>
   </section>
 </main>

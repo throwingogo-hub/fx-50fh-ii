@@ -35,16 +35,23 @@ export class StatStore {
   }
   removeAt(i) { this.data.splice(i, 1); }
 
-  /** Sums over the transformed samples. */
-  sums(paired) {
+  /**
+   * Accumulate sample data.
+   *
+   * S-SUM, S-VAR and MINMAX always operate on the values the user entered.
+   * Non-linear regression coefficients, however, are calculated from the
+   * guide's linearised coordinates (ln x, ln y or 1/x). Keep those two views
+   * explicit so selecting a regression type never changes the sample stats.
+   */
+  sums(paired, transformed = false) {
     const t = this.type;
     const s = {
       n: 0, x: 0, x2: 0, y: 0, y2: 0, xy: 0, x3: 0, x4: 0, x2y: 0,
       minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity
     };
     for (const d of this.data) {
-      const x = paired ? mapX(t, d.x) : d.x;
-      const y = paired ? mapY(t, d.y) : 0;
+      const x = paired && transformed ? mapX(t, d.x) : d.x;
+      const y = paired ? (transformed ? mapY(t, d.y) : d.y) : 0;
       const f = d.f;
       s.n += f;
       s.x += f * x; s.x2 += f * x * x; s.x3 += f * x ** 3; s.x4 += f * x ** 4;
@@ -89,7 +96,7 @@ export class StatStore {
       case 'maxX': return s.maxX;
       case 'minY': return s.minY;
       case 'maxY': return s.maxY;
-      default: return this.coef(name, s);
+      default: return this.coef(name, this.sums(true, true));
     }
   }
 
@@ -128,7 +135,7 @@ export class StatStore {
   /** Estimated values: 'x', 'y', 'x1', 'x2'. */
   estimate(kind, v) {
     const t = this.type;
-    const s = this.sums(true);
+    const s = this.sums(true, true);
     if (t === 'Quad') {
       const a = this.coef('a', s), b = this.coef('b', s), c = this.coef('c', s);
       if (kind === 'y') return a + b * v + c * v * v;

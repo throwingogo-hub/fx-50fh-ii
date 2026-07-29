@@ -1,8 +1,8 @@
 // keymap.js — physical key geometry and per-key function assignments.
 //
-// Coordinates are in the pixel space of assets/fx-50fh-ii.png (846 x 1710),
-// measured directly off the product photo by connected-component detection of
-// the key caps, so every hotspot sits on the real key it names.
+// Coordinates are in the native pixel space of the generated faceplate
+// (881 x 1785), measured directly from its key caps. The chroma-key removal
+// preserves every opaque RGB pixel, so this map follows the unmodified artwork.
 //
 // Each key carries the functions printed on/around it:
 //   base        white legend on the key cap
@@ -13,16 +13,16 @@
 //   stat        blue legend                           (direct press, SD/REG)
 //   statShift   amber legend in a blue frame          (SHIFT + key, SD/REG)
 
-export const SHELL_W = 846;
-export const SHELL_H = 1710;
-export const LCD_RECT = { x: 106, y: 258, w: 634, h: 249 };
+export const SHELL_W = 881;
+export const SHELL_H = 1785;
+export const LCD_RECT = { x: 145, y: 288, w: 588, h: 245 };
 
-// Column/row rulers taken from the measured key blobs.
-const C6 = [89, 204, 318, 432, 546, 661];   // six-across function rows
-const W6 = 99, H6 = 63;
-const C5 = [88, 226, 363, 501, 639];        // five-across numeric block
-const W5 = 122, H5 = 86;
-const R = { fn1: 856, fn2: 954, fn3: 1053, n1: 1155, n2: 1275, n3: 1394, n4: 1513 };
+// Column/row rulers measured from the generated key blobs.
+const C6 = [131, 236, 341, 446, 550, 655];  // six-across function rows
+const W6 = 94, H6 = 64;
+const C5 = [132, 258, 384, 511, 637];       // five-across numeric block
+const W5 = 112, H5 = 88;
+const R = { fn1: 863, fn2: 951, fn3: 1052, n1: 1148, n2: 1263, n3: 1372, n4: 1491 };
 
 function k(id, x, y, w, h, spec) {
   return Object.assign({ id, x, y, w, h }, spec);
@@ -36,20 +36,20 @@ function row5(y, defs) {
 
 export const KEYS = [
   // ---- top row: modifiers, cursor pad, mode, power -------------------------
-  k('SHIFT', 85, 612, 93, 76, { base: 'SHIFT', kind: 'mod' }),
-  k('ALPHA', 201, 627, 92, 76, { base: 'ALPHA', kind: 'mod' }),
-  k('UP', 356, 611, 135, 62, { base: '▲', kind: 'cursor', pad: true }),
-  k('LEFT', 322, 673, 62, 62, { base: '◀', kind: 'cursor', pad: true }),
-  k('RIGHT', 463, 673, 62, 62, { base: '▶', kind: 'cursor', pad: true }),
-  k('DOWN', 356, 735, 135, 62, { base: '▼', kind: 'cursor', pad: true }),
-  k('MODE', 553, 630, 94, 71, { base: 'MODE', shift: 'SETUP' }),
-  k('ON', 670, 612, 91, 73, { base: 'ON' }),
+  k('SHIFT', 126, 641, 92, 73, { base: 'SHIFT', kind: 'mod' }),
+  k('ALPHA', 232, 648, 90, 73, { base: 'ALPHA', kind: 'mod' }),
+  k('UP', 376, 629, 136, 64, { base: '▲', kind: 'cursor', pad: true }),
+  k('LEFT', 342, 684, 68, 64, { base: '◀', kind: 'cursor', pad: true }),
+  k('RIGHT', 478, 684, 68, 64, { base: '▶', kind: 'cursor', pad: true }),
+  k('DOWN', 376, 739, 136, 64, { base: '▼', kind: 'cursor', pad: true }),
+  k('MODE', 555, 645, 92, 72, { base: 'MODE', shift: 'SETUP' }),
+  k('ON', 660, 630, 92, 72, { base: 'ON' }),
 
   // ---- program / formula row ----------------------------------------------
-  k('PROG', 81, 762, 95, 62, { base: 'Prog', shift: 'EXIT', orange: true }),
-  k('FMLA', 195, 762, 96, 62, { base: 'FMLA', shift: 'LOOK', orange: true }),
-  k('RECIP', 555, 759, 99, 62, { base: 'x⁻¹', shift: 'x!', basen: 'LOGIC' }),
-  k('CUBE', 669, 759, 99, 62, { base: 'x³', shift: '∛(' }),
+  k('PROG', 124, 769, 94, 62, { base: 'Prog', shift: 'EXIT', orange: true }),
+  k('FMLA', 230, 769, 94, 62, { base: 'FMLA', shift: 'LOOK', orange: true }),
+  k('RECIP', 557, 768, 96, 62, { base: 'x⁻¹', shift: 'x!', basen: 'LOGIC' }),
+  k('CUBE', 662, 768, 96, 62, { base: 'x³', shift: '∛(' }),
 
   // ---- function rows -------------------------------------------------------
   ...row6(R.fn1, [
