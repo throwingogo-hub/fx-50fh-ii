@@ -193,6 +193,46 @@ main {
 }
 .save-state::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 6px; border-radius: 50%; background: #4f8a69; }
 
+.exam-pack {
+  margin: 0 0 14px 18px;
+  padding: 14px;
+  border: 1px solid #2e5f52;
+  border-radius: 3px 12px 12px 3px;
+  background: linear-gradient(135deg, rgba(217,232,223,.92), rgba(246,242,228,.82));
+  box-shadow: 3px 4px 0 rgba(47,118,99,.14);
+}
+.exam-pack-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+#exam-pack-eyebrow { margin: 0 0 4px; color: #a2472a; font: 800 9px/1.2 ui-monospace, monospace; letter-spacing: .09em; }
+#exam-pack-title { margin: 0; font: 700 20px/1 "American Typewriter", Rockwell, serif; letter-spacing: -.03em; }
+#exam-pack-description { max-width: 285px; margin: 6px 0 0; color: #536058; font-size: 10px; line-height: 1.35; }
+#load-exam-pack {
+  flex: none;
+  padding: 8px 10px;
+  border: 1px solid #233f37;
+  border-radius: 4px;
+  background: #2e6e5d;
+  color: white;
+  font: 800 10px/1.2 "Avenir Next", sans-serif;
+  cursor: pointer;
+}
+#load-exam-pack:hover { transform: translateY(-1px); background: #255b4d; }
+.exam-pack-slots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-top: 12px; }
+.exam-pack-slot { min-width: 0; border: 1px solid rgba(71,86,76,.28); border-radius: 4px; background: rgba(255,255,255,.48); }
+.exam-pack-slot summary { display: flex; gap: 8px; align-items: center; padding: 8px; cursor: pointer; list-style: none; }
+.exam-pack-slot summary::-webkit-details-marker { display: none; }
+.exam-pack-slot summary::after { content: "+"; margin-left: auto; color: #517064; font: 700 13px ui-monospace, monospace; }
+.exam-pack-slot[open] summary::after { content: "−"; }
+.exam-pack-slot summary > b { color: var(--orange); font: 900 12px/1 ui-monospace, monospace; }
+.exam-pack-slot summary span { min-width: 0; }
+.exam-pack-slot summary strong, .exam-pack-slot summary small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.exam-pack-slot summary strong { color: #29342f; font: 800 10px/1.2 "Avenir Next", sans-serif; }
+.exam-pack-slot summary small { margin-top: 2px; color: #66756d; font: 8px/1.2 ui-monospace, monospace; letter-spacing: .03em; }
+.exam-pack-slot > p, .exam-pack-slot > small { display: block; margin: 0 8px 7px; color: #4e5b54; font-size: 9px; line-height: 1.4; }
+.exam-pack-slot > p b { color: #985035; font: 800 8px ui-monospace, monospace; }
+.exam-pack-slot > small { padding-top: 6px; border-top: 1px dashed rgba(71,86,76,.25); color: #74786f; }
+.exam-pack-status { margin: 9px 0 3px; color: #40594f; font: 700 9px/1.35 ui-monospace, monospace; }
+.syllabus-link { color: #756d5d; font-size: 9px; text-underline-offset: 2px; }
+
 .program-slots {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -328,7 +368,7 @@ main {
 @media (max-width: 520px) {
   main { padding-inline: 10px; }
   #studio { padding: 20px 14px 18px 10px; border-radius: 4px 14px 14px 4px; }
-  .studio-head, .program-slots, .studio-editor-card, .command-drawer, .studio-footnote { margin-left: 14px; }
+  .studio-head, .exam-pack, .program-slots, .studio-editor-card, .command-drawer, .studio-footnote { margin-left: 14px; }
   .studio-head { gap: 8px; }
   #studio h1 { font-size: 26px; }
   .studio-intro { max-width: 240px; }
@@ -336,6 +376,9 @@ main {
   .program-slots button { padding-inline: 5px; }
   .editor-topline { align-items: flex-end; }
   .studio-primary-actions .danger-link { margin-left: 0; }
+  .exam-pack-head { display: block; }
+  #load-exam-pack { margin-top: 10px; }
+  .exam-pack-slots { grid-template-columns: 1fr; }
   .command-group { grid-template-columns: 1fr; gap: 4px; }
   .command-group > span { padding-top: 0; }
 }

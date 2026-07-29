@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>CASIO fx-50FH II — web</title>
 <meta name="description" content="A 1:1 working web recreation of the CASIO fx-50FH II (H.K.E.A.A. approved) programmable scientific calculator: all six modes, 23 built-in formulas, 40 scientific constants, base-n, statistics and the BASIC-like program mode.">
-<link rel="stylesheet" href="css/style.css?v=green-cutout-9206630d">
+<link rel="stylesheet" href="css/style.css?v=core-max-20260729">
 </head>
 <body>
 
@@ -34,6 +34,20 @@
         </div>
         <span id="studio-save-state" class="save-state" role="status">saved</span>
       </header>
+
+      <section class="exam-pack" aria-labelledby="exam-pack-title">
+        <div class="exam-pack-head">
+          <div>
+            <p id="exam-pack-eyebrow"></p>
+            <h2 id="exam-pack-title"></h2>
+            <p id="exam-pack-description"></p>
+          </div>
+          <button type="button" id="load-exam-pack" data-studio-action="load-hkdse-pack">Load P1–P4</button>
+        </div>
+        <div id="exam-pack-slots" class="exam-pack-slots"></div>
+        <p id="exam-pack-status" class="exam-pack-status" role="status">Preview the input maps, then load when ready.</p>
+        <a class="syllabus-link" href="https://www.edb.gov.hk/attachment/en/curriculum-development/kla/ma/curr/EN_CP_e.pdf" target="_blank" rel="noopener">Built from the official Compulsory Part syllabus ↗</a>
+      </section>
 
       <div id="program-slots" class="program-slots" role="tablist" aria-label="Program slots">
         <button type="button" role="tab" data-slot="0" aria-selected="true"><b>P1</b><span>empty</span></button>
