@@ -4,7 +4,6 @@
 import { Program, PROGRAM_MEMORY } from './program.js';
 import { bytesOf } from './tokens.js';
 import { formatProgramText, parseProgramText } from './program-codec.js';
-import { HKDSE_CORE_MAX } from './program-presets.js?v=core-guide-20260729';
 
 const STORAGE_KEY = 'fx50fhii.program-studio.v2';
 const MODES = new Set(['COMP', 'CMPLX', 'BASE', 'SD', 'REG']);
@@ -32,9 +31,6 @@ export function setupProgramStudio(machine, onMachineChange) {
   const editorLabel = studio.querySelector('.editor-label');
   const clearButton = studio.querySelector('[data-studio-action="clear"]');
   const palette = document.getElementById('command-palette');
-  const packSlots = document.getElementById('exam-pack-slots');
-  const packStatus = document.getElementById('exam-pack-status');
-  const packButton = document.getElementById('load-exam-pack');
 
   let selected = 0;
   let drafts = [null, null, null, null];
@@ -42,8 +38,6 @@ export function setupProgramStudio(machine, onMachineChange) {
   let lastValid = true;
   let clearArmed = false;
   let clearTimer = 0;
-  let packArmed = false;
-  let packTimer = 0;
 
   function programFor(slot) { return machine.programs[slot]; }
 
@@ -210,111 +204,6 @@ export function setupProgramStudio(machine, onMachineChange) {
     }
   }
 
-  function buildExamPack() {
-    document.getElementById('exam-pack-eyebrow').textContent = HKDSE_CORE_MAX.eyebrow;
-    document.getElementById('exam-pack-title').textContent = HKDSE_CORE_MAX.title;
-    document.getElementById('exam-pack-description').textContent = HKDSE_CORE_MAX.description;
-    HKDSE_CORE_MAX.slots.forEach((slot, index) => {
-      const parsed = parseProgramText(slot.source, slot.mode);
-      const card = document.createElement('details');
-      card.className = 'exam-pack-slot';
-      const summary = document.createElement('summary');
-      const marker = document.createElement('b');
-      marker.textContent = `P${index + 1}`;
-      const title = document.createElement('span');
-      title.innerHTML = `<strong>${slot.name}</strong><small>${slot.code} · ${parsed.bytes}B</small>`;
-      summary.append(marker, title);
-      const purpose = document.createElement('p');
-      purpose.textContent = slot.purpose;
-      const inputs = document.createElement('p');
-      inputs.innerHTML = '<b>IN</b> ';
-      inputs.append(slot.inputs);
-      const outputs = document.createElement('p');
-      outputs.innerHTML = '<b>OUT</b> ';
-      outputs.append(slot.outputs);
-      const manual = document.createElement('div');
-      manual.className = 'slot-manual';
-      const maps = document.createElement('div');
-      maps.className = 'slot-io-map';
-      for (const [heading, lines] of [['Input prompts', slot.guide.inputs], ['Output order', slot.guide.outputs]]) {
-        const section = document.createElement('section');
-        const label = document.createElement('h3');
-        label.textContent = heading;
-        const list = document.createElement('ol');
-        for (const line of lines) {
-          const item = document.createElement('li');
-          item.textContent = line;
-          list.appendChild(item);
-        }
-        section.append(label, list);
-        maps.appendChild(section);
-      }
-      const examples = document.createElement('div');
-      examples.className = 'slot-examples';
-      const examplesTitle = document.createElement('h3');
-      examplesTitle.textContent = slot.examples.length === 1 ? 'Worked example' : 'Worked examples';
-      examples.appendChild(examplesTitle);
-      for (const example of slot.examples) {
-        const exampleEl = document.createElement('article');
-        const exampleTitle = document.createElement('b');
-        exampleTitle.textContent = `${example.title} · ${example.question}`;
-        const exampleInput = document.createElement('p');
-        exampleInput.append('TYPE  ', example.inputText);
-        const exampleOutput = document.createElement('p');
-        exampleOutput.append('GET   ', example.outputText);
-        exampleEl.append(exampleTitle, exampleInput, exampleOutput);
-        examples.appendChild(exampleEl);
-      }
-      manual.append(maps, examples);
-      const note = document.createElement('small');
-      note.textContent = slot.note;
-      card.append(summary, purpose, inputs, outputs, manual, note);
-      packSlots.appendChild(card);
-    });
-  }
-
-  function resetPackConfirmation() {
-    packArmed = false;
-    clearTimeout(packTimer);
-    packButton.textContent = 'Load P1–P4';
-  }
-
-  function loadExamPack() {
-    const parsedSlots = HKDSE_CORE_MAX.slots.map((slot) => ({
-      slot,
-      parsed: parseProgramText(slot.source, slot.mode)
-    }));
-    const bytes = parsedSlots.reduce((sum, item) => sum + item.parsed.bytes, 0);
-    if (parsedSlots.some((item) => item.parsed.errors.length) || bytes > PROGRAM_MEMORY) {
-      packStatus.textContent = 'The bundled pack failed validation and was not loaded.';
-      return;
-    }
-    if (!packArmed) {
-      packArmed = true;
-      packButton.textContent = 'Confirm replace P1–P4';
-      packStatus.textContent = `This replaces all four slots with the ${bytes}B pack. Click confirm to continue.`;
-      packTimer = setTimeout(() => {
-        resetPackConfirmation();
-        packStatus.textContent = 'Load cancelled — your programs were not changed.';
-      }, 6000);
-      return;
-    }
-
-    // Replace atomically from the user's point of view. Clearing first avoids
-    // a temporary over-capacity failure when the previous four slots were full.
-    for (let index = 0; index < 4; index++) machine.clearStudioProgram(index);
-    parsedSlots.forEach(({ slot, parsed }, index) => {
-      drafts[index] = { mode: slot.mode, source: slot.source };
-      machine.setStudioProgram(index, slot.mode, parsed.tokenIds);
-    });
-    resetPackConfirmation();
-    selected = 0;
-    showSlot(0);
-    persist();
-    onMachineChange();
-    packStatus.textContent = `${HKDSE_CORE_MAX.title} loaded · ${bytes} / ${PROGRAM_MEMORY} bytes used · ${PROGRAM_MEMORY - bytes} bytes free.`;
-  }
-
   async function copyProgram() {
     try {
       await navigator.clipboard.writeText(source.value);
@@ -341,7 +230,6 @@ export function setupProgramStudio(machine, onMachineChange) {
   loadStorage();
   for (let i = 0; i < drafts.length; i++) if (!drafts[i]) drafts[i] = deriveDraft(i);
   buildPalette();
-  buildExamPack();
   showSlot(selected);
 
   toggle.addEventListener('click', () => {
@@ -372,10 +260,8 @@ export function setupProgramStudio(machine, onMachineChange) {
   studio.addEventListener('click', async (event) => {
     const action = event.target.closest('[data-studio-action]')?.dataset.studioAction;
     if (!action) return;
-    if (action !== 'load-hkdse-pack' && packArmed) resetPackConfirmation();
     if (action === 'copy') return copyProgram();
     if (action === 'paste') return pasteProgram();
-    if (action === 'load-hkdse-pack') return loadExamPack();
 
     const state = inspectEditor(true);
     if (action === 'run' && !state.runnable) return;

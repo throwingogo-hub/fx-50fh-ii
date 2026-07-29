@@ -5,6 +5,9 @@ scientific calculator that the HKEAA approves for the HKDSE.
 
 **[Open the calculator →](https://throwingogo-hub.github.io/fx-50fh-ii/)**
 
+Optional HKDSE Core programs are documented in [programs.md](programs.md).
+They are copied manually and are never installed by the calculator.
+
 It is not a calculator app with a Casio skin. It is the fx-50FH II's own state
 machine — its six modes, its two-line display, its 680 bytes of program memory,
 its error messages — driven by the same key sequences you would press on the
@@ -51,10 +54,6 @@ Everything the keyboard is printed with is implemented:
   `Dec`/`Hex`/`Bin`/`Oct` and `DT`. Program Studio adds normal copy/paste text,
   command insertion, byte and structure checks, direct run/edit controls, and
   automatic on-device recovery for all four slots—including active key-editor drafts.
-  Its **HKDSE Core MAX** preset uses 624 of 680 bytes across P1–P4 for quadratic
-  analysis, AP/GP, coordinate geometry/circles, and all distinct trigonometric
-  solutions for 0° ≤ θ ≤ 360°. Each slot includes copyable source, exact prompt
-  and output maps, and interpreter-tested worked examples.
 - **Errors** — `Math`, `Syntax`, `Stack`, `Arg`, `Go`, `Nesting`, `Memory` and
   `Data Full`,
   and pressing `◄` or `►` on an error jumps the cursor to the character that
@@ -83,8 +82,7 @@ Then open `http://localhost:8000/`.
 
 ## Tests
 
-387 checks, including worked examples, operating limits, REPLAY/history navigation,
-the full HKDSE Core MAX branch matrix, Program Studio text/recovery, and exhaustive LCD menu-layout/glyph
+284 checks, including worked examples, operating limits, REPLAY/history navigation, Program Studio text/recovery, and exhaustive LCD menu-layout/glyph
 coverage derived from the user's guide, driven
 through the machine by key sequence rather than by calling the maths directly —
 so they exercise input, evaluation and formatting the way a person does.

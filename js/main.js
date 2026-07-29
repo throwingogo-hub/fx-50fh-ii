@@ -5,7 +5,7 @@
 import { KEYS, SHELL_W, SHELL_H, PC_KEYS } from './keymap.js';
 import { LCD, GLASS } from './lcd.js';
 import { Machine } from './machine.js';
-import { setupProgramStudio } from './studio.js?v=core-guide-20260729';
+import { setupProgramStudio } from './studio.js';
 
 const shell = document.getElementById('shell');
 const canvas = document.getElementById('lcd');

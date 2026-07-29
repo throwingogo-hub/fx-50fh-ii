@@ -93,10 +93,7 @@ export function parseProgramText(source, mode = 'COMP') {
   let i = 0;
 
   const push = (id) => {
-    const previousId = tokenIds[tokenIds.length - 1];
-    // The output command is already a statement separator on the calculator.
-    // A human-friendly newline after ◢ must not quietly consume another byte.
-    if (id === ':' && (previousId === ':' || TOK[previousId]?.c === 'output')) return;
+    if (id === ':' && tokenIds[tokenIds.length - 1] === ':') return;
     tokenIds.push(id);
   };
 

@@ -1,0 +1,306 @@
+# HKDSE Core programs for fx-50FH II
+
+These programs are optional. They are **not built into the web calculator** and
+will never replace your program slots automatically. Copy only the programs you
+want into [Program Studio](https://throwingogo-hub.github.io/fx-50fh-ii/).
+
+The complete P1–P4 pack uses **652 of 680 bytes** when pasted into Program
+Studio. It focuses on calculations from the HKDSE Mathematics Compulsory Part
+that are slow or error-prone to repeat by hand. The calculator already has
+direct `nPr`, `nCr`, SD/REG statistics and built-in formula functions, so this
+pack does not waste memory duplicating them.
+
+## Install a program
+
+1. Open **Program Studio** below the calculator.
+2. Select the destination slot: P1, P2, P3 or P4.
+3. Keep **Run mode** set to `COMP`.
+4. Copy the entire matching code block below and paste it into **source**.
+5. Wait for **Structure OK**. The slot is saved automatically on this device.
+6. Repeat only for the other programs you want.
+
+Installing a program manually replaces only the selected slot. Copy any
+important existing source somewhere safe first.
+
+## Run a program
+
+- In Program Studio, select its slot and press **Run on calculator**; or
+- On the calculator home screen, press **Prog**, then press `1`, `2`, `3` or `4`.
+
+When the display shows `A?`, `B?`, `M?` or another variable prompt, enter the
+requested value and press **EXE**. Each answer pauses on screen; press **EXE**
+again to reveal the next answer. The calculator returns home after the last one.
+
+For a negative input on the physical calculator, use the `(-)` key. In Program
+Studio source and the examples below, an ordinary minus sign is fine.
+
+## P1 — Quadratic X-Ray
+
+Use P1 for a quadratic equation
+
+```text
+ax² + bx + c = 0
+```
+
+### Inputs
+
+| Prompt | Enter |
+|---|---|
+| `A?` | coefficient `a` of `x²` |
+| `B?` | coefficient `b` of `x` |
+| `C?` | constant `c` |
+
+### Outputs
+
+The answers appear in this order:
+
+1. Discriminant `Δ = b² − 4ac`
+2. Vertex x-coordinate `h`
+3. Vertex y-coordinate `k`
+4. First real root
+5. Second real root
+
+If `Δ < 0`, P1 stops after the vertex because there are no real roots. If
+`Δ = 0`, the repeated root is shown once.
+
+### Example
+
+For `x² − 5x + 6 = 0`:
+
+```text
+TYPE  A=1, B=-5, C=6
+GET   Δ=1, h=2.5, k=-0.25, roots 3 and 2
+```
+
+### Copy into P1
+
+```text
+?→A
+?→B
+?→C
+B²-4×A×C→D
+D◢
+-B÷(2×A)◢
+C-B²÷(4×A)◢
+D<0⇒Goto 9
+(-B+√(D))÷(2×A)◢
+D=0⇒Goto 9
+(-B-√(D))÷(2×A)◢
+Lbl 9
+```
+
+## P2 — Sequence Engine
+
+P2 begins with `M?`. This selects the type of sequence.
+
+### Inputs and outputs
+
+| `M` | Calculation | Remaining inputs | Outputs |
+|---:|---|---|---|
+| `1` | Arithmetic progression | `A` first term, `B` common difference, `C=n` | `Tₙ`, then `Sₙ` |
+| `2` | Finite geometric progression | `A` first term, `B` common ratio, `C=n` | `Tₙ`, then `Sₙ` |
+| `3` | Infinite geometric progression | `A` first term, `B` common ratio | `S∞` |
+
+Use `M=3` only when `|B| < 1`.
+
+### Examples
+
+Arithmetic progression with `a=2`, `d=3`, `n=5`:
+
+```text
+TYPE  M=1, A=2, B=3, C=5
+GET   T₅=14, S₅=40
+```
+
+Finite geometric progression with `a=3`, `r=2`, `n=4`:
+
+```text
+TYPE  M=2, A=3, B=2, C=4
+GET   T₄=24, S₄=45
+```
+
+Infinite geometric progression with `a=6`, `r=0.5`:
+
+```text
+TYPE  M=3, A=6, B=0.5
+GET   S∞=12
+```
+
+### Copy into P2
+
+```text
+?→M
+M=1⇒Goto 1
+M=2⇒Goto 2
+M=3⇒Goto 3
+Goto 9
+Lbl 1
+?→A
+?→B
+?→C
+A+(C-1)×B◢
+C×(2×A+(C-1)×B)÷2◢
+Goto 9
+Lbl 2
+?→A
+?→B
+?→C
+A×B^(C-1)◢
+B=1⇒Goto 4
+A×(1-B^(C))÷(1-B)◢
+Goto 9
+Lbl 4
+A×C◢
+Goto 9
+Lbl 3
+?→A
+?→B
+A÷(1-B)◢
+Lbl 9
+```
+
+## P3 — Coordinate Lab
+
+P3 begins with `M?`. Choose two-point geometry or a circle equation.
+
+### Mode 1 — two points
+
+Enter:
+
+| Prompt | Enter |
+|---|---|
+| `M?` | `1` |
+| `A?`, `B?` | first point `(x₁,y₁)` |
+| `C?`, `D?` | second point `(x₂,y₂)` |
+
+Outputs: distance, midpoint x-coordinate, midpoint y-coordinate, then slope.
+A vertical line produces `Math ERROR` at the slope, after the first three useful
+answers have already appeared.
+
+Example for `(0,0)` and `(3,4)`:
+
+```text
+TYPE  M=1, A=0, B=0, C=3, D=4
+GET   distance 5, midpoint (1.5,2), slope 1.333333333
+```
+
+### Mode 2 — circle equation
+
+Write the equation as
+
+```text
+x² + y² + Dx + Ey + F = 0
+```
+
+Then enter `M=2`, coefficient `D` at `A?`, coefficient `E` at `B?`, and
+coefficient `F` at `C?`. The outputs are centre `h`, centre `k`, then radius `r`.
+
+Example for `x² + y² − 4x + 6y − 12 = 0`:
+
+```text
+TYPE  M=2, A=-4, B=6, C=-12
+GET   centre (2,-3), radius 5
+```
+
+### Copy into P3
+
+```text
+?→M
+M=1⇒Goto 1
+M=2⇒Goto 2
+Goto 9
+Lbl 1
+?→A
+?→B
+?→C
+?→D
+√((C-A)²+(D-B)²)◢
+(A+C)÷2◢
+(B+D)÷2◢
+(D-B)÷(C-A)◢
+Goto 9
+Lbl 2
+?→A
+?→B
+?→C
+-A÷2◢
+-B÷2◢
+√((A²+B²)÷4-C)◢
+Lbl 9
+```
+
+## P4 — Trig 360
+
+P4 finds every distinct solution for `0° ≤ θ ≤ 360°`. It switches the
+calculator to degrees automatically.
+
+### Inputs
+
+| Prompt | Enter |
+|---|---|
+| `M?` | `1` for sine, `2` for cosine, or `3` for tangent |
+| `D?` | the isolated trig value |
+
+Isolate the trig function first. For example, `2sin θ = 1` becomes
+`sin θ = 0.5`, so enter `D=0.5`. For sine and cosine, `D` must be between
+`-1` and `1`.
+
+### Examples
+
+```text
+2sin θ=1   → TYPE M=1, D=0.5  → GET 30°, 150°
+cos θ=1    → TYPE M=2, D=1    → GET 0°, 360°
+tan θ=-1   → TYPE M=3, D=-1   → GET 135°, 315°
+```
+
+### Copy into P4
+
+```text
+Deg
+?→M
+?→D
+M=1⇒Goto 1
+M=2⇒Goto 2
+M=3⇒Goto 3
+Goto 9
+Lbl 1
+sin^-1(D)→X
+X<0⇒Goto 4
+X◢
+X=90⇒Goto 9
+180-X→Y
+Y◢
+X≠0⇒Goto 9
+360◢
+Goto 9
+Lbl 4
+180-X→Y
+Y◢
+X=-90⇒Goto 9
+360+X→Y
+Y◢
+Goto 9
+Lbl 2
+cos^-1(D)→X
+X◢
+X=180⇒Goto 9
+360-X→Y
+Y◢
+Goto 9
+Lbl 3
+tan^-1(D)→X
+X<0⇒X+180→X
+X◢
+X+180→Y
+Y◢
+X≠0⇒Goto 9
+360◢
+Lbl 9
+```
+
+## Syllabus basis
+
+The program choices come from the Education Bureau's
+[Explanatory Notes to the Mathematics Curriculum — Compulsory Part](https://www.edb.gov.hk/attachment/en/curriculum-development/kla/ma/curr/EN_CP_e.pdf),
+especially quadratics, arithmetic and geometric sequences, coordinate geometry,
+circle equations and trigonometric equations.

@@ -11,7 +11,6 @@ import { StatStore } from '../js/stats.js';
 import { KEYS, SHELL_W, SHELL_H } from '../js/keymap.js';
 import { glyphLayers, hasGlyph, lcdTextCells } from '../js/font.js';
 import { formatProgramText, parseProgramText } from '../js/program-codec.js';
-import { HKDSE_CORE_MAX } from '../js/program-presets.js';
 
 // ---- key sequence DSL -------------------------------------------------------
 // digits and operators are literal; @ prefixes SHIFT, # prefixes ALPHA,
@@ -625,80 +624,6 @@ for (let i = 0; i < CONSTANTS.length; i++) {
   check('Program Studio preserves the guide example token sequence', parsed.tokenIds.join(','),
     'pIn,pAsg,varA,:,varA,mul,2,.,5,4,pOut');
   check('Program Studio text round-trips', formatProgramText(parsed.tokens), source);
-}
-{
-  const parsed = parseProgramText('A◢\nB◢', 'COMP');
-  check('a newline after output does not consume a redundant separator byte',
-    parsed.tokenIds.join(','), 'varA,pOut,varB,pOut');
-}
-{
-  const parsedSlots = HKDSE_CORE_MAX.slots.map((slot) => parseProgramText(slot.source, slot.mode));
-  const bytes = parsedSlots.reduce((sum, parsed) => sum + parsed.bytes, 0);
-  check('HKDSE Core MAX fills all four program areas', parsedSlots.length, 4);
-  check('HKDSE Core MAX source parses without errors', parsedSlots.every((parsed) => !parsed.errors.length), true);
-  check('HKDSE Core MAX fits shared calculator memory', bytes, 624);
-  check('every HKDSE Core MAX slot documents inputs, outputs and examples', HKDSE_CORE_MAX.slots.every((slot) =>
-    slot.guide?.inputs?.length && slot.guide?.outputs?.length && slot.examples?.length), true);
-  check('every HKDSE Core MAX slot has valid program structure', parsedSlots.every((parsed, index) => {
-    try { new Program(HKDSE_CORE_MAX.slots[index].mode, parsed.tokens).start(new Machine()); return true; }
-    catch { return false; }
-  }), true);
-}
-
-function runStudioSource(source, inputs) {
-  const parsed = parseProgramText(source, 'COMP');
-  const machine = new Machine();
-  const run = new Program('COMP', parsed.tokens).start(machine);
-  const queue = [...inputs];
-  const outputs = [];
-  let state = run.step();
-  let guard = 0;
-  while (!state.done && guard++ < 100) {
-    if (state.kind === 'input') {
-      run.provide(queue.shift());
-    } else if (state.kind === 'output') {
-      outputs.push(state.value.re);
-      run.resume();
-    }
-    state = run.step();
-  }
-  return outputs;
-}
-
-function nearList(name, got, want, eps = 1e-9) {
-  check(`${name} output count`, got.length, want.length);
-  want.forEach((value, index) => near(`${name} output ${index + 1}`, got[index], value, eps));
-}
-
-{
-  const [quadratic, sequence, coordinate, trig] = HKDSE_CORE_MAX.slots;
-  nearList('Core MAX quadratic real roots', runStudioSource(quadratic.source, [1, -5, 6]), [1, 2.5, -0.25, 3, 2]);
-  nearList('Core MAX quadratic negative discriminant', runStudioSource(quadratic.source, [1, 0, 1]), [-4, 0, 1]);
-  nearList('Core MAX quadratic repeated root', runStudioSource(quadratic.source, [1, -2, 1]), [0, 1, 0, 1]);
-  nearList('Core MAX arithmetic progression', runStudioSource(sequence.source, [1, 2, 3, 5]), [14, 40]);
-  nearList('Core MAX geometric progression', runStudioSource(sequence.source, [2, 3, 2, 4]), [24, 45]);
-  nearList('Core MAX geometric ratio one', runStudioSource(sequence.source, [2, 3, 1, 4]), [3, 12]);
-  nearList('Core MAX infinite geometric sum', runStudioSource(sequence.source, [3, 6, .5]), [12]);
-  nearList('Core MAX two-point geometry', runStudioSource(coordinate.source, [1, 0, 0, 3, 4]), [5, 1.5, 2, 4 / 3]);
-  nearList('Core MAX circle equation', runStudioSource(coordinate.source, [2, -4, 6, -12]), [2, -3, 5]);
-  nearList('Core MAX positive sine solutions', runStudioSource(trig.source, [1, .5]), [30, 150]);
-  nearList('Core MAX negative sine solutions', runStudioSource(trig.source, [1, -.5]), [210, 330]);
-  nearList('Core MAX inclusive sine endpoints', runStudioSource(trig.source, [1, 0]), [0, 180, 360]);
-  nearList('Core MAX duplicate-free sine endpoint', runStudioSource(trig.source, [1, 1]), [90]);
-  nearList('Core MAX duplicate-free negative sine endpoint', runStudioSource(trig.source, [1, -1]), [270]);
-  nearList('Core MAX cosine solutions', runStudioSource(trig.source, [2, .5]), [60, 300]);
-  nearList('Core MAX inclusive cosine endpoints', runStudioSource(trig.source, [2, 1]), [0, 360]);
-  nearList('Core MAX positive tangent solutions', runStudioSource(trig.source, [3, 1]), [45, 225]);
-  nearList('Core MAX negative tangent solutions', runStudioSource(trig.source, [3, -1]), [135, 315]);
-  nearList('Core MAX inclusive tangent endpoints', runStudioSource(trig.source, [3, 0]), [0, 180, 360]);
-
-  HKDSE_CORE_MAX.slots.forEach((slot, slotIndex) => {
-    slot.examples.forEach((example, exampleIndex) => nearList(
-      `Core MAX documented P${slotIndex + 1} example ${exampleIndex + 1}`,
-      runStudioSource(slot.source, example.inputs),
-      example.outputs
-    ));
-  });
 }
 {
   const parsed = parseProgramText('For 1->A To 5\nA M+\nNext', 'COMP');
