@@ -97,9 +97,10 @@ The calculator's behaviour was reconstructed from CASIO's published user's
 guide for this calculator family, and the key layout was measured from
 photographs of the unit.
 
-The active `assets/fx-50fh-ii-generated.png` shell is the AI-generated reconstruction
-at its original 881×1785 geometry. Only its flat magenta background was made
-transparent; every fully opaque subject pixel retains its original RGB values.
+The active `assets/fx-50fh-ii-generated.png` shell is the supplied AI-generated
+881×1785 PNG itself, stored byte-for-byte with no transparency conversion,
+recolouring, resampling, or edited key artwork. The LCD and invisible hit targets
+are the only browser-rendered layers placed over it.
 Its LCD and all 50 key targets are measured directly in that native coordinate
 space. `assets/fx-50fh-ii.png` is the source CASIO product
 photograph retained for calibration and identification. CASIO holds the source
