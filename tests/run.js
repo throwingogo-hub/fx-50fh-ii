@@ -9,6 +9,7 @@ import { tok } from '../js/tokens.js';
 import { CONSTANTS } from '../js/consts.js';
 import { StatStore } from '../js/stats.js';
 import { KEYS, SHELL_W, SHELL_H } from '../js/keymap.js';
+import { hasGlyph } from '../js/font.js';
 
 // ---- key sequence DSL -------------------------------------------------------
 // digits and operators are literal; @ prefixes SHIFT, # prefixes ALPHA,
@@ -91,6 +92,68 @@ check('every key has a spoken base label', KEYS.every((key) => typeof key.base =
 check('every hotspot stays inside the fitted shell', KEYS.every((key) =>
   key.x >= 0 && key.y >= 0 && key.w > 0 && key.h > 0 &&
   key.x + key.w <= SHELL_W && key.y + key.h <= SHELL_H), true);
+
+// ---- shared LCD menu layout ------------------------------------------------
+{
+  const m = new Machine();
+  m.openModeMenu();
+  let v = m.view();
+  check('MODE page 1 keeps numbers in their physical LCD cells', v.line2Cells.join(''), ' 1   2  3 ');
+  check('MODE menu shows both paging arrows', v.scrollLeft && v.scrollRight, true);
+  m.press('RIGHT');
+  v = m.view();
+  check('MODE page 2 keeps numbers in their physical LCD cells', v.line2Cells.join(''), '4   5   6 ');
+
+  m.openConstMenu(0);
+  v = m.view();
+  check('four-choice menus keep 1–4 under their labels', v.line2Cells.join(''), '1  2  3 4 ');
+
+  m.openDrgMenu();
+  v = m.view();
+  check('DRG renders three choices rather than a title-only screen',
+    v.line1 === 'D    R     G    ' && v.line2Cells.join('') === '1  2   3  ', true);
+}
+{
+  const m = new Machine();
+  const specs = [];
+  const collect = (open) => { open(); specs.push(m.menu); };
+  collect(() => m.openModeMenu());
+  for (let page = 0; page < 6; page++) collect(() => m.openSetup(page));
+  collect(() => m.openClrMenu());
+  collect(() => m.openDrgMenu());
+  collect(() => m.openConstMenu(0));
+  collect(() => m.openLogicMenu(0));
+  m.mode = 'SD';
+  collect(() => m.openSSum(0));
+  collect(() => m.openSVar());
+  m.mode = 'REG';
+  collect(() => m.openSSum(0));
+  collect(() => m.openSVar());
+  collect(() => m.openRegVar(0));
+  collect(() => m.openRegMinMax(0));
+  collect(() => m.openRegTypeMenu());
+  collect(() => m.openPCmd(0));
+
+  let layoutsValid = true;
+  let pagedArrowsValid = true;
+  let glyphsValid = true;
+  for (const spec of specs) {
+    m.menu = spec;
+    for (let page = 0; page < spec.pages.length; page++) {
+      spec.page = page;
+      const view = m.menuView();
+      const source = spec.pages[page];
+      layoutsValid &&= source.title ? view.line2Cells === null : view.line2Cells.length === 10;
+      pagedArrowsValid &&= spec.pages.length === 1 || (view.scrollLeft && view.scrollRight);
+      for (const text of [source.title || '', ...source.items.map((item) => item.label)]) {
+        for (const ch of text) glyphsValid &&= hasGlyph(ch);
+      }
+    }
+  }
+  check('every menu page preserves all ten lower LCD cells', layoutsValid, true);
+  check('every multi-page menu exposes both paging arrows', pagedArrowsValid, true);
+  check('every menu symbol has a real LCD glyph instead of fallback square', glyphsValid, true);
+}
 
 // ---- ON / power reset ------------------------------------------------------
 {

@@ -751,7 +751,6 @@ export class Machine {
     this.openMenu({
       page: 0,
       pages: [{
-        title: 'DRG',
         items: [
           { label: 'D', run: push('degU') },
           { label: 'R', run: push('radU') },
@@ -1397,7 +1396,7 @@ export class Machine {
     const m = this.menu;
     const page = m.pages[m.page];
     if (page.title) {
-      return { line1: page.title.slice(0, 16), line2: '' };
+      return { line1: page.title.slice(0, 16), line2: '', line2Cells: null };
     }
 
     const items = page.items;
@@ -1420,7 +1419,14 @@ export class Machine {
       row2[Math.max(0, Math.min(9, cell))] = digit;
     });
 
-    return { line1: row1.join(''), line2: row2.join('').replace(/\s+$/, '') };
+    const paged = m.pages.length > 1;
+    return {
+      line1: row1.join(''),
+      line2: row2.join('').replace(/\s+$/, ''),
+      line2Cells: row2,
+      scrollLeft: paged,
+      scrollRight: paged
+    };
   }
 
   statView() {

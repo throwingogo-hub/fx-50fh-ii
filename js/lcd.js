@@ -11,8 +11,9 @@ const M = {
   // indicator strip
   indY: 309.65, indDot: 2.77, indH: 20.66,
   // upper dot-matrix line
-  // measured off the photograph: cells on a 33.7 px pitch, dots on a 6.05 x 8.9
-  // grid, so the dots are noticeably taller than they are wide
+  // measured off the photograph: cells on a 33.7 px pitch, elements on a
+  // 6.05 x 8.9 grid. Adjacent lit elements touch to form the continuous,
+  // squared-off strokes visible on the real LCD.
   l1X: 191.15, l1Y: 340.64, l1Cell: 31.11, l1DotW: 5.59, l1DotH: 8.76, l1Cols: 16,
   // lower segment line: 37 x 91 digits on a 48.3 px pitch, as measured
   signX: 163.46,
@@ -97,7 +98,7 @@ export class LCD {
       for (let i = 0; i < 5; i++) {
         for (let r = 0; r < 7; r++) {
           if (cols[i] & (1 << r)) {
-            c.fillRect(cx + i * dot, y + r * dot, dot * 0.92, dot * 0.92);
+            c.fillRect(cx + i * dot, y + r * dot, dot, dot);
           }
         }
       }
@@ -133,7 +134,7 @@ export class LCD {
         for (let r = 0; r < 7; r++) {
           if (cols[i] & (1 << r)) {
             c.fillRect(cx + i * M.l1DotW, y0 + r * M.l1DotH,
-              M.l1DotW * 0.92, M.l1DotH * 0.9);
+              M.l1DotW, M.l1DotH);
           }
         }
       }
@@ -158,16 +159,22 @@ export class LCD {
     const c = this.ctx;
     if (v.left) this.#smallText(M.labX - GLASS.x, M.l2Y - GLASS.y + 12, v.left, true, 4.4);
 
-    // Split the payload into cells; '.' rides along with the cell before it.
+    // Menus provide ten fixed physical cells. Calculation results instead use
+    // the normal right-aligned payload where '.' rides with the preceding cell.
+    const fixed = Array.isArray(v.line2Cells);
     const raw = v.line2 || '';
-    const negative = raw.startsWith('-');
+    const negative = !fixed && raw.startsWith('-');
     const payload = negative ? raw.slice(1) : raw;
-    const cells = [];
-    for (const ch of payload) {
-      if ((ch === '.' || ch === ',') && cells.length) cells[cells.length - 1].dp = true;
-      else cells.push({ ch, dp: false });
+    const cells = fixed
+      ? v.line2Cells.slice(0, M.l2Cells).map((ch) => ({ ch, dp: false }))
+      : [];
+    if (!fixed) {
+      for (const ch of payload) {
+        if ((ch === '.' || ch === ',') && cells.length) cells[cells.length - 1].dp = true;
+        else cells.push({ ch, dp: false });
+      }
     }
-    const start = Math.max(0, M.l2Cells - cells.length);
+    const start = fixed ? 0 : Math.max(0, M.l2Cells - cells.length);
     const y = M.l2Y - GLASS.y;
 
     // The minus sign has its own annunciator cell and does not consume one of
