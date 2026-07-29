@@ -51,9 +51,9 @@ Everything the keyboard is printed with is implemented:
   `Dec`/`Hex`/`Bin`/`Oct` and `DT`. Program Studio adds normal copy/paste text,
   command insertion, byte and structure checks, direct run/edit controls, and
   automatic on-device recovery for all four slots—including active key-editor drafts.
-  Its **HKDSE Core MAX** preset uses 676 of 680 bytes across P1–P4 for quadratic
+  Its **HKDSE Core MAX** preset uses 624 of 680 bytes across P1–P4 for quadratic
   analysis, AP/GP, coordinate geometry/circles, and all distinct trigonometric
-  solutions in 0°–360°. Each slot includes a copyable source and input/output map.
+  solutions for 0° ≤ θ ≤ 360°. Each slot includes a copyable source and input/output map.
 - **Errors** — `Math`, `Syntax`, `Stack`, `Arg`, `Go`, `Nesting`, `Memory` and
   `Data Full`,
   and pressing `◄` or `►` on an error jumps the cursor to the character that

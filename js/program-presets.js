@@ -20,16 +20,12 @@ export const HKDSE_CORE_MAX = {
 ?→C
 B²-4×A×C→D
 D◢
--B÷(2×A)→X
-X◢
-C-B²÷(4×A)→Y
-Y◢
+-B÷(2×A)◢
+C-B²÷(4×A)◢
 D<0⇒Goto 9
-(-B+√(D))÷(2×A)→X
-X◢
+(-B+√(D))÷(2×A)◢
 D=0⇒Goto 9
-(-B-√(D))÷(2×A)→Y
-Y◢
+(-B-√(D))÷(2×A)◢
 Lbl 9`
     },
     {
@@ -49,30 +45,24 @@ Lbl 1
 ?→A
 ?→B
 ?→C
-A+(C-1)×B→X
-X◢
-C×(2×A+(C-1)×B)÷2→Y
-Y◢
+A+(C-1)×B◢
+C×(2×A+(C-1)×B)÷2◢
 Goto 9
 Lbl 2
 ?→A
 ?→B
 ?→C
-A×B^(C-1)→X
-X◢
+A×B^(C-1)◢
 B=1⇒Goto 4
-A×(1-B^(C))÷(1-B)→Y
-Y◢
+A×(1-B^(C))÷(1-B)◢
 Goto 9
 Lbl 4
-A×C→Y
-Y◢
+A×C◢
 Goto 9
 Lbl 3
 ?→A
 ?→B
-A÷(1-B)→X
-X◢
+A÷(1-B)◢
 Lbl 9`
     },
     {
@@ -92,32 +82,25 @@ Lbl 1
 ?→B
 ?→C
 ?→D
-√((C-A)²+(D-B)²)→X
-X◢
-(A+C)÷2→X
-X◢
-(B+D)÷2→Y
-Y◢
-(D-B)÷(C-A)→M
-M◢
+√((C-A)²+(D-B)²)◢
+(A+C)÷2◢
+(B+D)÷2◢
+(D-B)÷(C-A)◢
 Goto 9
 Lbl 2
 ?→A
 ?→B
 ?→C
--A÷2→X
-X◢
--B÷2→Y
-Y◢
-√((A²+B²)÷4-C)→M
-M◢
+-A÷2◢
+-B÷2◢
+√((A²+B²)÷4-C)◢
 Lbl 9`
     },
     {
       name: 'Trig 360',
       code: 'ALL SOLUTIONS',
       mode: 'COMP',
-      purpose: 'All distinct solutions from 0° up to, but not including, 360°.',
+      purpose: 'All distinct solutions for 0° ≤ θ ≤ 360°.',
       inputs: 'M=1 sin · M=2 cos · M=3 tan · then D after isolating the trig ratio',
       outputs: 'Angles in ascending order',
       note: 'For sin/cos, D must be from −1 to 1. The program switches the calculator to degrees.',
@@ -135,6 +118,8 @@ X◢
 X=90⇒Goto 9
 180-X→Y
 Y◢
+X≠0⇒Goto 9
+360◢
 Goto 9
 Lbl 4
 180-X→Y
@@ -146,7 +131,6 @@ Goto 9
 Lbl 2
 cos^-1(D)→X
 X◢
-X=0⇒Goto 9
 X=180⇒Goto 9
 360-X→Y
 Y◢
@@ -157,6 +141,8 @@ X<0⇒X+180→X
 X◢
 X+180→Y
 Y◢
+X≠0⇒Goto 9
+360◢
 Lbl 9`
     }
   ]
