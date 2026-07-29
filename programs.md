@@ -317,6 +317,10 @@ None duplicates an existing program or a one-button calculator feature:
 | F | first sequence sum reaching a target | P2 requires `n` to be known already |
 | G | bearings and 3D displacement | handles quadrant corrections and spatial components |
 | H | cubic synthetic division | reduces a cubic from one known root and finds the others |
+| I | hypergeometric probability ranges | evaluates exact, at-least and at-most cases in one run |
+| J | transformed quadratic roots | forms new equations without first finding the original roots |
+| K | tangents from a point to a circle | returns both points of contact and the tangent length |
+| L | annuities and reducing-balance loans | handles regular payments, not just one-off compound growth |
 
 ### Suggested four-slot combinations
 
@@ -327,6 +331,7 @@ None duplicates an existing program or a one-button calculator feature:
 | Coordinate geometry | Coordinate | Extra B | Extra A | Trig | 647B |
 | Statistics and algebra | Sequences | Extra D | Extra A | Trig | 560B |
 | Advanced Section B / MCQ | Extra E | Extra F | Extra G | Extra H | 680B |
+| Paper 1 Section B power pack | Extra I | Extra J | Extra K | Extra L | 668B |
 
 ## Extra A — Simultaneous 2×2 Solver (74B)
 
@@ -815,6 +820,284 @@ M=0⇒Goto 9
 Lbl 9
 ```
 
+## Paper 1 Section B power pack
+
+The next four programs are designed as one **668B alternative pack** for the
+longer structured questions in Paper 1 Section B. They cover probability,
+algebra, coordinate geometry and financial modelling while leaving `12B` free.
+
+The programs supply numerical results and checks. In Paper 1, still write the
+formula, substitution and reasoning required by the question; a calculator
+answer by itself does not earn the method marks.
+
+## Extra I — Without-Replacement Probability (208B)
+
+Uses the hypergeometric model for a population containing two types of item.
+It finds the probability of drawing exactly, at least or at most a specified
+number of type-A items when all items are drawn together **without replacement**.
+
+### Inputs
+
+| Prompt | Enter |
+|---|---|
+| `M?` | `1` for exactly, `2` for at least, or `3` for at most |
+| `A?` | number of type-A items in the population |
+| `B?` | number of other items in the population |
+| `C?` | total number of items drawn |
+| `D?` | required number of type-A items |
+
+### Output
+
+The single output is the required probability. For `M=1`, enter a feasible
+value of `D`: `max(0,C-B) ≤ D ≤ min(A,C)`. Counts must be non-negative integers,
+and this compact program is intended for the small populations used in DSE
+questions; factorials above `69!` exceed the calculator's numerical range.
+
+### Examples
+
+A box contains 5 red and 4 black balls, and 2 balls are drawn together:
+
+```text
+TYPE  M=1, A=5, B=4, C=2, D=2  → GET P(exactly 2 red)=0.2777777778 = 5/18
+TYPE  M=2, A=5, B=4, C=2, D=1  → GET P(at least 1 red)=0.8333333333 = 5/6
+TYPE  M=3, A=5, B=4, C=2, D=1  → GET P(at most 1 red)=0.7222222222 = 13/18
+```
+
+For written working, show the combination expression. For example, the first
+answer is `5C2 / 9C2`; Extra I is the fast arithmetic check and range-summer.
+
+### Copy this program
+
+```text
+?→M
+?→A
+?→B
+?→C
+?→D
+0→X
+C-B>0⇒C-B→X
+C→Y
+A<C⇒A→Y
+M=1⇒Goto 1
+M=2⇒Goto 2
+M=3⇒Goto 3
+Goto 9
+Lbl 1
+D→X
+D→Y
+Goto 4
+Lbl 2
+D>X⇒D→X
+Goto 4
+Lbl 3
+D<Y⇒D→Y
+Lbl 4
+0→M
+While X≤Y
+(M)+A!×B!×C!×(A+B-C)!÷(X!×(A-X)!×(C-X)!×(B-C+X)!×(A+B)!)→M
+X+1→X
+WhileEnd
+M◢
+Lbl 9
+```
+
+## Extra J — Transformed-Roots Builder (111B)
+
+Start with a quadratic
+
+```text
+Ax² + Bx + C = 0
+```
+
+whose roots are `α` and `β`. Extra J forms a new **monic** quadratic without
+calculating `α` and `β` separately. This avoids rounding errors and is useful
+when a Section B question asks for an equation with related roots.
+
+### Mode 1 — roots `Xα+Y` and `Xβ+Y`
+
+Enter `M=1`, followed by the original coefficients `A`, `B`, `C`, then the
+multiplier `X` and shift `Y`.
+
+Outputs the coefficients `P`, then `Q`, of
+
+```text
+z² + Pz + Q = 0
+```
+
+Example: `x²-5x+6=0` has roots `α,β`. Form the equation whose roots are
+`2α+1, 2β+1`:
+
+```text
+TYPE  M=1, A=1, B=-5, C=6, X=2, Y=1
+GET   P=-12, Q=35
+WRITE z²-12z+35=0
+```
+
+### Mode 2 — roots `α²` and `β²`
+
+Enter `M=2` and the original coefficients `A`, `B`, `C`. The outputs are again
+`P`, then `Q`, in `z²+Pz+Q=0`.
+
+```text
+TYPE  M=2, A=1, B=-5, C=6
+GET   P=-13, Q=36
+WRITE z²-13z+36=0
+```
+
+### Copy this program
+
+```text
+?→M
+?→A
+?→B
+?→C
+M=1⇒Goto 1
+M=2⇒Goto 2
+Goto 9
+Lbl 1
+?→X
+?→Y
+X×B÷A-2×Y◢
+X²×C÷A-X×Y×B÷A+Y²◢
+Goto 9
+Lbl 2
+2×C÷A-(B÷A)²◢
+(C÷A)²◢
+Lbl 9
+```
+
+## Extra K — Tangents from a Point to a Circle (176B)
+
+For a circle with centre `(h,k)`, radius `r`, and a supplied point `(p,q)`,
+Extra K finds the tangent length and both points of contact. The supplied point
+may be outside or on the circle.
+
+### Inputs
+
+| Prompt | Enter |
+|---|---|
+| `A?` | centre x-coordinate `h` |
+| `B?` | centre y-coordinate `k` |
+| `C?` | radius `r` |
+| `D?` | external point x-coordinate `p` |
+| `X?` | external point y-coordinate `q` |
+
+### Outputs
+
+1. Tangent length
+2. First contact point `x₁`, then `y₁`
+3. Second contact point `x₂`, then `y₂`
+
+If the supplied point lies on the circle, the tangent length is `0` and that
+point is shown once. If it lies inside the circle, the program ends without an
+output because no real tangent exists.
+
+### Example
+
+For the circle `x²+y²=25` and the point `(13,0)`:
+
+```text
+TYPE  A=0, B=0, C=5, D=13, X=0
+GET   tangent length 12
+      contact points (1.923076923,4.615384615)
+                     (1.923076923,-4.615384615)
+```
+
+Use each contact point with the supplied point to form the two tangent-line
+equations. Keep extra calculator digits until the final answer.
+
+### Copy this program
+
+```text
+?→A
+?→B
+?→C
+?→D
+?→X
+D-A→D
+X-B→X
+D²+X²→M
+(M)-C²→Y
+Y<0⇒Goto 9
+√(Y)◢
+Y=0⇒Goto 8
+A+(C²×D-C×X×√(Y))÷M◢
+B+(C²×X+C×D×√(Y))÷M◢
+A+(C²×D+C×X×√(Y))÷M◢
+B+(C²×X-C×D×√(Y))÷M◢
+Goto 9
+Lbl 8
+A+D◢
+B+X◢
+Lbl 9
+```
+
+## Extra L — Annuity and Loan Engine (173B)
+
+Uses a constant percentage interest rate per payment period and payments made
+at the **end** of each period. Enter the rate per period, not automatically the
+annual rate: for a nominal annual rate of 6% compounded monthly, enter `B=0.5`.
+The interest rate must be non-zero.
+
+### Inputs and outputs
+
+| `M` | Find | `A?` | `B?` | `C?` | `D?` | Output |
+|---:|---|---|---|---|---|---|
+| `1` | future savings value | starting balance | rate % per period | number of periods | regular deposit | future value |
+| `2` | regular loan payment | original loan | rate % per period | total payments | — | payment |
+| `3` | outstanding loan | original loan | rate % per period | payments already made | regular payment | balance |
+
+### Examples
+
+Start with `$1000`, then deposit `$100` at the end of each month for 12 months
+at 1% per month:
+
+```text
+TYPE  M=1, A=1000, B=1, C=12, D=100
+GET   future value 2395.075331
+```
+
+Repay a `$100000` loan over 240 monthly payments at 0.5% per month:
+
+```text
+TYPE  M=2, A=100000, B=0.5, C=240
+GET   monthly payment 716.4310585
+```
+
+After 12 payments of that amount:
+
+```text
+TYPE  M=3, A=100000, B=0.5, C=12, D=716.4310585
+GET   outstanding balance 97330.20118
+```
+
+### Copy this program
+
+```text
+?→M
+?→A
+?→B
+B÷100→B
+M=1⇒Goto 1
+M=2⇒Goto 2
+M=3⇒Goto 3
+Goto 9
+Lbl 1
+?→C
+?→D
+A×(1+B)^(C)+D×((1+B)^(C)-1)÷B◢
+Goto 9
+Lbl 2
+?→C
+A×B÷(1-(1+B)^(-C))◢
+Goto 9
+Lbl 3
+?→C
+?→D
+A×(1+B)^(C)-D×((1+B)^(C)-1)÷B◢
+Lbl 9
+```
+
 ## Syllabus basis
 
 The program choices come from the Education Bureau's
@@ -826,3 +1109,7 @@ equations and measures of dispersion.
 The [HKEAA Mathematics assessment framework](https://www.hkeaa.edu.hk/DocLibrary/HKDSE/Subject_Information/math/2026hkdse-e-math.pdf)
 explains the examination structure and the broader Compulsory Part coverage in
 the later sections of the papers.
+
+The probability, roots-of-equations and circle work in this pack was also
+checked against the structure of the official
+[2023 Paper 1 Level 5 exemplars](https://www.hkeaa.edu.hk/DocLibrary/HKDSE/Subject_Information/math/2023-Sample-MATH-CP-Level5-E-4792.pdf).
