@@ -637,6 +637,8 @@ for (let i = 0; i < CONSTANTS.length; i++) {
   check('HKDSE Core MAX fills all four program areas', parsedSlots.length, 4);
   check('HKDSE Core MAX source parses without errors', parsedSlots.every((parsed) => !parsed.errors.length), true);
   check('HKDSE Core MAX fits shared calculator memory', bytes, 624);
+  check('every HKDSE Core MAX slot documents inputs, outputs and examples', HKDSE_CORE_MAX.slots.every((slot) =>
+    slot.guide?.inputs?.length && slot.guide?.outputs?.length && slot.examples?.length), true);
   check('every HKDSE Core MAX slot has valid program structure', parsedSlots.every((parsed, index) => {
     try { new Program(HKDSE_CORE_MAX.slots[index].mode, parsed.tokens).start(new Machine()); return true; }
     catch { return false; }
@@ -689,6 +691,14 @@ function nearList(name, got, want, eps = 1e-9) {
   nearList('Core MAX positive tangent solutions', runStudioSource(trig.source, [3, 1]), [45, 225]);
   nearList('Core MAX negative tangent solutions', runStudioSource(trig.source, [3, -1]), [135, 315]);
   nearList('Core MAX inclusive tangent endpoints', runStudioSource(trig.source, [3, 0]), [0, 180, 360]);
+
+  HKDSE_CORE_MAX.slots.forEach((slot, slotIndex) => {
+    slot.examples.forEach((example, exampleIndex) => nearList(
+      `Core MAX documented P${slotIndex + 1} example ${exampleIndex + 1}`,
+      runStudioSource(slot.source, example.inputs),
+      example.outputs
+    ));
+  });
 }
 {
   const parsed = parseProgramText('For 1->A To 5\nA M+\nNext', 'COMP');

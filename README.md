@@ -53,7 +53,8 @@ Everything the keyboard is printed with is implemented:
   automatic on-device recovery for all four slots—including active key-editor drafts.
   Its **HKDSE Core MAX** preset uses 624 of 680 bytes across P1–P4 for quadratic
   analysis, AP/GP, coordinate geometry/circles, and all distinct trigonometric
-  solutions for 0° ≤ θ ≤ 360°. Each slot includes a copyable source and input/output map.
+  solutions for 0° ≤ θ ≤ 360°. Each slot includes copyable source, exact prompt
+  and output maps, and interpreter-tested worked examples.
 - **Errors** — `Math`, `Syntax`, `Stack`, `Arg`, `Go`, `Nesting`, `Memory` and
   `Data Full`,
   and pressing `◄` or `►` on an error jumps the cursor to the character that
@@ -82,7 +83,7 @@ Then open `http://localhost:8000/`.
 
 ## Tests
 
-345 checks, including worked examples, operating limits, REPLAY/history navigation,
+387 checks, including worked examples, operating limits, REPLAY/history navigation,
 the full HKDSE Core MAX branch matrix, Program Studio text/recovery, and exhaustive LCD menu-layout/glyph
 coverage derived from the user's guide, driven
 through the machine by key sequence rather than by calling the maths directly —

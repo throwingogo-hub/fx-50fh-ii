@@ -4,7 +4,7 @@
 import { Program, PROGRAM_MEMORY } from './program.js';
 import { bytesOf } from './tokens.js';
 import { formatProgramText, parseProgramText } from './program-codec.js';
-import { HKDSE_CORE_MAX } from './program-presets.js';
+import { HKDSE_CORE_MAX } from './program-presets.js?v=core-guide-20260729';
 
 const STORAGE_KEY = 'fx50fhii.program-studio.v2';
 const MODES = new Set(['COMP', 'CMPLX', 'BASE', 'SD', 'REG']);
@@ -232,9 +232,43 @@ export function setupProgramStudio(machine, onMachineChange) {
       const outputs = document.createElement('p');
       outputs.innerHTML = '<b>OUT</b> ';
       outputs.append(slot.outputs);
+      const manual = document.createElement('div');
+      manual.className = 'slot-manual';
+      const maps = document.createElement('div');
+      maps.className = 'slot-io-map';
+      for (const [heading, lines] of [['Input prompts', slot.guide.inputs], ['Output order', slot.guide.outputs]]) {
+        const section = document.createElement('section');
+        const label = document.createElement('h3');
+        label.textContent = heading;
+        const list = document.createElement('ol');
+        for (const line of lines) {
+          const item = document.createElement('li');
+          item.textContent = line;
+          list.appendChild(item);
+        }
+        section.append(label, list);
+        maps.appendChild(section);
+      }
+      const examples = document.createElement('div');
+      examples.className = 'slot-examples';
+      const examplesTitle = document.createElement('h3');
+      examplesTitle.textContent = slot.examples.length === 1 ? 'Worked example' : 'Worked examples';
+      examples.appendChild(examplesTitle);
+      for (const example of slot.examples) {
+        const exampleEl = document.createElement('article');
+        const exampleTitle = document.createElement('b');
+        exampleTitle.textContent = `${example.title} · ${example.question}`;
+        const exampleInput = document.createElement('p');
+        exampleInput.append('TYPE  ', example.inputText);
+        const exampleOutput = document.createElement('p');
+        exampleOutput.append('GET   ', example.outputText);
+        exampleEl.append(exampleTitle, exampleInput, exampleOutput);
+        examples.appendChild(exampleEl);
+      }
+      manual.append(maps, examples);
       const note = document.createElement('small');
       note.textContent = slot.note;
-      card.append(summary, purpose, inputs, outputs, note);
+      card.append(summary, purpose, inputs, outputs, manual, note);
       packSlots.appendChild(card);
     });
   }

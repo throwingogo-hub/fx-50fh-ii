@@ -218,6 +218,7 @@ main {
 #load-exam-pack:hover { transform: translateY(-1px); background: #255b4d; }
 .exam-pack-slots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-top: 12px; }
 .exam-pack-slot { min-width: 0; border: 1px solid rgba(71,86,76,.28); border-radius: 4px; background: rgba(255,255,255,.48); }
+.exam-pack-slot[open] { grid-column: 1 / -1; border-color: rgba(46,95,82,.55); background: rgba(255,255,255,.7); }
 .exam-pack-slot summary { display: flex; gap: 8px; align-items: center; padding: 8px; cursor: pointer; list-style: none; }
 .exam-pack-slot summary::-webkit-details-marker { display: none; }
 .exam-pack-slot summary::after { content: "+"; margin-left: auto; color: #517064; font: 700 13px ui-monospace, monospace; }
@@ -230,6 +231,19 @@ main {
 .exam-pack-slot > p, .exam-pack-slot > small { display: block; margin: 0 8px 7px; color: #4e5b54; font-size: 9px; line-height: 1.4; }
 .exam-pack-slot > p b { color: #985035; font: 800 8px ui-monospace, monospace; }
 .exam-pack-slot > small { padding-top: 6px; border-top: 1px dashed rgba(71,86,76,.25); color: #74786f; }
+.slot-manual { margin: 8px; padding-top: 8px; border-top: 1px solid rgba(71,86,76,.22); }
+.slot-io-map { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.slot-manual h3 { margin: 0 0 5px; color: #385c50; font: 800 8px/1.2 ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; }
+.slot-manual ol { margin: 0; padding-left: 20px; color: #414a45; font-size: 9px; line-height: 1.45; }
+.slot-manual li + li { margin-top: 3px; }
+.slot-examples { margin-top: 10px; }
+.slot-examples article { padding: 7px 8px; border-left: 3px solid var(--orange); background: rgba(233,228,211,.62); }
+.slot-examples article + article { margin-top: 5px; }
+.slot-examples article > b { display: block; color: #343b37; font-size: 9px; }
+.slot-examples article p { margin: 3px 0 0; color: #5e625c; font: 8px/1.4 ui-monospace, monospace; }
+.slot-examples article p:last-child { color: #245e4f; font-weight: 800; }
+.exam-pack-howto { margin: 10px 0 0; padding: 8px 9px; border: 1px dashed rgba(46,95,82,.38); background: rgba(255,255,255,.36); color: #4b5751; font-size: 9px; line-height: 1.45; }
+.exam-pack-howto > b:first-child { margin-right: 5px; color: var(--orange); font: 900 8px ui-monospace, monospace; letter-spacing: .08em; }
 .exam-pack-status { margin: 9px 0 3px; color: #40594f; font: 700 9px/1.35 ui-monospace, monospace; }
 .syllabus-link { color: #756d5d; font-size: 9px; text-underline-offset: 2px; }
 
@@ -379,6 +393,7 @@ main {
   .exam-pack-head { display: block; }
   #load-exam-pack { margin-top: 10px; }
   .exam-pack-slots { grid-template-columns: 1fr; }
+  .slot-io-map { grid-template-columns: 1fr; gap: 10px; }
   .command-group { grid-template-columns: 1fr; gap: 4px; }
   .command-group > span { padding-top: 0; }
 }
