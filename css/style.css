@@ -39,7 +39,7 @@ main {
   position: relative;
   width: 100%;
   aspect-ratio: 881 / 1785;
-  background: url('../assets/fx-50fh-ii-generated.png?v=3b60f316') center / 100% 100% no-repeat;
+  background: url('../assets/fx-50fh-ii-generated-transparent.png?v=9206630d') center / 100% 100% no-repeat;
   filter: drop-shadow(0 18px 30px rgba(0, 0, 0, .28));
   touch-action: manipulation;
   user-select: none;
