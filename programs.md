@@ -298,9 +298,237 @@ X≠0⇒Goto 9
 Lbl 9
 ```
 
+## Extra swap-in library
+
+The calculator has only four physical program slots. The programs below are
+**alternatives**, not another pack to install together with P1–P4. Copy an extra
+program into whichever slot you choose when a topic is useful, then restore the
+old source from this file later.
+
+None duplicates an existing program or a one-button calculator feature:
+
+| Extra | Adds | Why it is different |
+|---|---|---|
+| A | simultaneous 2×2 equations | the fx-50FH II has no equation-solver mode |
+| B | circle through three points | P3 starts from a completed general equation |
+| C | growth and decay unknowns | solves for final value, time, rate or starting value |
+| D | combined population statistics | combines summary data without the original observations |
+
+### Suggested four-slot combinations
+
+| Focus | P1 | P2 | P3 | P4 | Total |
+|---|---|---|---|---|---:|
+| Original Core pack | Quadratic | Sequences | Coordinate | Trig | 652B |
+| Algebra and growth | Quadratic | Extra A | Sequences | Extra C | 509B |
+| Coordinate geometry | Coordinate | Extra B | Extra A | Trig | 647B |
+| Statistics and algebra | Sequences | Extra D | Extra A | Trig | 560B |
+
+## Extra A — Simultaneous 2×2 Solver (74B)
+
+Solves two linear equations written as
+
+```text
+Ax + By = C
+Dx + Xy = Y
+```
+
+The letters `X` and `Y` on the second equation are calculator memory names;
+they mean the coefficient of `y` and the right-hand side respectively.
+
+### Inputs
+
+| Prompt | Enter |
+|---|---|
+| `A?`, `B?`, `C?` | the three values in the first equation |
+| `D?`, `X?`, `Y?` | the three values in the second equation |
+
+### Outputs
+
+1. Determinant
+2. Solution `x`
+3. Solution `y`
+
+If the determinant is `0`, there is no unique solution and the program stops
+after displaying `0`.
+
+### Example
+
+For `2x+y=7` and `x−y=2`:
+
+```text
+TYPE  A=2, B=1, C=7, D=1, X=-1, Y=2
+GET   determinant -3, x=3, y=1
+```
+
+### Copy this program
+
+```text
+?→A
+?→B
+?→C
+?→D
+?→X
+?→Y
+A×X-B×D→M
+M◢
+M=0⇒Goto 9
+(C×X-B×Y)÷M◢
+(A×Y-C×D)÷M◢
+Lbl 9
+```
+
+## Extra B — Circle Through Three Points (199B)
+
+Finds the centre and radius of the unique circle through three supplied points.
+Unlike P3 mode 2, you do not need to derive the general circle equation first.
+
+### Inputs
+
+| Prompt | Enter |
+|---|---|
+| `A?`, `B?` | first point `(x₁,y₁)` |
+| `C?`, `D?` | second point `(x₂,y₂)` |
+| `X?`, `Y?` | third point `(x₃,y₃)` |
+
+### Outputs
+
+1. Centre x-coordinate `h`
+2. Centre y-coordinate `k`
+3. Radius `r`
+
+Three collinear points do not define a circle and produce `Math ERROR`.
+
+### Example
+
+For the points `(0,0)`, `(4,0)` and `(0,6)`:
+
+```text
+TYPE  A=0, B=0, C=4, D=0, X=0, Y=6
+GET   centre (2,3), radius 3.605551275
+```
+
+### Copy this program
+
+```text
+?→A
+?→B
+?→C
+?→D
+?→X
+?→Y
+((A²+B²)×(D-Y)+(C²+D²)×(Y-B)+(X²+Y²)×(B-D))÷(2×(A×(D-Y)+C×(Y-B)+X×(B-D)))→M
+M◢
+((A²+B²)×(X-C)+(C²+D²)×(A-X)+(X²+Y²)×(C-A))÷(2×(A×(D-Y)+C×(Y-B)+X×(B-D)))→C
+C◢
+√((A-M)²+(B-C)²)◢
+```
+
+## Extra C — Growth and Decay Solver (157B)
+
+Uses the model
+
+```text
+final = start × (1 + rate/100)^periods
+```
+
+Enter a negative percentage rate for decay. The program begins with `M?`, which
+selects the unknown quantity.
+
+### Inputs and outputs
+
+| `M` | Find | Enter at `A?` | Enter at `B?` | Enter at `C?` | Output |
+|---:|---|---|---|---|---|
+| `1` | final value | start | rate % | periods | final |
+| `2` | number of periods | start | rate % | final | periods |
+| `3` | rate | start | final | periods | rate % |
+| `4` | starting value | final | rate % | periods | start |
+
+### Examples
+
+```text
+TYPE  M=1, A=1000, B=5, C=3     → GET 1157.625
+TYPE  M=2, A=1000, B=10, C=1210 → GET 2 periods
+TYPE  M=3, A=1000, B=1210, C=2  → GET 10%
+TYPE  M=4, A=1210, B=10, C=2    → GET 1000
+```
+
+### Copy this program
+
+```text
+?→M
+?→A
+?→B
+?→C
+M=1⇒Goto 1
+M=2⇒Goto 2
+M=3⇒Goto 3
+M=4⇒Goto 4
+Goto 9
+Lbl 1
+A×(1+B÷100)^(C)◢
+Goto 9
+Lbl 2
+log(C÷A)÷log(1+B÷100)◢
+Goto 9
+Lbl 3
+100×((B÷A)^(1÷C)-1)◢
+Goto 9
+Lbl 4
+A÷(1+B÷100)^(C)◢
+Lbl 9
+```
+
+## Extra D — Combined Population Statistics (79B)
+
+Combines two groups when a question gives only each group's size, mean and
+population standard deviation. This is different from SD mode because the
+original observations are not required.
+
+### Inputs
+
+| Prompt | Enter |
+|---|---|
+| `A?` | first group size `n₁` |
+| `B?` | first group mean `μ₁` |
+| `C?` | first group population SD `σ₁` |
+| `D?` | second group size `n₂` |
+| `X?` | second group mean `μ₂` |
+| `Y?` | second group population SD `σ₂` |
+
+### Outputs
+
+1. Combined mean
+2. Combined population standard deviation
+
+Use population SD `σ`, not sample SD `s`.
+
+### Example
+
+Two groups have `(n, μ, σ)=(2,10,2)` and `(2,14,2)`:
+
+```text
+TYPE  A=2, B=10, C=2, D=2, X=14, Y=2
+GET   combined mean 12, combined SD 2.828427125
+```
+
+### Copy this program
+
+```text
+?→A
+?→B
+?→C
+?→D
+?→X
+?→Y
+(A×B+D×X)÷(A+D)→M
+M◢
+√((A×(C²+B²)+D×(Y²+X²))÷(A+D)-M²)◢
+```
+
 ## Syllabus basis
 
 The program choices come from the Education Bureau's
 [Explanatory Notes to the Mathematics Curriculum — Compulsory Part](https://www.edb.gov.hk/attachment/en/curriculum-development/kla/ma/curr/EN_CP_e.pdf),
-especially quadratics, arithmetic and geometric sequences, coordinate geometry,
-circle equations and trigonometric equations.
+especially quadratics, equations, exponential growth and decay, arithmetic and
+geometric sequences, coordinate geometry, circle equations, trigonometric
+equations and measures of dispersion.
