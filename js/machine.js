@@ -18,8 +18,8 @@ const INPUT_BYTES = 99;
 
 // Glass geometry, measured off the unit, used to line a menu's numbers up
 // under its labels. Kept in step with the same constants in lcd.js.
-const L1_X = 156, L1_CELL = 33.7;
-const L2_X = 172, L2_PITCH = 48.3, L2_W = 37;
+const L1_X = 191.15, L1_CELL = 31.11;
+const L2_X = 205.92, L2_PITCH = 44.59, L2_W = 34.15;
 
 export class Machine {
   constructor() {
@@ -88,7 +88,7 @@ export class Machine {
   // key entry point
   press(id) {
     if (this.off) {
-      if (id === 'ON') { this.off = false; this.screen = 'input'; }
+      if (id === 'ON') this.pressOn();
       return;
     }
     if (id === 'SHIFT') { this.shift = !this.shift; this.alpha = false; return; }
@@ -98,7 +98,7 @@ export class Machine {
     this.shift = false;
     this.alpha = false;
 
-    if (id === 'ON') { this.screen = 'input'; return; }
+    if (id === 'ON') { this.pressOn(); return; }
     if (shift && id === 'AC') { this.off = true; return; }
 
     try {
@@ -113,6 +113,34 @@ export class Machine {
   raise(kind) {
     this.error = kind;
     this.screen = 'error';
+  }
+
+  // ON is both the power-on and all-clear key. In the program editor it also
+  // stores the program and returns to the calculation mode chosen for it,
+  // rather than leaving the machine stranded on a PRGM screen.
+  pressOn() {
+    let returnMode = this.mode;
+    if (this.prog && this.prog.stage === 'edit') {
+      const stored = this.programs[this.prog.slot];
+      returnMode = stored ? stored.mode : 'COMP';
+      this.saveProgram();
+    } else if (this.prog && this.prog.stage === 'running') {
+      returnMode = this.prog.savedMode || this.mode;
+    } else if (this.mode === 'PRGM') {
+      returnMode = 'COMP';
+    }
+
+    this.off = false;
+    this.mode = returnMode;
+    this.menu = null;
+    this.menuReturn = null;
+    this.pending = null;
+    this.error = null;
+    this.formula = null;
+    this.statBrowse = null;
+    this.prog = null;
+    this.message = null;
+    this.clearEntry();
   }
 
   dispatch(id, shift, alpha) {
@@ -308,7 +336,9 @@ export class Machine {
     // While the program editor is open every token goes into the program.
     if (this.prog && this.prog.stage === 'edit') return this.progInsert(t);
     if (this.screen === 'result') this.startFromResult(t);
-    if (bytesOf(this.tokens) + (t.b || 1) > INPUT_BYTES) { this.raise('Stack'); return; }
+    // The input area is a fixed 99 bytes. Once full, further key operations are
+    // ignored; Stack ERROR belongs to evaluation-stack overflow, not typing.
+    if (bytesOf(this.tokens) + (t.b || 1) > INPUT_BYTES) return;
     if (this.insert || this.cursor >= this.tokens.length) {
       this.tokens.splice(this.cursor, 0, t);
     } else {
@@ -466,7 +496,9 @@ export class Machine {
     if (this.screen === 'result' && this.result) value = this.result.z.re;
     else if (this.tokens.length) value = evaluate(parse(this.tokens, this.ctx()), this.ctx()).re;
     else value = this.ans.re;
-    this.vars.M = r15(this.vars.M + sign * value);
+    const next = this.vars.M + sign * value;
+    if (!Number.isFinite(next) || Math.abs(next) >= 1e100) throw new CalcError('Math');
+    this.vars.M = r15(next);
     this.result = { z: C(value), view: 'normal', engShift: 0, part: 0 };
     this.screen = 'result';
   }
@@ -876,6 +908,10 @@ export class Machine {
   statEnter() {
     const parts = this.splitStatInput();
     if (!parts) { this.raise('Syntax'); return; }
+    const limit = this.mode === 'SD'
+      ? (this.setup.freq ? 40 : 80)
+      : (this.setup.freq ? 26 : 40);
+    if (this.stat.count >= limit) throw new CalcError('Data Full');
     this.stat.add(parts.x, parts.y, parts.f);
     this.result = { z: C(parts.x), view: 'normal', engShift: 0, part: 0 };
     this.ans = C(parts.x);
@@ -1071,6 +1107,9 @@ export class Machine {
     let out;
     try {
       out = spec.run(f.values, deg);
+      if (Object.values(out).some((x) => !Number.isFinite(x) || Math.abs(x) >= 1e100)) {
+        throw new CalcError('Math');
+      }
     } catch (e) {
       this.formula = null;
       this.raise('Math');
@@ -1125,10 +1164,10 @@ export class Machine {
 
     if (p.stage === 'newmode') {
       if (id === 'LEFT' || id === 'RIGHT') { p.page = p.page ? 0 : 1; return; }
-      const modes = p.page === 0 ? ['COMP', 'CMPLX'] : ['BASE', 'SD', 'REG'];
-      const i = { N1: 0, N2: 1, N3: 2 }[id];
-      if (i === undefined || !modes[i]) return;
-      const runMode = p.page === 0 ? modes[i] : modes[i];
+      const runMode = p.page === 0
+        ? { N1: 'COMP', N2: 'CMPLX' }[id]
+        : { N3: 'BASE', N4: 'SD', N5: 'REG' }[id];
+      if (!runMode) return;
       this.programs[p.slot] = new Program(runMode, []);
       this.prog = { stage: 'edit', slot: p.slot, tokens: [], cursor: 0 };
       return;
@@ -1260,7 +1299,7 @@ export class Machine {
       if (id === 'DEL') { if (st.edit) st.edit.pop(); return; }
       st.edit = st.edit || [];
       const t = this.tokenFor(id, shift, alpha);
-      if (t) st.edit.push(t);
+      if (t && bytesOf(st.edit) + (t.b || 1) <= INPUT_BYTES) st.edit.push(t);
       return;
     }
     if (st.kind === 'output') {
@@ -1288,10 +1327,16 @@ export class Machine {
     if (this.mode === 'CMPLX' && this.result && !isReal(this.result.z)) ind.add('R⇔I');
     if (this.mode === 'CMPLX' && this.result && this.result.part === 1) ind.add('i');
 
-    const base = { indicators: ind, cursor: -1, cursorKind: this.insert ? 'insert' : 'overwrite' };
+    const lowInputMemory = this.screen === 'input' && INPUT_BYTES - bytesOf(this.tokens) <= 8;
+    const base = {
+      indicators: ind,
+      cursor: -1,
+      cursorKind: lowInputMemory ? 'full' : (this.insert ? 'insert' : 'overwrite')
+    };
 
     if (this.screen === 'error') {
-      return Object.assign(base, { line1: this.error + ' ERROR', line2: '' });
+      const message = this.error === 'Data Full' ? this.error : this.error + ' ERROR';
+      return Object.assign(base, { line1: message, line2: '' });
     }
     if (this.screen === 'contrast') {
       return Object.assign(base, { line1: 'LIGHT ▮▮▮▮ DARK', line2: '' });
@@ -1419,13 +1464,17 @@ export class Machine {
     const used = this.programs.map((x, i) => (x ? String(i + 1) : '-')).join('');
     const free = String(PROGRAM_MEMORY - this.programBytes());
     if (p.stage === 'root') return { line1: 'EDIT  RUN  DEL', line2: '1     2    3' };
-    if (p.stage === 'editpick') return { line1: 'EDIT    Program', line2: 'P-' + used, exp: '', right: free };
+    if (p.stage === 'editpick') {
+      return { line1: 'EDIT    Program', line2: `P-${used} ${free.padStart(3, ' ')}` };
+    }
     if (p.stage === 'runpick') return { line1: 'RUN     Program', line2: 'P-' + used };
-    if (p.stage === 'delpick') return { line1: 'DELETE  Program', line2: 'P-' + used };
+    if (p.stage === 'delpick') {
+      return { line1: 'DELETE  Program', line2: `P-${used} ${free.padStart(3, ' ')}` };
+    }
     if (p.stage === 'newmode') {
       return p.page === 0
         ? { line1: 'MODE:COMP CMPLX', line2: '1    2' }
-        : { line1: 'MODE:BASE SD REG', line2: '1    2  3' };
+        : { line1: 'MODE:BASE SD REG', line2: '3    4  5' };
     }
     if (p.stage === 'edit') {
       const text = textOf(p.tokens);

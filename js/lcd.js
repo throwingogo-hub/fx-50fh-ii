@@ -1,25 +1,26 @@
 // lcd.js — draws the two-line LCD onto a canvas that sits exactly over the
-// glass in the product photo.  All metrics below were measured off the photo:
+// glass in the reconstructed shell. All metrics below were measured off the photo:
 // the upper line is a 16-character 5x7 dot matrix with tall, non-square dots,
 // the lower line is ten 7-segment cells plus a two-digit exponent field.
 
 import { glyph, SEG } from './font.js';
 
-export const GLASS = { x: 106, y: 257, w: 637, h: 249 };
+export const GLASS = { x: 145, y: 288, w: 588, h: 245 };
 
 const M = {
   // indicator strip
-  indY: 279, indDot: 3.0, indH: 21,
+  indY: 309.65, indDot: 2.77, indH: 20.66,
   // upper dot-matrix line
   // measured off the photograph: cells on a 33.7 px pitch, dots on a 6.05 x 8.9
   // grid, so the dots are noticeably taller than they are wide
-  l1X: 156, l1Y: 310.5, l1Cell: 33.7, l1DotW: 6.05, l1DotH: 8.9, l1Cols: 16,
+  l1X: 191.15, l1Y: 340.64, l1Cell: 31.11, l1DotW: 5.59, l1DotH: 8.76, l1Cols: 16,
   // lower segment line: 37 x 91 digits on a 48.3 px pitch, as measured
-  l2X: 172, l2Y: 387, l2Pitch: 48.3, l2W: 37, l2H: 91, l2Cells: 10,
-  labX: 116, labW: 52,
+  signX: 163.46,
+  l2X: 205.92, l2Y: 415.91, l2Pitch: 44.59, l2W: 34.15, l2H: 89.54, l2Cells: 10,
+  labX: 154.23, labW: 48,
   // exponent field: a fixed "x10" legend with raised small digits above it
-  expX: 648, expY: 394, expDot: 4.6, expDigitX: 6,
-  expLegendY: 438, expLegendDot: 4.6
+  expX: 645.31, expY: 422.8, expDot: 4.25, expDigitX: 5.54,
+  expLegendY: 466.09, expLegendDot: 4.25
 };
 
 const ON = '#22282b';
@@ -159,13 +160,19 @@ export class LCD {
 
     // Split the payload into cells; '.' rides along with the cell before it.
     const raw = v.line2 || '';
+    const negative = raw.startsWith('-');
+    const payload = negative ? raw.slice(1) : raw;
     const cells = [];
-    for (const ch of raw) {
+    for (const ch of payload) {
       if ((ch === '.' || ch === ',') && cells.length) cells[cells.length - 1].dp = true;
       else cells.push({ ch, dp: false });
     }
     const start = Math.max(0, M.l2Cells - cells.length);
     const y = M.l2Y - GLASS.y;
+
+    // The minus sign has its own annunciator cell and does not consume one of
+    // the ten mantissa digits on the physical 10+2 display.
+    if (negative) this.#cell(M.signX - GLASS.x, y, M.l2W * 0.72, M.l2H, { ch: '-', dp: false });
 
     for (let i = 0; i < cells.length && start + i < M.l2Cells; i++) {
       const x = (M.l2X - GLASS.x) + (start + i) * M.l2Pitch;

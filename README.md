@@ -49,7 +49,8 @@ Everything the keyboard is printed with is implemented:
   `For`/`To`/`Step`/`Next`, `While`/`WhileEnd`, `Break`, the six relational
   operators, the setup commands, `ClrMemory`, `ClrStat`, `M+`, `M−`, `Rnd(`,
   `Dec`/`Hex`/`Bin`/`Oct` and `DT`.
-- **Errors** — `Math`, `Syntax`, `Stack`, `Arg`, `Go`, `Nesting` and `Memory`,
+- **Errors** — `Math`, `Syntax`, `Stack`, `Arg`, `Go`, `Nesting`, `Memory` and
+  `Data Full`,
   and pressing `◄` or `►` on an error jumps the cursor to the character that
   caused it.
 
@@ -76,7 +77,7 @@ Then open `http://localhost:8000/`.
 
 ## Tests
 
-92 checks, taken from the worked examples printed in the user's guide, driven
+239 checks, including worked examples and operating limits printed in the user's guide, driven
 through the machine by key sequence rather than by calling the maths directly —
 so they exercise input, evaluation and formatting the way a person does.
 
@@ -88,7 +89,7 @@ node tests/run.js
 
 The physical keyboard is mapped: digits and operators are literal, `Enter` is
 `EXE`, `Backspace` is `DEL`, `Escape` is `AC`, arrow keys drive `REPLAY`, and
-`Shift` and `Alt` latch `SHIFT` and `ALPHA`. Everything else is clickable.
+`Space` and `Tab` latch `SHIFT` and `ALPHA`. Everything else is clickable.
 
 ## Provenance and licensing
 
@@ -96,12 +97,15 @@ The calculator's behaviour was reconstructed from CASIO's published user's
 guide for this calculator family, and the key layout was measured from
 photographs of the unit.
 
-`assets/fx-50fh-ii.png` is a **CASIO product photograph** of the fx-50FH II,
-retouched here (background removed, upscaled). It is reproduced for
-identification and educational use; CASIO holds the copyright, and *fx-50FH II*,
-*SUPER-FX PLUS* and *CASIO* are CASIO's trademarks. This project is
+The active `assets/fx-50fh-ii-generated.png` shell is the AI-generated reconstruction
+at its original 881×1785 geometry. Only its flat magenta background was made
+transparent; every fully opaque subject pixel retains its original RGB values.
+Its LCD and all 50 key targets are measured directly in that native coordinate
+space. `assets/fx-50fh-ii.png` is the source CASIO product
+photograph retained for calibration and identification. CASIO holds the source
+photograph's copyright, and *fx-50FH II*, *SUPER-FX PLUS* and *CASIO* are CASIO's trademarks. This project is
 unaffiliated with and unendorsed by CASIO Computer Co., Ltd. and by the Hong
 Kong Examinations and Assessment Authority.
 
-The code in `js/`, `css/`, `tests/` and `index.html` is MIT licensed — see
+The code in `js/`, `css/`, `tests/`, `tools/` and `index.html` is MIT licensed — see
 [LICENSE](LICENSE).

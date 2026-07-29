@@ -272,7 +272,60 @@ class Parser {
 }
 
 export function parse(tokens, ctx) {
-  return new Parser(tokens, ctx).parse();
+  const ast = new Parser(tokens, ctx).parse();
+  const numericLimit = ctx.mode === 'CMPLX' ? 5 : 10;
+  if (numericStackNeed(ast) > numericLimit || commandStackPeak(tokens) > 24) err('Stack');
+  return ast;
+}
+
+// Values are evaluated left-to-right. While the right operand is evaluated,
+// the completed left value remains on the numeric stack. This reproduces the
+// five occupied numeric slots in the guide's stack illustration.
+function numericStackNeed(node) {
+  if (!node) return 0;
+  if (node.t === 'num' || node.t === 'val') return 1;
+  if (node.t === 'bin') {
+    return Math.max(numericStackNeed(node.a), 1 + numericStackNeed(node.b));
+  }
+  const children = node.args || node.parts || (node.a ? [node.a] : []);
+  let peak = 1;
+  children.forEach((child, i) => { peak = Math.max(peak, i + numericStackNeed(child)); });
+  return peak;
+}
+
+// Priority-aware operator scan for the calculator's 24-level command stack.
+// Parenthetical function tokens include their opening parenthesis and occupy a
+// single command slot, matching the key-operation storage model.
+function commandStackPeak(tokens) {
+  const stack = [];
+  let peak = 0;
+  const note = () => { peak = Math.max(peak, stack.length); };
+  const pushOp = (p) => {
+    while (stack.length && !stack[stack.length - 1].open && stack[stack.length - 1].p <= p) stack.pop();
+    stack.push({ p });
+    note();
+  };
+  for (const t of tokens) {
+    if (t.k === K.OPEN || t.k === K.FN || t.k === K.POW) {
+      stack.push({ open: true });
+      note();
+    } else if (t.k === K.CLOSE) {
+      while (stack.length && !stack[stack.length - 1].open) stack.pop();
+      if (stack.length) stack.pop();
+    } else if (t.k === K.SEP) {
+      while (stack.length && !stack[stack.length - 1].open) stack.pop();
+    } else if (t.k === K.INFIX) {
+      pushOp(t.p);
+    } else if (t.k === K.FRAC) {
+      pushOp(3);
+    } else if (t.k === K.PRE) {
+      stack.push({ p: 4 });
+      note();
+    } else if (t.k === K.POST || t.k === K.EST || t.k === K.CONV) {
+      peak = Math.max(peak, stack.length + 1);
+    }
+  }
+  return peak;
 }
 
 // ---------------------------------------------------------------------------
@@ -291,7 +344,22 @@ export function parse(tokens, ctx) {
 const FACT_MAX = 69;
 
 export function evaluate(node, ctx) {
-  const E = (n) => evaluate(n, ctx);
+  return checkedEvaluate(node, ctx, true);
+}
+
+function checkedEvaluate(node, ctx, final) {
+  const z = evaluateNode(node, ctx);
+  if (!z || !Number.isFinite(z.re) || !Number.isFinite(z.im) ||
+      Math.abs(z.re) >= 1e100 || Math.abs(z.im) >= 1e100) err('Math');
+  if (final && ctx.mode === 'BASE') {
+    const bits = WORD_BITS[ctx.base] || 32;
+    if (!Number.isInteger(z.re) || z.re < -(2 ** (bits - 1)) || z.re > 2 ** (bits - 1) - 1) err('Math');
+  }
+  return z;
+}
+
+function evaluateNode(node, ctx) {
+  const E = (n) => checkedEvaluate(n, ctx, false);
   const real = (n) => {
     const z = E(n);
     if (!isReal(z)) err('Math');
@@ -376,6 +444,11 @@ export function parseBaseDigits(s, base) {
     if (d < 0) err('Syntax');
     v = v * base + d;
   }
+  if (base === 10) {
+    if (v > 2 ** 31 - 1) err('Math');
+    return v;
+  }
+  if (v >= 2 ** WORD_BITS[base]) err('Math');
   return wrapWord(v, base);
 }
 
@@ -430,8 +503,11 @@ function binary(f, node, ctx, E, real) {
       else if (f === 'sub') v = x - y;
       else if (f === 'mul') v = x * y;
       else { if (y === 0) err('Math'); v = Math.trunc(x / y); }
-      if (Math.abs(v) > 2 ** (WORD_BITS[ctx.base] || 32)) err('Math');
-      return C(wrapWord(v, ctx.base));
+      const bits = WORD_BITS[ctx.base] || 32;
+      const min = -(2 ** (bits - 1));
+      const max = 2 ** (bits - 1) - 1;
+      if (v < min || v > max) err('Math');
+      return C(Math.trunc(v));
     }
     if (f === 'add') return rz(cadd(a, b));
     if (f === 'sub') return rz(csub(a, b));
@@ -466,7 +542,7 @@ function binary(f, node, ctx, E, real) {
   }
   if (f === 'nPr' || f === 'nCr') {
     const n = real(node.a), r = real(node.b);
-    if (!Number.isInteger(n) || !Number.isInteger(r) || n < 0 || r < 0 || r > n) err('Math');
+    if (!Number.isInteger(n) || !Number.isInteger(r) || n < 0 || n >= 1e10 || r < 0 || r > n) err('Math');
     let v = 1;
     for (let i = 0; i < r; i++) v *= (n - i);
     if (f === 'nCr') for (let i = 2; i <= r; i++) v /= i;
@@ -511,6 +587,9 @@ function callFn(f, args, ctx, E, real) {
     case 'sin': case 'cos': case 'tan': {
       const z = one();
       if (!isReal(z)) err('Math');
+      const limit = ctx.angle === 'Deg' ? 9e9
+        : ctx.angle === 'Gra' ? 1e10 : 157079632.7;
+      if (Math.abs(z.re) >= limit) err('Math');
       const x = toRad(z.re, ctx.angle);
       if (f === 'tan') {
         const q = z.re / (ctx.angle === 'Deg' ? 90 : ctx.angle === 'Gra' ? 100 : Math.PI / 2);
@@ -524,8 +603,16 @@ function callFn(f, args, ctx, E, real) {
       return C(r15(fromRad(Math[f](x), ctx.angle)));
     }
     case 'atan': return C(r15(fromRad(Math.atan(oneR()), ctx.angle)));
-    case 'sinh': return C(r15(Math.sinh(oneR())));
-    case 'cosh': return C(r15(Math.cosh(oneR())));
+    case 'sinh': {
+      const x = oneR();
+      if (Math.abs(x) >= 230.2585092) err('Math');
+      return C(r15(Math.sinh(x)));
+    }
+    case 'cosh': {
+      const x = oneR();
+      if (Math.abs(x) >= 230.2585092) err('Math');
+      return C(r15(Math.cosh(x)));
+    }
     case 'tanh': return C(r15(Math.tanh(oneR())));
     case 'asinh': return C(r15(Math.asinh(oneR())));
     case 'acosh': { const x = oneR(); if (x < 1) err('Math'); return C(r15(Math.acosh(x))); }
@@ -541,8 +628,20 @@ function callFn(f, args, ctx, E, real) {
       return C(r15(Math.log10(x)));
     }
     case 'ln': { const x = oneR(); if (x <= 0) err('Math'); return C(r15(Math.log(x))); }
-    case 'exp10': { const v = Math.pow(10, oneR()); if (!isFinite(v)) err('Math'); return C(r15(v)); }
-    case 'expe': { const v = Math.exp(oneR()); if (!isFinite(v)) err('Math'); return C(r15(v)); }
+    case 'exp10': {
+      const x = oneR();
+      if (x >= 100) err('Math');
+      const v = Math.pow(10, x);
+      if (!isFinite(v)) err('Math');
+      return C(r15(v));
+    }
+    case 'expe': {
+      const x = oneR();
+      if (x >= 230.2585092) err('Math');
+      const v = Math.exp(x);
+      if (!isFinite(v)) err('Math');
+      return C(r15(v));
+    }
     case 'sqrt': {
       const z = one();
       if (isReal(z)) { if (z.re < 0) err('Math'); return C(r15(Math.sqrt(z.re))); }
