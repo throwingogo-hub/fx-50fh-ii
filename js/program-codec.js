@@ -8,6 +8,7 @@ const ASCII_ALIASES = [
   ['whileend', 'pWhileEnd'], ['whlend', 'pWhileEnd'],
   ['clrmemory', 'pClrMemory'], ['clrmem', 'pClrMemory'], ['clrstat', 'pClrStat'],
   ['freqoff', 'pFreqOff'], ['freqon', 'pFreqOn'], ['ifend', 'pIfEnd'],
+  ['npr', 'nPr'], ['ncr', 'nCr'],
   ['sinh^-1(', 'asinh'], ['cosh^-1(', 'acosh'], ['tanh^-1(', 'atanh'],
   ['sin^-1(', 'asin'], ['cos^-1(', 'acos'], ['tan^-1(', 'atan'],
   ['sqrt(', 'sqrt'], ['cbrt(', 'cbrt'], ['pi', 'pi'],

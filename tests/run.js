@@ -5,6 +5,7 @@
 
 import { Machine } from '../js/machine.js';
 import { Program } from '../js/program.js';
+import { readFileSync } from 'node:fs';
 import { K, TOK, tok } from '../js/tokens.js';
 import { CONSTANTS } from '../js/consts.js';
 import { StatStore } from '../js/stats.js';
@@ -629,6 +630,25 @@ for (let i = 0; i < CONSTANTS.length; i++) {
   const parsed = parseProgramText('For 1->A To 5\nA M+\nNext', 'COMP');
   check('Program Studio accepts ASCII assignment arrows', parsed.errors.length, 0);
   check('Program Studio recognizes loop commands', parsed.tokenIds.includes('pFor') && parsed.tokenIds.includes('pNext'), true);
+}
+{
+  const parsed = parseProgramText('5 nCr 2\n5 nPr 2', 'COMP');
+  check('Program Studio accepts copyable nCr and nPr names', parsed.errors.length, 0);
+  check('Program Studio maps nCr and nPr to calculator tokens', parsed.tokenIds.join(','),
+    '5,nCr,2,:,5,nPr,2');
+}
+{
+  const guide = readFileSync(new URL('../programs.md', import.meta.url), 'utf8');
+  const starts = [...guide.matchAll(/^## (P[1-4]|Extra [A-N])[^\n]*\((\d+)B\)/gm)];
+  check('program guide exposes byte counts for all 18 programs', starts.length, 18);
+  for (let i = 0; i < starts.length; i++) {
+    const section = guide.slice(starts[i].index, starts[i + 1]?.index ?? guide.length);
+    const copy = section.slice(section.lastIndexOf('### Copy'));
+    const source = copy.match(/```text\n([\s\S]*?)```/)?.[1].trimEnd() || '';
+    const parsed = parseProgramText(source, 'COMP');
+    check(`${starts[i][1]} guide source parses`, parsed.errors.length, 0);
+    check(`${starts[i][1]} guide byte label is exact`, parsed.bytes, Number(starts[i][2]));
+  }
 }
 {
   const commandsRoundTrip = Object.entries(TOK)

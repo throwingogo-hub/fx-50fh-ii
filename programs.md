@@ -4,11 +4,16 @@ These programs are optional. They are **not built into the web calculator** and
 will never replace your program slots automatically. Copy only the programs you
 want into [Program Studio](https://throwingogo-hub.github.io/fx-50fh-ii/).
 
-The complete P1–P4 pack uses **584 of 680 bytes** when pasted into Program
+The complete P1–P4 pack uses **478 of 680 bytes** when pasted into Program
 Studio. It focuses on calculations from the HKDSE Mathematics Compulsory Part
 that are slow or error-prone to repeat by hand. The calculator already has
 direct `nPr`, `nCr`, SD/REG statistics and built-in formula functions, so this
 pack does not waste memory duplicating them.
+
+Every heading shows the exact Program Studio byte count. The July compact pass
+reduced the complete 18-program library from **2,522B to 1,812B** (710B, or
+28%). Any deliberately removed diagnostic output or tighter input restriction
+is stated in the relevant section below.
 
 ## Install a program
 
@@ -39,7 +44,7 @@ same source line. This is intentional: `◢` already ends the preceding statemen
 so adding a line break there wastes one program byte. Paste the blocks exactly
 as shown if you want the stated byte counts.
 
-## P1 — Quadratic X-Ray
+## P1 — Quadratic X-Ray (80B)
 
 Use P1 for a quadratic equation
 
@@ -83,15 +88,14 @@ GET   Δ=1, h=2.5, k=-0.25, roots 3 and 2
 ?→A
 ?→B
 ?→C
-2×A→X
-B²-4×A×C→D
-D◢-B÷X◢-D÷(2×X)◢D<0⇒Goto 9
-(-B+√(D))÷X→C
+B²-4AC→D
+D◢-B÷2÷A◢-D÷4÷A◢D<0⇒Goto 9
+(√(D)-B)÷2÷A→C
 C◢D=0⇒Goto 9
 -B÷A-C◢Lbl 9
 ```
 
-## P2 — Sequence Engine
+## P2 — Sequence Engine (110B)
 
 P2 begins with `M?`. This selects the type of sequence.
 
@@ -103,7 +107,8 @@ P2 begins with `M?`. This selects the type of sequence.
 | `2` | Finite geometric progression | `A` first term, `B` common ratio, `C=n` | `Tₙ`, then `Sₙ` |
 | `3` | Infinite geometric progression | `A` first term, `B` common ratio | `S∞` |
 
-Use `M=3` only when `|B| < 1`.
+Use `M=3` only when `|B| < 1`. For `M=2`, use `B≠1`; a constant GP is
+quicker by hand: `Tₙ=A`, `Sₙ=AC`.
 
 ### Examples
 
@@ -132,31 +137,20 @@ GET   S∞=12
 
 ```text
 ?→M
-M=1⇒Goto 1
-M=2⇒Goto 2
-M=3⇒Goto 3
-Goto 9
-Lbl 1
 ?→A
 ?→B
+M=3⇒A÷(1-B)→X
+M=3⇒Goto 9
 ?→C
-A+(C-1)×B◢C×(A+Ans)÷2◢Goto 9
-Lbl 2
-?→A
-?→B
-?→C
-A×B^(C-1)→D
-D◢B=1⇒Goto 4
-(A-B×D)÷(1-B)◢Goto 9
-Lbl 4
-A×C◢Goto 9
-Lbl 3
-?→A
-?→B
-A÷(1-B)◢Lbl 9
+M=1⇒A+(C-1)B→D
+M=2⇒AB^(C-1)→D
+D◢M=1⇒C(A+D)÷2→X
+M=2⇒(A-BD)÷(1-B)→X
+Lbl 9
+X◢
 ```
 
-## P3 — Coordinate Lab
+## P3 — Coordinate Lab (104B)
 
 P3 begins with `M?`. Choose two-point geometry or a circle equation.
 
@@ -203,25 +197,19 @@ GET   centre (2,-3), radius 5
 
 ```text
 ?→M
-M=1⇒Goto 1
-M=2⇒Goto 2
-Goto 9
-Lbl 1
 ?→A
 ?→B
 ?→C
+M=2⇒Goto 2
 ?→D
 C-A→X
 D-B→Y
 √(X²+Y²)◢(A+C)÷2◢(B+D)÷2◢Y÷X◢Goto 9
 Lbl 2
-?→A
-?→B
-?→C
--A÷2◢-B÷2◢√((A²+B²)÷4-C)◢Lbl 9
+-A÷2◢-B÷2◢√(A²+B²-4C)÷2◢Lbl 9
 ```
 
-## P4 — Trig 360
+## P4 — Trig 360 (184B)
 
 P4 finds every distinct solution for `0° ≤ θ ≤ 360°`. It switches the
 calculator to degrees automatically.
@@ -253,8 +241,10 @@ Deg
 ?→D
 M=1⇒Goto 1
 M=2⇒Goto 2
-M=3⇒Goto 3
-Goto 9
+tan^-1(D)→X
+X<0⇒X+180→X
+X◢X+180◢X≠0⇒Goto 9
+360◢Goto 9
 Lbl 1
 sin^-1(D)→X
 X<0⇒Goto 4
@@ -267,12 +257,7 @@ Lbl 4
 Lbl 2
 cos^-1(D)→X
 X◢X=180⇒Goto 9
-360-X◢Goto 9
-Lbl 3
-tan^-1(D)→X
-X<0⇒X+180→X
-X◢X+180◢X≠0⇒Goto 9
-360◢Lbl 9
+360-X◢Lbl 9
 ```
 
 ## Extra swap-in library
@@ -305,15 +290,15 @@ None duplicates an existing program or a one-button calculator feature:
 
 | Focus | P1 | P2 | P3 | P4 | Total |
 |---|---|---|---|---|---:|
-| Original Core pack | Quadratic | Sequences | Coordinate | Trig | 584B |
-| Algebra and growth | Quadratic | Extra A | Sequences | Extra C | 434B |
-| Coordinate geometry | Coordinate | Extra B | Extra A | Trig | 545B |
-| Statistics and algebra | Sequences | Extra D | Extra A | Trig | 513B |
-| Advanced Section B / MCQ | Extra E | Extra F | Extra G | Extra H | 547B |
-| Paper 1 Section B power pack | Extra I | Extra J | Extra K | Extra L | 558B |
-| Centres and variation | Extra M | Extra N | Quadratic | Extra D | 323B |
+| Original Core pack | Quadratic | Sequences | Coordinate | Trig | 478B |
+| Algebra and growth | Quadratic | Extra A | Sequences | Extra C | 352B |
+| Coordinate geometry | Coordinate | Extra B | Extra A | Trig | 469B |
+| Statistics and algebra | Sequences | Extra D | Extra A | Trig | 419B |
+| Advanced Section B / MCQ | Extra E | Extra F | Extra G | Extra H | 392B |
+| Paper 1 Section B power pack | Extra I | Extra J | Extra K | Extra L | 424B |
+| Centres and variation | Extra M | Extra N | Quadratic | Extra D | 307B |
 
-## Extra A — Simultaneous 2×2 Solver (71B)
+## Extra A — Simultaneous 2×2 Solver (52B)
 
 Solves two linear equations written as
 
@@ -334,12 +319,11 @@ they mean the coefficient of `y` and the right-hand side respectively.
 
 ### Outputs
 
-1. Determinant
-2. Solution `x`
-3. Solution `y`
+1. Solution `x`
+2. Solution `y`
 
-If the determinant is `0`, there is no unique solution and the program stops
-after displaying `0`.
+If the determinant is `0`, there is no unique solution and the calculator
+shows `Math ERROR`.
 
 ### Example
 
@@ -347,7 +331,7 @@ For `2x+y=7` and `x−y=2`:
 
 ```text
 TYPE  A=2, B=1, C=7, D=1, X=-1, Y=2
-GET   determinant -3, x=3, y=1
+GET   x=3, y=1
 ```
 
 ### Copy this program
@@ -359,12 +343,11 @@ GET   determinant -3, x=3, y=1
 ?→D
 ?→X
 ?→Y
-A×X-B×D→M
-M◢M=0⇒Goto 9
-(C×X-B×Y)÷M◢(A×Y-C×D)÷M◢Lbl 9
+AX-BD→M
+(CX-BY)÷M◢(AY-CD)÷M◢
 ```
 
-## Extra B — Circle Through Three Points (141B)
+## Extra B — Circle Through Three Points (129B)
 
 Finds the centre and radius of the unique circle through three supplied points.
 Unlike P3 mode 2, you do not need to derive the general circle equation first.
@@ -407,12 +390,12 @@ C-A→C
 D-B→D
 X-A→X
 Y-B→Y
-(C×(X²+Y²)-X×(C²+D²))÷(2×(C×Y-D×X))→M
-((C²+D²)×Y-(X²+Y²)×D)÷(2×(C×Y-D×X))→C
+(C(X²+Y²)-X(C²+D²))÷2÷(CY-DX)→M
+((C²+D²)Y-(X²+Y²)D)÷2÷(CY-DX)→C
 A+C◢B+M◢√(C²+M²)◢
 ```
 
-## Extra C — Growth and Decay Solver (112B)
+## Extra C — Growth and Decay Solver (110B)
 
 Uses the model
 
@@ -448,14 +431,14 @@ TYPE  M=4, A=1210, B=10, C=2    → GET 1000
 ?→A
 ?→B
 ?→C
-M=1⇒A×(1+B÷100)^(C)→X
+M=1⇒A(1+B÷100)^(C)→X
 M=2⇒log(C÷A)÷log(1+B÷100)→X
-M=3⇒100×((B÷A)^(1÷C)-1)→X
+M=3⇒100((B÷A)^(1÷C)-1)→X
 M=4⇒A÷(1+B÷100)^(C)→X
 X◢
 ```
 
-## Extra D — Combined Population Statistics (77B)
+## Extra D — Combined Population Statistics (73B)
 
 Combines two groups when a question gives only each group's size, mean and
 population standard deviation. This is different from SD mode because the
@@ -497,7 +480,7 @@ GET   combined mean 12, combined SD 2.828427125
 ?→D
 ?→X
 ?→Y
-(A×B+D×X)÷(A+D)◢√((A×(C²+B²)+D×(Y²+X²))÷(A+D)-(Ans)²)◢
+(AB+DX)÷(A+D)◢√((A(C²+B²)+D(Y²+X²))÷(A+D)-(Ans)²)◢
 ```
 
 ## Advanced Section B / MCQ library
@@ -507,10 +490,10 @@ non-foundation-style questions found in Paper 2 Section B. They automate the
 arithmetic after you have formed the correct equation or model; they do not
 replace the working that Paper 1 requires.
 
-All four advanced programs occupy `547B`, leaving `133B` free for editing or a
-small personal utility.
+All four advanced programs occupy `392B`, leaving `288B` free for editing or
+two small personal utilities.
 
-## Extra E — Line–Circle Intersections (135B)
+## Extra E — Line–Circle Intersections (111B)
 
 Finds the intersection points of a circle and a non-vertical straight line.
 Write the two equations as
@@ -532,13 +515,13 @@ Here `X` is the line's slope and `Y` is its y-intercept.
 
 ### Outputs
 
-1. Intersection discriminant
-2. First point `x₁`, then `y₁`
-3. Second point `x₂`, then `y₂`
+1. First point `x₁`, then `y₁`
+2. Second point `x₂`, then `y₂`
 
-If the discriminant is negative, there is no intersection. If it is zero, the
-line is tangent and only one point is shown. A vertical line `x=k` must first be
-handled algebraically because it cannot be written as `y=Xx+Y`.
+If the discriminant is negative, there is no real intersection and the
+calculator shows `Math ERROR`. If it is zero, the line is tangent and only one
+point is shown. A vertical line `x=k` must first be handled algebraically
+because it cannot be written as `y=Xx+Y`.
 
 ### Examples
 
@@ -546,14 +529,14 @@ For `x²+y²−4x−2y−4=0` and `y=1`:
 
 ```text
 TYPE  A=-4, B=-2, C=-4, X=0, Y=1
-GET   discriminant 36, points (5,1) and (-1,1)
+GET   points (5,1) and (-1,1)
 ```
 
 For the same circle and tangent `y=4`:
 
 ```text
 TYPE  A=-4, B=-2, C=-4, X=0, Y=4
-GET   discriminant 0, tangent point (2,4)
+GET   tangent point (2,4)
 ```
 
 ### Copy this program
@@ -564,17 +547,16 @@ GET   discriminant 0, tangent point (2,4)
 ?→C
 ?→X
 ?→Y
-2×X×Y+A+B×X→D
-D²-4×(1+X²)×(Y²+B×Y+C)→M
-2×(1+X²)→A
-M◢M<0⇒Goto 9
-(-D+√(M))÷A→C
-C◢X×C+Y◢M=0⇒Goto 9
-(-D-√(M))÷A→C
-C◢X×C+Y◢Lbl 9
+2XY+A+BX→D
+D²-4(1+X²)(Y²+BY+C)→M
+2(1+X²)→A
+(√(M)-D)÷A→C
+C◢XC+Y◢M=0⇒Goto 9
+-2D÷A-C→C
+C◢XC+Y◢Lbl 9
 ```
 
-## Extra F — Sequence Target Solver (127B)
+## Extra F — Sequence Target Solver (72B)
 
 Finds the **smallest positive integer `n`** for which a partial sum reaches or
 exceeds a target. This is useful when a Section B question asks “after how many
@@ -622,89 +604,67 @@ GET   n=7, S₇=64.34375
 ?→C
 0→X
 0→Y
-M=1⇒Goto 1
-M=2⇒Goto 2
-Goto 9
-Lbl 1
-While Y<C
-X+1→X
-Y+A+(X-1)×B→Y
-WhileEnd
-X◢Y◢Goto 9
-Lbl 2
 A→D
 While Y<C
 X+1→X
 Y+D→Y
-D×B→D
+M=1⇒D+B→D
+M=2⇒DB→D
 WhileEnd
-X◢Y◢Lbl 9
+X◢Y◢
 ```
 
-## Extra G — Bearings and 3D Displacement (168B)
+## Extra G — Bearings and 3D Displacement (114B)
 
-Puts two common geometry calculations behind one selector and switches to
-degrees automatically.
+Calculates a complete displacement in one run and switches to degrees
+automatically.
 
-### Mode 1 — plan distance and bearing
+### Inputs
 
-At `M?`, enter `1`. Then enter east/west displacement at `A?` and north/south
-displacement at `B?`:
+Enter east/west displacement at `A?`, north/south displacement at `B?`, and
+vertical displacement at `C?`:
 
 - east and north are positive;
 - west and south are negative.
 
-Outputs: plan distance, then the three-figure bearing measured clockwise from
-north. The displacement must not be `(0,0)`.
+The four outputs are horizontal distance, spatial length, acute elevation or
+depression angle, then the three-figure bearing measured clockwise from north.
+The horizontal displacement must not be `(0,0)`.
 
-Example: travel `3` units east and `4` units north.
+For a plan-only question, enter `C=0`; the first output is the required distance
+and the last output is the bearing. Ignore the repeated spatial length and the
+zero elevation angle.
 
 ```text
-TYPE  M=1, A=3, B=4
-GET   distance 5, bearing 36.86989765°
+TYPE  A=3, B=4, C=0
+GET   horizontal 5, spatial 5, elevation 0°, bearing 36.86989765°
 ```
 
-### Mode 2 — 3D segment
-
-At `M?`, enter `2`. Enter two perpendicular horizontal components at `A?` and
-`B?`, then the vertical component at `C?`.
-
-Outputs: horizontal projection, spatial length, then the acute angle of
-elevation/depression to the horizontal. The horizontal projection must be
-non-zero.
+For a 3D segment:
 
 ```text
-TYPE  M=2, A=3, B=4, C=12
-GET   horizontal 5, spatial length 13, angle 67.38013505°
+TYPE  A=3, B=4, C=12
+GET   horizontal 5, spatial 13, elevation 67.38013505°, bearing 36.86989765°
 ```
 
 ### Copy this program
 
 ```text
 Deg
-?→M
-M=1⇒Goto 1
-M=2⇒Goto 2
-Goto 9
-Lbl 1
-?→A
-?→B
-√(A²+B²)◢B=0⇒Goto 3
-tan^-1(A÷B)→X
-B<0⇒X+180→X
-X<0⇒X+360→X
-X◢Goto 9
-Lbl 3
-180-90×A÷Abs(A)◢Goto 9
-Lbl 2
 ?→A
 ?→B
 ?→C
 √(A²+B²)→X
-X◢√(X²+C²)◢tan^-1(Abs(C)÷X)◢Lbl 9
+X◢√(X²+C²)◢tan^-1(Abs(C)÷X)◢B=0⇒Goto 3
+tan^-1(A÷B)→Y
+B<0⇒Y+180→Y
+Y<0⇒Y+360→Y
+Y◢Goto 9
+Lbl 3
+180-90A÷Abs(A)◢Lbl 9
 ```
 
-## Extra H — Cubic Synthetic Division (117B)
+## Extra H — Cubic Synthetic Division (95B)
 
 Reduces a cubic polynomial when one root is already known, checks the remainder,
 then solves the remaining quadratic factor.
@@ -724,10 +684,8 @@ Ax³ + Bx² + Cx + D
 
 ### Outputs
 
-1. New `B` and new `C`, giving quotient `Ax²+Bx+C`
-2. Remainder
-3. If the remainder is zero: discriminant of the quotient
-4. Remaining distinct real roots
+1. Remainder
+2. If the remainder is zero: the remaining distinct real roots
 
 A non-zero remainder means the supplied `X` is not a root. A negative
 discriminant means the quadratic factor has no additional real roots.
@@ -738,7 +696,7 @@ For `x³−6x²+11x−6` with known root `1`:
 
 ```text
 TYPE  A=1, B=-6, C=11, D=-6, X=1
-GET   quotient x²−5x+6, remainder 0, discriminant 1, roots 3 and 2
+GET   remainder 0, roots 3 and 2
 ```
 
 The adjacent `◢` commands below still pause separately; keeping them on one
@@ -752,28 +710,27 @@ source line avoids unnecessary separator bytes.
 ?→C
 ?→D
 ?→X
-B+A×X→B
-C+B×X→C
-D+C×X→D
-B◢C◢D◢D≠0⇒Goto 9
-B²-4×A×C→M
-M◢M<0⇒Goto 9
-(-B+√(M))÷(2×A)→D
+B+AX→B
+C+BX→C
+D+CX→D
+D◢D≠0⇒Goto 9
+B²-4AC→M
+(√(M)-B)÷2÷A→D
 D◢M=0⇒Goto 9
 -B÷A-D◢Lbl 9
 ```
 
 ## Paper 1 Section B power pack
 
-The next four programs are designed as one **558B alternative pack** for the
+The next four programs are designed as one **424B alternative pack** for the
 longer structured questions in Paper 1 Section B. They cover probability,
-algebra, coordinate geometry and financial modelling while leaving `122B` free.
+algebra, coordinate geometry and financial modelling while leaving `256B` free.
 
 The programs supply numerical results and checks. In Paper 1, still write the
 formula, substitution and reasoning required by the question; a calculator
 answer by itself does not earn the method marks.
 
-## Extra I — Without-Replacement Probability (164B)
+## Extra I — Without-Replacement Probability (130B)
 
 Uses the hypergeometric model for a population containing two types of item.
 It finds the probability of drawing exactly, at least or at most a specified
@@ -792,9 +749,9 @@ number of type-A items when all items are drawn together **without replacement**
 ### Output
 
 The single output is the required probability. For `M=1`, enter a feasible
-value of `D`: `max(0,C-B) ≤ D ≤ min(A,C)`. Counts must be non-negative integers,
-and this compact program is intended for the small populations used in DSE
-questions; factorials above `69!` exceed the calculator's numerical range.
+value of `D`: `max(0,C-B) ≤ D ≤ min(A,C)`. Counts must be non-negative integers.
+This version uses the calculator's native `nCr` operation, avoiding the old
+factorial expansion and its `69!` limit.
 
 ### Examples
 
@@ -827,13 +784,13 @@ M=2⇒D>X⇒D→X
 M=3⇒D<Y⇒D→Y
 0→M
 While X≤Y
-A!×B!×C!×(A+B-C)!÷(X!×(A-X)!×(C-X)!×(B-C+X)!×(A+B)!)M+
+A nCr X B nCr(C-X)÷(A+B)nCr C M+
 X+1→X
 WhileEnd
 M◢
 ```
 
-## Extra J — Transformed-Roots Builder (104B)
+## Extra J — Transformed-Roots Builder (83B)
 
 Start with a quadratic
 
@@ -883,19 +840,16 @@ WRITE z²-13z+36=0
 ?→A
 ?→B
 ?→C
-M=1⇒Goto 1
 M=2⇒Goto 2
-Goto 9
-Lbl 1
 ?→X
 ?→Y
-X×B÷A-2×Y◢X²×C÷A-Y×Ans-Y²◢Goto 9
+XB÷A-2Y◢X²C÷A-YAns-Y²◢Goto 9
 Lbl 2
 C÷A→X
-2×X-(B÷A)²◢X²◢Lbl 9
+2X-(B÷A)²◢X²◢Lbl 9
 ```
 
-## Extra K — Tangents from a Point to a Circle (155B)
+## Extra K — Tangents from a Point to a Circle (104B)
 
 For a circle with centre `(h,k)`, radius `r`, and a supplied point `(p,q)`,
 Extra K finds the tangent length and both points of contact. The supplied point
@@ -918,8 +872,8 @@ may be outside or on the circle.
 3. Second contact point `x₂`, then `y₂`
 
 If the supplied point lies on the circle, the tangent length is `0` and that
-point is shown once. If it lies inside the circle, the program ends without an
-output because no real tangent exists.
+same contact point appears twice. If it lies inside the circle, the calculator
+shows `Math ERROR` because no real tangent exists.
 
 ### Example
 
@@ -946,17 +900,12 @@ equations. Keep extra calculator digits until the final answer.
 D-A→D
 X-B→X
 D²+X²→M
-(M)-C²→Y
-Y<0⇒Goto 9
-√(Y)→Y
-Y◢Y=0⇒Goto 8
-C÷M→M
-A+M×(C×D-X×Y)◢B+M×(C×X+D×Y)◢A+M×(C×D+X×Y)◢B+M×(C×X-D×Y)◢Goto 9
-Lbl 8
-A+D◢B+X◢Lbl 9
+√((M)-C²)→Y
+Y◢C÷M→M
+A+M(CD-XY)◢B+M(CX+DY)◢A+M(CD+XY)◢B+M(CX-DY)◢
 ```
 
-## Extra L — Annuity and Loan Engine (135B)
+## Extra L — Annuity and Loan Engine (107B)
 
 Uses a constant percentage interest rate per payment period and payments made
 at the **end** of each period. Enter the rate per period, not automatically the
@@ -1004,18 +953,13 @@ GET   outstanding balance 97330.20118
 B÷100→B
 ?→C
 (1+B)^(C)→X
-M=1⇒Goto 1
-M=2⇒Goto 2
-M=3⇒Goto 3
-Goto 9
-Lbl 1
+M=2⇒AB÷(1-1÷X)→Y
+M=2⇒Goto 9
 ?→D
-A×X+D×(X-1)÷B◢Goto 9
-Lbl 2
-A×B÷(1-1÷X)◢Goto 9
-Lbl 3
-?→D
-A×X-D×(X-1)÷B◢Lbl 9
+M=1⇒AX+D(X-1)÷B→Y
+M=3⇒AX-D(X-1)÷B→Y
+Lbl 9
+Y◢
 ```
 
 ## Extra M — Four Centres of a Right Triangle (71B)
@@ -1067,7 +1011,6 @@ property above; the coordinates alone are normally only the calculation part.
 ### Copy this program
 
 ```text
-?→M
 ?→A
 ?→B
 ?→C
@@ -1076,7 +1019,7 @@ property above; the coordinates alone are normally only the calculation part.
 M(A+D)÷B◢M◢
 ```
 
-## Extra N — Direct and Inverse Variation (88B)
+## Extra N — Direct and Inverse Variation (83B)
 
 Handles the power models
 
@@ -1125,13 +1068,12 @@ questions.
 ?→B
 ?→C
 ?→D
-D→Y
-M=2⇒-D→Y
-M=4⇒-D→Y
-B÷A^(Y)→X
-X◢M<3⇒X×C^(Y)→D
-M>2⇒(C÷X)^(1÷Y)→D
-D◢
+M=2⇒-D→D
+M=4⇒-D→D
+B÷A^(D)→X
+X◢M<3⇒XC^(D)→Y
+M>2⇒(C÷X)^(1÷D)→Y
+Y◢
 ```
 
 ## Syllabus basis
