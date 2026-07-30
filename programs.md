@@ -4,7 +4,7 @@ These programs are optional. They are **not built into the web calculator** and
 will never replace your program slots automatically. Copy only the programs you
 want into [Program Studio](https://throwingogo-hub.github.io/fx-50fh-ii/).
 
-The complete P1–P4 pack uses **652 of 680 bytes** when pasted into Program
+The complete P1–P4 pack uses **584 of 680 bytes** when pasted into Program
 Studio. It focuses on calculations from the HKDSE Mathematics Compulsory Part
 that are slow or error-prone to repeat by hand. The calculator already has
 direct `nPr`, `nCr`, SD/REG statistics and built-in formula functions, so this
@@ -33,6 +33,11 @@ again to reveal the next answer. The calculator returns home after the last one.
 
 For a negative input on the physical calculator, use the `(-)` key. In Program
 Studio source and the examples below, an ordinary minus sign is fine.
+
+Some output pauses `◢` are followed immediately by the next statement on the
+same source line. This is intentional: `◢` already ends the preceding statement,
+so adding a line break there wastes one program byte. Paste the blocks exactly
+as shown if you want the stated byte counts.
 
 ## P1 — Quadratic X-Ray
 
@@ -78,15 +83,12 @@ GET   Δ=1, h=2.5, k=-0.25, roots 3 and 2
 ?→A
 ?→B
 ?→C
+2×A→X
 B²-4×A×C→D
-D◢
--B÷(2×A)◢
-C-B²÷(4×A)◢
-D<0⇒Goto 9
-(-B+√(D))÷(2×A)◢
-D=0⇒Goto 9
-(-B-√(D))÷(2×A)◢
-Lbl 9
+D◢-B÷X◢-D÷(2×X)◢D<0⇒Goto 9
+(-B+√(D))÷X→C
+C◢D=0⇒Goto 9
+-B÷A-C◢Lbl 9
 ```
 
 ## P2 — Sequence Engine
@@ -138,25 +140,20 @@ Lbl 1
 ?→A
 ?→B
 ?→C
-A+(C-1)×B◢
-C×(2×A+(C-1)×B)÷2◢
-Goto 9
+A+(C-1)×B◢C×(A+Ans)÷2◢Goto 9
 Lbl 2
 ?→A
 ?→B
 ?→C
-A×B^(C-1)◢
-B=1⇒Goto 4
-A×(1-B^(C))÷(1-B)◢
-Goto 9
+A×B^(C-1)→D
+D◢B=1⇒Goto 4
+(A-B×D)÷(1-B)◢Goto 9
 Lbl 4
-A×C◢
-Goto 9
+A×C◢Goto 9
 Lbl 3
 ?→A
 ?→B
-A÷(1-B)◢
-Lbl 9
+A÷(1-B)◢Lbl 9
 ```
 
 ## P3 — Coordinate Lab
@@ -214,19 +211,14 @@ Lbl 1
 ?→B
 ?→C
 ?→D
-√((C-A)²+(D-B)²)◢
-(A+C)÷2◢
-(B+D)÷2◢
-(D-B)÷(C-A)◢
-Goto 9
+C-A→X
+D-B→Y
+√(X²+Y²)◢(A+C)÷2◢(B+D)÷2◢Y÷X◢Goto 9
 Lbl 2
 ?→A
 ?→B
 ?→C
--A÷2◢
--B÷2◢
-√((A²+B²)÷4-C)◢
-Lbl 9
+-A÷2◢-B÷2◢√((A²+B²)÷4-C)◢Lbl 9
 ```
 
 ## P4 — Trig 360
@@ -266,36 +258,21 @@ Goto 9
 Lbl 1
 sin^-1(D)→X
 X<0⇒Goto 4
-X◢
-X=90⇒Goto 9
-180-X→Y
-Y◢
-X≠0⇒Goto 9
-360◢
-Goto 9
+X◢X=90⇒Goto 9
+180-X◢X≠0⇒Goto 9
+360◢Goto 9
 Lbl 4
-180-X→Y
-Y◢
-X=-90⇒Goto 9
-360+X→Y
-Y◢
-Goto 9
+180-X◢X=-90⇒Goto 9
+360+X◢Goto 9
 Lbl 2
 cos^-1(D)→X
-X◢
-X=180⇒Goto 9
-360-X→Y
-Y◢
-Goto 9
+X◢X=180⇒Goto 9
+360-X◢Goto 9
 Lbl 3
 tan^-1(D)→X
 X<0⇒X+180→X
-X◢
-X+180→Y
-Y◢
-X≠0⇒Goto 9
-360◢
-Lbl 9
+X◢X+180◢X≠0⇒Goto 9
+360◢Lbl 9
 ```
 
 ## Extra swap-in library
@@ -328,15 +305,15 @@ None duplicates an existing program or a one-button calculator feature:
 
 | Focus | P1 | P2 | P3 | P4 | Total |
 |---|---|---|---|---|---:|
-| Original Core pack | Quadratic | Sequences | Coordinate | Trig | 652B |
-| Algebra and growth | Quadratic | Extra A | Sequences | Extra C | 509B |
-| Coordinate geometry | Coordinate | Extra B | Extra A | Trig | 647B |
-| Statistics and algebra | Sequences | Extra D | Extra A | Trig | 560B |
-| Advanced Section B / MCQ | Extra E | Extra F | Extra G | Extra H | 680B |
-| Paper 1 Section B power pack | Extra I | Extra J | Extra K | Extra L | 668B |
-| Centres and variation | Extra M | Extra N | Quadratic | Extra D | 660B |
+| Original Core pack | Quadratic | Sequences | Coordinate | Trig | 584B |
+| Algebra and growth | Quadratic | Extra A | Sequences | Extra C | 434B |
+| Coordinate geometry | Coordinate | Extra B | Extra A | Trig | 545B |
+| Statistics and algebra | Sequences | Extra D | Extra A | Trig | 513B |
+| Advanced Section B / MCQ | Extra E | Extra F | Extra G | Extra H | 547B |
+| Paper 1 Section B power pack | Extra I | Extra J | Extra K | Extra L | 558B |
+| Centres and variation | Extra M | Extra N | Quadratic | Extra D | 596B |
 
-## Extra A — Simultaneous 2×2 Solver (74B)
+## Extra A — Simultaneous 2×2 Solver (71B)
 
 Solves two linear equations written as
 
@@ -383,14 +360,11 @@ GET   determinant -3, x=3, y=1
 ?→X
 ?→Y
 A×X-B×D→M
-M◢
-M=0⇒Goto 9
-(C×X-B×Y)÷M◢
-(A×Y-C×D)÷M◢
-Lbl 9
+M◢M=0⇒Goto 9
+(C×X-B×Y)÷M◢(A×Y-C×D)÷M◢Lbl 9
 ```
 
-## Extra B — Circle Through Three Points (199B)
+## Extra B — Circle Through Three Points (141B)
 
 Finds the centre and radius of the unique circle through three supplied points.
 Unlike P3 mode 2, you do not need to derive the general circle equation first.
@@ -429,14 +403,16 @@ GET   centre (2,3), radius 3.605551275
 ?→D
 ?→X
 ?→Y
-((A²+B²)×(D-Y)+(C²+D²)×(Y-B)+(X²+Y²)×(B-D))÷(2×(A×(D-Y)+C×(Y-B)+X×(B-D)))→M
-M◢
-((A²+B²)×(X-C)+(C²+D²)×(A-X)+(X²+Y²)×(C-A))÷(2×(A×(D-Y)+C×(Y-B)+X×(B-D)))→C
-C◢
-√((A-M)²+(B-C)²)◢
+C-A→C
+D-B→D
+X-A→X
+Y-B→Y
+(C×(X²+Y²)-X×(C²+D²))÷(2×(C×Y-D×X))→M
+((C²+D²)×Y-(X²+Y²)×D)÷(2×(C×Y-D×X))→C
+A+C◢B+M◢√(C²+M²)◢
 ```
 
-## Extra C — Growth and Decay Solver (157B)
+## Extra C — Growth and Decay Solver (112B)
 
 Uses the model
 
@@ -472,26 +448,14 @@ TYPE  M=4, A=1210, B=10, C=2    → GET 1000
 ?→A
 ?→B
 ?→C
-M=1⇒Goto 1
-M=2⇒Goto 2
-M=3⇒Goto 3
-M=4⇒Goto 4
-Goto 9
-Lbl 1
-A×(1+B÷100)^(C)◢
-Goto 9
-Lbl 2
-log(C÷A)÷log(1+B÷100)◢
-Goto 9
-Lbl 3
-100×((B÷A)^(1÷C)-1)◢
-Goto 9
-Lbl 4
-A÷(1+B÷100)^(C)◢
-Lbl 9
+M=1⇒A×(1+B÷100)^(C)→X
+M=2⇒log(C÷A)÷log(1+B÷100)→X
+M=3⇒100×((B÷A)^(1÷C)-1)→X
+M=4⇒A÷(1+B÷100)^(C)→X
+X◢
 ```
 
-## Extra D — Combined Population Statistics (79B)
+## Extra D — Combined Population Statistics (77B)
 
 Combines two groups when a question gives only each group's size, mean and
 population standard deviation. This is different from SD mode because the
@@ -533,9 +497,7 @@ GET   combined mean 12, combined SD 2.828427125
 ?→D
 ?→X
 ?→Y
-(A×B+D×X)÷(A+D)→M
-M◢
-√((A×(C²+B²)+D×(Y²+X²))÷(A+D)-M²)◢
+(A×B+D×X)÷(A+D)◢√((A×(C²+B²)+D×(Y²+X²))÷(A+D)-(Ans)²)◢
 ```
 
 ## Advanced Section B / MCQ library
@@ -545,10 +507,10 @@ non-foundation-style questions found in Paper 2 Section B. They automate the
 arithmetic after you have formed the correct equation or model; they do not
 replace the working that Paper 1 requires.
 
-All four advanced programs occupy exactly `680B`, so install them only as a
-complete alternative to the earlier packs. There is no spare byte for editing.
+All four advanced programs occupy `547B`, leaving `133B` free for editing or a
+small personal utility.
 
-## Extra E — Line–Circle Intersections (169B)
+## Extra E — Line–Circle Intersections (135B)
 
 Finds the intersection points of a circle and a non-vertical straight line.
 Write the two equations as
@@ -602,20 +564,17 @@ GET   discriminant 0, tangent point (2,4)
 ?→C
 ?→X
 ?→Y
-(2×X×Y+A+B×X)²-4×(1+X²)×(Y²+B×Y+C)→M
-M◢
-M<0⇒Goto 9
-(-(2×X×Y+A+B×X)+√(M))÷(2×(1+X²))→C
-C◢
-X×C+Y◢
-M=0⇒Goto 9
-(-(2×X×Y+A+B×X)-√(M))÷(2×(1+X²))→C
-C◢
-X×C+Y◢
-Lbl 9
+2×X×Y+A+B×X→D
+D²-4×(1+X²)×(Y²+B×Y+C)→M
+2×(1+X²)→A
+M◢M<0⇒Goto 9
+(-D+√(M))÷A→C
+C◢X×C+Y◢M=0⇒Goto 9
+(-D-√(M))÷A→C
+C◢X×C+Y◢Lbl 9
 ```
 
-## Extra F — Sequence Target Solver (202B)
+## Extra F — Sequence Target Solver (127B)
 
 Finds the **smallest positive integer `n`** for which a partial sum reaches or
 exceeds a target. This is useful when a Section B question asks “after how many
@@ -661,35 +620,28 @@ GET   n=7, S₇=64.34375
 ?→A
 ?→B
 ?→C
-1→X
+0→X
+0→Y
 M=1⇒Goto 1
 M=2⇒Goto 2
 Goto 9
 Lbl 1
-While X×(2×A+(X-1)×B)÷2<C
+While Y<C
 X+1→X
+Y+A+(X-1)×B→Y
 WhileEnd
-X◢
-X×(2×A+(X-1)×B)÷2◢
-Goto 9
+X◢Y◢Goto 9
 Lbl 2
-B=1⇒Goto 3
-While A×(1-B^(X))÷(1-B)<C
+A→D
+While Y<C
 X+1→X
+Y+D→Y
+D×B→D
 WhileEnd
-X◢
-A×(1-B^(X))÷(1-B)◢
-Goto 9
-Lbl 3
-While A×X<C
-X+1→X
-WhileEnd
-X◢
-A×X◢
-Lbl 9
+X◢Y◢Lbl 9
 ```
 
-## Extra G — Bearings and 3D Displacement (184B)
+## Extra G — Bearings and 3D Displacement (168B)
 
 Puts two common geometry calculations behind one selector and switches to
 degrees automatically.
@@ -737,32 +689,22 @@ Goto 9
 Lbl 1
 ?→A
 ?→B
-√(A²+B²)◢
-B=0⇒Goto 3
+√(A²+B²)◢B=0⇒Goto 3
 tan^-1(A÷B)→X
 B<0⇒X+180→X
 X<0⇒X+360→X
-X◢
-Goto 9
+X◢Goto 9
 Lbl 3
-A>0⇒Goto 4
-270◢
-Goto 9
-Lbl 4
-90◢
-Goto 9
+180-90×A÷Abs(A)◢Goto 9
 Lbl 2
 ?→A
 ?→B
 ?→C
 √(A²+B²)→X
-X◢
-√(X²+C²)◢
-tan^-1(Abs(C)÷X)◢
-Lbl 9
+X◢√(X²+C²)◢tan^-1(Abs(C)÷X)◢Lbl 9
 ```
 
-## Extra H — Cubic Synthetic Division (125B)
+## Extra H — Cubic Synthetic Division (117B)
 
 Reduces a cubic polynomial when one root is already known, checks the remainder,
 then solves the remaining quadratic factor.
@@ -799,8 +741,8 @@ TYPE  A=1, B=-6, C=11, D=-6, X=1
 GET   quotient x²−5x+6, remainder 0, discriminant 1, roots 3 and 2
 ```
 
-The three adjacent `◢` commands below still pause separately; keeping them on
-one source line saves the final three bytes needed for the 680B advanced pack.
+The adjacent `◢` commands below still pause separately; keeping them on one
+source line avoids unnecessary separator bytes.
 
 ### Copy this program
 
@@ -815,25 +757,23 @@ C+B×X→C
 D+C×X→D
 B◢C◢D◢D≠0⇒Goto 9
 B²-4×A×C→M
-M◢
-M<0⇒Goto 9
-(-B+√(M))÷(2×A)◢
-M=0⇒Goto 9
-(-B-√(M))÷(2×A)◢
-Lbl 9
+M◢M<0⇒Goto 9
+(-B+√(M))÷(2×A)→D
+D◢M=0⇒Goto 9
+-B÷A-D◢Lbl 9
 ```
 
 ## Paper 1 Section B power pack
 
-The next four programs are designed as one **668B alternative pack** for the
+The next four programs are designed as one **558B alternative pack** for the
 longer structured questions in Paper 1 Section B. They cover probability,
-algebra, coordinate geometry and financial modelling while leaving `12B` free.
+algebra, coordinate geometry and financial modelling while leaving `122B` free.
 
 The programs supply numerical results and checks. In Paper 1, still write the
 formula, substitution and reasoning required by the question; a calculator
 answer by itself does not earn the method marks.
 
-## Extra I — Without-Replacement Probability (208B)
+## Extra I — Without-Replacement Probability (164B)
 
 Uses the hypergeometric model for a population containing two types of item.
 It finds the probability of drawing exactly, at least or at most a specified
@@ -881,30 +821,19 @@ answer is `5C2 / 9C2`; Extra I is the fast arithmetic check and range-summer.
 C-B>0⇒C-B→X
 C→Y
 A<C⇒A→Y
-M=1⇒Goto 1
-M=2⇒Goto 2
-M=3⇒Goto 3
-Goto 9
-Lbl 1
-D→X
-D→Y
-Goto 4
-Lbl 2
-D>X⇒D→X
-Goto 4
-Lbl 3
-D<Y⇒D→Y
-Lbl 4
+M=1⇒D→X
+M=1⇒D→Y
+M=2⇒D>X⇒D→X
+M=3⇒D<Y⇒D→Y
 0→M
 While X≤Y
-(M)+A!×B!×C!×(A+B-C)!÷(X!×(A-X)!×(C-X)!×(B-C+X)!×(A+B)!)→M
+A!×B!×C!×(A+B-C)!÷(X!×(A-X)!×(C-X)!×(B-C+X)!×(A+B)!)M+
 X+1→X
 WhileEnd
 M◢
-Lbl 9
 ```
 
-## Extra J — Transformed-Roots Builder (111B)
+## Extra J — Transformed-Roots Builder (104B)
 
 Start with a quadratic
 
@@ -960,16 +889,13 @@ Goto 9
 Lbl 1
 ?→X
 ?→Y
-X×B÷A-2×Y◢
-X²×C÷A-X×Y×B÷A+Y²◢
-Goto 9
+X×B÷A-2×Y◢X²×C÷A-Y×Ans-Y²◢Goto 9
 Lbl 2
-2×C÷A-(B÷A)²◢
-(C÷A)²◢
-Lbl 9
+C÷A→X
+2×X-(B÷A)²◢X²◢Lbl 9
 ```
 
-## Extra K — Tangents from a Point to a Circle (176B)
+## Extra K — Tangents from a Point to a Circle (155B)
 
 For a circle with centre `(h,k)`, radius `r`, and a supplied point `(p,q)`,
 Extra K finds the tangent length and both points of contact. The supplied point
@@ -1022,20 +948,15 @@ X-B→X
 D²+X²→M
 (M)-C²→Y
 Y<0⇒Goto 9
-√(Y)◢
-Y=0⇒Goto 8
-A+(C²×D-C×X×√(Y))÷M◢
-B+(C²×X+C×D×√(Y))÷M◢
-A+(C²×D+C×X×√(Y))÷M◢
-B+(C²×X-C×D×√(Y))÷M◢
-Goto 9
+√(Y)→Y
+Y◢Y=0⇒Goto 8
+C÷M→M
+A+M×(C×D-X×Y)◢B+M×(C×X+D×Y)◢A+M×(C×D+X×Y)◢B+M×(C×X-D×Y)◢Goto 9
 Lbl 8
-A+D◢
-B+X◢
-Lbl 9
+A+D◢B+X◢Lbl 9
 ```
 
-## Extra L — Annuity and Loan Engine (173B)
+## Extra L — Annuity and Loan Engine (135B)
 
 Uses a constant percentage interest rate per payment period and payments made
 at the **end** of each period. Enter the rate per period, not automatically the
@@ -1081,27 +1002,23 @@ GET   outstanding balance 97330.20118
 ?→A
 ?→B
 B÷100→B
+?→C
+(1+B)^(C)→X
 M=1⇒Goto 1
 M=2⇒Goto 2
 M=3⇒Goto 3
 Goto 9
 Lbl 1
-?→C
 ?→D
-A×(1+B)^(C)+D×((1+B)^(C)-1)÷B◢
-Goto 9
+A×X+D×(X-1)÷B◢Goto 9
 Lbl 2
-?→C
-A×B÷(1-(1+B)^(-C))◢
-Goto 9
+A×B÷(1-1÷X)◢Goto 9
 Lbl 3
-?→C
 ?→D
-A×(1+B)^(C)-D×((1+B)^(C)-1)÷B◢
-Lbl 9
+A×X-D×(X-1)÷B◢Lbl 9
 ```
 
-## Extra M — Four Centres of a Triangle (384B)
+## Extra M — Four Centres of a Triangle (344B)
 
 Finds the coordinates of the centroid, circumcentre, orthocentre or incentre of
 a triangle from its three vertices. This is a swap-in program occupying one
@@ -1159,31 +1076,19 @@ X-A→X
 Y-B→Y
 M=1⇒Goto 1
 M=2⇒Goto 2
-M=3⇒Goto 3
+M=3⇒Goto 2
 M=4⇒Goto 4
 Goto 9
 Lbl 1
-A+(C+X)÷3◢
-B+(D+Y)÷3◢
-Goto 9
+A+(C+X)÷3◢B+(D+Y)÷3◢Goto 9
 Lbl 2
-2×(C×Y-D×X)→M
-A+((C²+D²)×Y-(X²+Y²)×D)÷M◢
-B+(C×(X²+Y²)-X×(C²+D²))÷M◢
-Goto 9
-Lbl 3
-2×(C×Y-D×X)→M
-A+C+X-2×((C²+D²)×Y-(X²+Y²)×D)÷M◢
-B+D+Y-2×(C×(X²+Y²)-X×(C²+D²))÷M◢
-Goto 9
+A+((M)-2)×(C+X)+(7-3×M)×((C²+D²)×Y-(X²+Y²)×D)÷(2×(C×Y-D×X))◢B+((M)-2)×(D+Y)+(7-3×M)×(C×(X²+Y²)-X×(C²+D²))÷(2×(C×Y-D×X))◢Goto 9
 Lbl 4
 √((C-X)²+(D-Y)²)+√(X²+Y²)+√(C²+D²)→M
-A+(√(X²+Y²)×C+√(C²+D²)×X)÷M◢
-B+(√(X²+Y²)×D+√(C²+D²)×Y)÷M◢
-Lbl 9
+A+(√(X²+Y²)×C+√(C²+D²)×X)÷M◢B+(√(X²+Y²)×D+√(C²+D²)×Y)÷M◢Lbl 9
 ```
 
-## Extra N — Direct and Inverse Variation (96B)
+## Extra N — Direct and Inverse Variation (88B)
 
 Handles the power models
 
@@ -1236,13 +1141,9 @@ D→Y
 M=2⇒-D→Y
 M=4⇒-D→Y
 B÷A^(Y)→X
-X◢
-M<3⇒Goto 1
-(C÷X)^(1÷Y)◢
-Goto 9
-Lbl 1
-X×C^(Y)◢
-Lbl 9
+X◢M<3⇒X×C^(Y)→D
+M>2⇒(C÷X)^(1÷Y)→D
+D◢
 ```
 
 ## Syllabus basis
