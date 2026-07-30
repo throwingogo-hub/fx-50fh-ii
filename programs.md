@@ -298,7 +298,7 @@ None duplicates an existing program or a one-button calculator feature:
 | J | transformed quadratic roots | forms new equations without first finding the original roots |
 | K | tangents from a point to a circle | returns both points of contact and the tangent length |
 | L | annuities and reducing-balance loans | handles regular payments, not just one-off compound growth |
-| M | four centres of a triangle | finds centroid, circumcentre, orthocentre or incentre from three points |
+| M | four centres of a right triangle | returns all four centres for the compact DSE `OAB` setup |
 | N | direct and inverse variation | finds the constant and predicts either `x` or `y` for power models |
 
 ### Suggested four-slot combinations
@@ -311,7 +311,7 @@ None duplicates an existing program or a one-button calculator feature:
 | Statistics and algebra | Sequences | Extra D | Extra A | Trig | 513B |
 | Advanced Section B / MCQ | Extra E | Extra F | Extra G | Extra H | 547B |
 | Paper 1 Section B power pack | Extra I | Extra J | Extra K | Extra L | 558B |
-| Centres and variation | Extra M | Extra N | Quadratic | Extra D | 596B |
+| Centres and variation | Extra M | Extra N | Quadratic | Extra D | 323B |
 
 ## Extra A — Simultaneous 2×2 Solver (71B)
 
@@ -1018,47 +1018,51 @@ Lbl 3
 A×X-D×(X-1)÷B◢Lbl 9
 ```
 
-## Extra M — Four Centres of a Triangle (344B)
+## Extra M — Four Centres of a Right Triangle (71B)
 
-Finds the coordinates of the centroid, circumcentre, orthocentre or incentre of
-a triangle from its three vertices. This is a swap-in program occupying one
-slot; run it again with another mode if a question needs more than one centre.
+Returns all four centres for the short coordinate setup common in DSE
+questions:
+
+```text
+O=(0,0), A=(a,b), B=(c,0), and angle OAB=90°
+```
+
+This is the special case used by the linked
+[82-byte four-centres video](https://www.youtube.com/watch?v=9NdcgqP22Ao), not
+an arbitrary three-point triangle solver. That restriction is exactly why it
+can be so short.
 
 ### Inputs
 
 | Prompt | Enter |
 |---|---|
-| `M?` | `1` centroid, `2` circumcentre, `3` orthocentre, or `4` incentre |
-| `A?`, `B?` | first vertex `P(A,B)` |
-| `C?`, `D?` | second vertex `Q(C,D)` |
-| `X?`, `Y?` | third vertex `R(X,Y)` |
+| `A?` | x-coordinate `a` of the right-angle vertex A |
+| `B?` | y-coordinate `b` of A |
+| `C?` | x-coordinate `c` of the other vertex B=(c,0) |
 
 ### Outputs
 
-The centre's x-coordinate appears first, followed by its y-coordinate. The
-three vertices must form a non-degenerate triangle. Enter the vertices in any
-order; the answer is unchanged.
+Eight answers appear as four consecutive coordinate pairs:
 
-| `M` | Centre | Property useful in written working |
+| Pair | Centre | Property useful in written working |
 |---:|---|---|
-| `1` | centroid `G` | intersection of medians; divides each median `2:1` |
-| `2` | circumcentre `O` | equidistant from all three vertices |
-| `3` | orthocentre `H` | intersection of altitudes |
-| `4` | incentre `I` | equidistant from all three sides |
+| 1 | centroid `G` | intersection of medians; divides each median `2:1` |
+| 2 | orthocentre `H` | the right-angle vertex A |
+| 3 | circumcentre `C` | midpoint of hypotenuse OB |
+| 4 | incentre `I` | equidistant from all three sides |
 
 ### Example
 
-For the right-angled triangle with vertices `(0,0)`, `(6,0)` and `(0,8)`:
+For the video's triangle `O=(0,0)`, `A=(9,12)`, `B=(25,0)`:
 
 ```text
-TYPE  M=1, A=0, B=0, C=6, D=0, X=0, Y=8  → GET G=(2,2.666666667)
-TYPE  M=2, A=0, B=0, C=6, D=0, X=0, Y=8  → GET O=(3,4)
-TYPE  M=3, A=0, B=0, C=6, D=0, X=0, Y=8  → GET H=(0,0)
-TYPE  M=4, A=0, B=0, C=6, D=0, X=0, Y=8  → GET I=(2,2)
+TYPE  A=9, B=12, C=25
+GET   G=(34/3,4), H=(9,12), C=(12.5,0), I=(10,5)
 ```
 
-In Paper 1, use the relevant defining property above to justify the centre;
-the coordinates alone are normally only the calculation part of the answer.
+The program assumes the stated orientation and right angle. Do not use it when
+all three vertices are arbitrary. In Paper 1, still show the relevant defining
+property above; the coordinates alone are normally only the calculation part.
 
 ### Copy this program
 
@@ -1067,25 +1071,9 @@ the coordinates alone are normally only the calculation part of the answer.
 ?→A
 ?→B
 ?→C
-?→D
-?→X
-?→Y
-C-A→C
-D-B→D
-X-A→X
-Y-B→Y
-M=1⇒Goto 1
-M=2⇒Goto 2
-M=3⇒Goto 2
-M=4⇒Goto 4
-Goto 9
-Lbl 1
-A+(C+X)÷3◢B+(D+Y)÷3◢Goto 9
-Lbl 2
-A+((M)-2)×(C+X)+(7-3×M)×((C²+D²)×Y-(X²+Y²)×D)÷(2×(C×Y-D×X))◢B+((M)-2)×(D+Y)+(7-3×M)×(C×(X²+Y²)-X×(C²+D²))÷(2×(C×Y-D×X))◢Goto 9
-Lbl 4
-√((C-X)²+(D-Y)²)+√(X²+Y²)+√(C²+D²)→M
-A+(√(X²+Y²)×C+√(C²+D²)×X)÷M◢B+(√(X²+Y²)×D+√(C²+D²)×Y)÷M◢Lbl 9
+(A+C)÷3◢B÷3◢A◢B◢C÷2◢0◢√(A²+B²)→D
+(D+BC÷D-C)÷2→M
+M(A+D)÷B◢M◢
 ```
 
 ## Extra N — Direct and Inverse Variation (88B)
