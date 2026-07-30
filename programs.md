@@ -321,6 +321,8 @@ None duplicates an existing program or a one-button calculator feature:
 | J | transformed quadratic roots | forms new equations without first finding the original roots |
 | K | tangents from a point to a circle | returns both points of contact and the tangent length |
 | L | annuities and reducing-balance loans | handles regular payments, not just one-off compound growth |
+| M | four centres of a triangle | finds centroid, circumcentre, orthocentre or incentre from three points |
+| N | direct and inverse variation | finds the constant and predicts either `x` or `y` for power models |
 
 ### Suggested four-slot combinations
 
@@ -332,6 +334,7 @@ None duplicates an existing program or a one-button calculator feature:
 | Statistics and algebra | Sequences | Extra D | Extra A | Trig | 560B |
 | Advanced Section B / MCQ | Extra E | Extra F | Extra G | Extra H | 680B |
 | Paper 1 Section B power pack | Extra I | Extra J | Extra K | Extra L | 668B |
+| Centres and variation | Extra M | Extra N | Quadratic | Extra D | 660B |
 
 ## Extra A — Simultaneous 2×2 Solver (74B)
 
@@ -1098,6 +1101,150 @@ A×(1+B)^(C)-D×((1+B)^(C)-1)÷B◢
 Lbl 9
 ```
 
+## Extra M — Four Centres of a Triangle (384B)
+
+Finds the coordinates of the centroid, circumcentre, orthocentre or incentre of
+a triangle from its three vertices. This is a swap-in program occupying one
+slot; run it again with another mode if a question needs more than one centre.
+
+### Inputs
+
+| Prompt | Enter |
+|---|---|
+| `M?` | `1` centroid, `2` circumcentre, `3` orthocentre, or `4` incentre |
+| `A?`, `B?` | first vertex `P(A,B)` |
+| `C?`, `D?` | second vertex `Q(C,D)` |
+| `X?`, `Y?` | third vertex `R(X,Y)` |
+
+### Outputs
+
+The centre's x-coordinate appears first, followed by its y-coordinate. The
+three vertices must form a non-degenerate triangle. Enter the vertices in any
+order; the answer is unchanged.
+
+| `M` | Centre | Property useful in written working |
+|---:|---|---|
+| `1` | centroid `G` | intersection of medians; divides each median `2:1` |
+| `2` | circumcentre `O` | equidistant from all three vertices |
+| `3` | orthocentre `H` | intersection of altitudes |
+| `4` | incentre `I` | equidistant from all three sides |
+
+### Example
+
+For the right-angled triangle with vertices `(0,0)`, `(6,0)` and `(0,8)`:
+
+```text
+TYPE  M=1, A=0, B=0, C=6, D=0, X=0, Y=8  → GET G=(2,2.666666667)
+TYPE  M=2, A=0, B=0, C=6, D=0, X=0, Y=8  → GET O=(3,4)
+TYPE  M=3, A=0, B=0, C=6, D=0, X=0, Y=8  → GET H=(0,0)
+TYPE  M=4, A=0, B=0, C=6, D=0, X=0, Y=8  → GET I=(2,2)
+```
+
+In Paper 1, use the relevant defining property above to justify the centre;
+the coordinates alone are normally only the calculation part of the answer.
+
+### Copy this program
+
+```text
+?→M
+?→A
+?→B
+?→C
+?→D
+?→X
+?→Y
+C-A→C
+D-B→D
+X-A→X
+Y-B→Y
+M=1⇒Goto 1
+M=2⇒Goto 2
+M=3⇒Goto 3
+M=4⇒Goto 4
+Goto 9
+Lbl 1
+A+(C+X)÷3◢
+B+(D+Y)÷3◢
+Goto 9
+Lbl 2
+2×(C×Y-D×X)→M
+A+((C²+D²)×Y-(X²+Y²)×D)÷M◢
+B+(C×(X²+Y²)-X×(C²+D²))÷M◢
+Goto 9
+Lbl 3
+2×(C×Y-D×X)→M
+A+C+X-2×((C²+D²)×Y-(X²+Y²)×D)÷M◢
+B+D+Y-2×(C×(X²+Y²)-X×(C²+D²))÷M◢
+Goto 9
+Lbl 4
+√((C-X)²+(D-Y)²)+√(X²+Y²)+√(C²+D²)→M
+A+(√(X²+Y²)×C+√(C²+D²)×X)÷M◢
+B+(√(X²+Y²)×D+√(C²+D²)×Y)÷M◢
+Lbl 9
+```
+
+## Extra N — Direct and Inverse Variation (96B)
+
+Handles the power models
+
+```text
+direct:   y = kx^n
+inverse:  y = k/x^n
+```
+
+It first finds and displays the constant `k`, then predicts either a new `y`
+or the corresponding positive `x`. Use a positive power `n` at `D?`.
+
+### Inputs and outputs
+
+| `M` | Model and unknown | `A?` | `B?` | `C?` | `D?` | Outputs |
+|---:|---|---|---|---|---|---|
+| `1` | direct; find new `y` | known `x` | known `y` | new `x` | power `n` | `k`, new `y` |
+| `2` | inverse; find new `y` | known `x` | known `y` | new `x` | power `n` | `k`, new `y` |
+| `3` | direct; find new `x` | known `x` | known `y` | target `y` | power `n` | `k`, new `x` |
+| `4` | inverse; find new `x` | known `x` | known `y` | target `y` | power `n` | `k`, new `x` |
+
+### Examples
+
+If `y` varies directly as `x³` and `y=16` when `x=2`, find `y` when `x=3`:
+
+```text
+TYPE  M=1, A=2, B=16, C=3, D=3
+GET   k=2, y=54
+```
+
+If `y` varies inversely as `x²` and `y=12` when `x=2`:
+
+```text
+TYPE  M=2, A=2, B=12, C=3, D=2  → GET k=48, y=5.333333333
+TYPE  M=4, A=2, B=12, C=3, D=2  → GET k=48, x=4 when target y=3
+```
+
+Use non-zero values wherever the model divides by `x`, `y` or `k`. Modes 3
+and 4 return the principal positive solution expected in ordinary DSE variation
+questions.
+
+### Copy this program
+
+```text
+?→M
+?→A
+?→B
+?→C
+?→D
+D→Y
+M=2⇒-D→Y
+M=4⇒-D→Y
+B÷A^(Y)→X
+X◢
+M<3⇒Goto 1
+(C÷X)^(1÷Y)◢
+Goto 9
+Lbl 1
+X×C^(Y)◢
+Lbl 9
+```
+
 ## Syllabus basis
 
 The program choices come from the Education Bureau's
@@ -1113,3 +1260,8 @@ the later sections of the papers.
 The probability, roots-of-equations and circle work in this pack was also
 checked against the structure of the official
 [2023 Paper 1 Level 5 exemplars](https://www.hkeaa.edu.hk/DocLibrary/HKDSE/Subject_Information/math/2023-Sample-MATH-CP-Level5-E-4792.pdf).
+
+The Education Bureau's official materials identify the four triangle centres
+as the centroid, circumcentre, incentre and orthocentre, and discuss their
+continued use in HKDSE questions in
+[School Mathematics Newsletter Issue 28](https://www.edb.gov.hk/attachment/en/curriculum-development/kla/ma/res/smn_28.pdf).
