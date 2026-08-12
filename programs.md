@@ -11,7 +11,7 @@ by hand. The calculator already has direct `nPr`, `nCr`, SD/REG statistics and
 built-in formula functions, so the pack does not duplicate them.
 
 Every heading shows the exact Program Studio byte count. The complete 18-program
-library is **1,812B**; seven recommended four-slot packs fit within the authentic
+library is **1,841B**; seven recommended four-slot packs fit within the authentic
 680-byte shared memory. Any deliberately removed diagnostic output or tighter
 input restriction is stated in the relevant section below.
 
@@ -297,7 +297,7 @@ None duplicates an existing program or a one-button calculator feature:
 | Algebra and growth | Quadratic | Extra A | Sequences | Extra C | 352B |
 | Coordinate geometry | Coordinate | Extra B | Extra A | Trig | 469B |
 | Statistics and algebra | Sequences | Extra D | Extra A | Trig | 419B |
-| Advanced Section B / MCQ | Extra E | Extra F | Extra G | Extra H | 392B |
+| Advanced Section B / MCQ | Extra E | Extra F | Extra G | Extra H | 421B |
 | Paper 1 Section B power pack | Extra I | Extra J | Extra K | Extra L | 424B |
 | Centres and variation | Extra M | Extra N | Quadratic | Extra D | 307B |
 
@@ -493,53 +493,73 @@ non-foundation-style questions found in Paper 2 Section B. They automate the
 arithmetic after you have formed the correct equation or model; they do not
 replace the working that Paper 1 requires.
 
-All four advanced programs occupy `392B`, leaving `288B` free for editing or
+All four advanced programs occupy `421B`, leaving `259B` free for editing or
 two small personal utilities.
 
-## Extra E — Line–Circle Intersections (111B)
+## Extra E — Line–Circle Intersections (140B)
 
-Finds the intersection points of a circle and a non-vertical straight line.
-Write the two equations as
+Finds the intersection points of a circle when a coordinate contains an
+unknown parameter such as `k`. Write the circle and the point on the straight
+line as
 
 ```text
 x² + y² + Ax + By + C = 0
-y = Xx + Y
+x = D + Xk
+y = Y + Mk
 ```
 
-Here `X` is the line's slope and `Y` is its y-intercept.
+This affine form accepts numbers and `k` in either coordinate:
+
+| Coordinate in the question | Constant | Coefficient of `k` |
+|---|---:|---:|
+| `x=3` | `D=3` | `X=0` |
+| `x=k` | `D=0` | `X=1` |
+| `x=2k−3` | `D=-3` | `X=2` |
+| `y=4` | `Y=4` | `M=0` |
+| `y=k` | `Y=0` | `M=1` |
+| `y=−k+5` | `Y=5` | `M=-1` |
 
 ### Inputs
 
 | Prompt | Enter |
 |---|---|
 | `A?`, `B?`, `C?` | coefficients of the circle equation |
-| `X?` | slope of the line |
-| `Y?` | y-intercept of the line |
+| `D?` | constant part of `x` |
+| `X?` | coefficient of `k` in `x` |
+| `Y?` | constant part of `y` |
+| `M?` | coefficient of `k` in `y` |
 
 ### Outputs
 
-1. First point `x₁`, then `y₁`
-2. Second point `x₂`, then `y₂`
-
-If the discriminant is negative, there is no real intersection and the
-calculator shows `Math ERROR`. If it is zero, the line is tangent and only one
-point is shown. A vertical line `x=k` must first be handled algebraically
-because it cannot be written as `y=Xx+Y`.
+For each real intersection, the answers appear as `k`, then `x`, then `y`. A
+tangent produces one triplet; a secant produces two. If the resulting quadratic
+has no real root, the calculator shows `Math ERROR`. At least one of `X` or `M`
+must be non-zero, because otherwise the supplied coordinates describe one fixed
+point rather than a line.
 
 ### Examples
 
-For `x²+y²−4x−2y−4=0` and `y=1`:
+For `x²+y²−4x−2y−4=0`, `x=k` and `y=1`:
 
 ```text
-TYPE  A=-4, B=-2, C=-4, X=0, Y=1
-GET   points (5,1) and (-1,1)
+TYPE  A=-4, B=-2, C=-4, D=0, X=1, Y=1, M=0
+GET   k=5, point (5,1)
+      k=-1, point (-1,1)
 ```
 
-For the same circle and tangent `y=4`:
+The same input form handles a vertical line. For `x=2` and `y=k`:
 
 ```text
-TYPE  A=-4, B=-2, C=-4, X=0, Y=4
-GET   tangent point (2,4)
+TYPE  A=-4, B=-2, C=-4, D=2, X=0, Y=0, M=1
+GET   k=4, point (2,4)
+      k=-2, point (2,-2)
+```
+
+For the tangent `x=k`, `y=4`:
+
+```text
+TYPE  A=-4, B=-2, C=-4, D=0, X=1, Y=4, M=0
+GET   k=2, tangent point (2,4)
 ```
 
 ### Copy this program
@@ -548,15 +568,20 @@ GET   tangent point (2,4)
 ?→A
 ?→B
 ?→C
+?→D
 ?→X
 ?→Y
-2XY+A+BX→D
-D²-4(1+X²)(Y²+BY+C)→M
-2(1+X²)→A
-(√(M)-D)÷A→C
-C◢XC+Y◢M=0⇒Goto 9
--2D÷A-C→C
-C◢XC+Y◢Lbl 9
+?→M
+D²+Y²+AD+BY+C→C
+2(DX+YM)+AX+BM→B
+X²+M²→A
+B²-4AC→C
+(√(C)-B)÷(2A)→C
+C◢D+XC◢Y+MC◢
+-B÷A-C→B
+B=C⇒Goto 9
+B◢D+XB◢Y+MB◢
+Lbl 9
 ```
 
 ## Extra F — Sequence Target Solver (72B)

@@ -144,20 +144,23 @@ export const PROGRAMS = Object.freeze([
   {
     "id": "E",
     "title": "Line–Circle Intersections",
-    "bytes": 111,
+    "bytes": 140,
     "mode": "COMP",
     "category": "Coordinate",
     "topics": [
       "line circle",
       "intersection",
       "tangent",
-      "secant"
+      "secant",
+      "parameter k",
+      "symbolic coordinate",
+      "vertical line"
     ],
-    "summary": "Find both intersections of a non-vertical line and a circle.",
-    "inputs": "Circle coefficients plus line slope and intercept.",
-    "outputs": "The two intersection points, or the tangent point.",
-    "example": "TYPE  A=-4, B=-2, C=-4, X=0, Y=1\nGET   points (5,1) and (-1,1)",
-    "source": "?→A\n?→B\n?→C\n?→X\n?→Y\n2XY+A+BX→D\nD²-4(1+X²)(Y²+BY+C)→M\n2(1+X²)→A\n(√(M)-D)÷A→C\nC◢XC+Y◢M=0⇒Goto 9\n-2D÷A-C→C\nC◢XC+Y◢Lbl 9"
+    "summary": "Solve parameter k and both intersections when either coordinate is a number or an affine expression in k.",
+    "inputs": "Circle A/B/C, then x=D+Xk and y=Y+Mk. For a number n use (n,0); for k use (0,1).",
+    "outputs": "Each real k value followed by its intersection coordinates, or the single tangent result.",
+    "example": "TYPE  A=-4, B=-2, C=-4, D=0, X=1, Y=1, M=0\nGET   k=5, point (5,1); k=-1, point (-1,1)",
+    "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\n?→M\nD²+Y²+AD+BY+C→C\n2(DX+YM)+AX+BM→B\nX²+M²→A\nB²-4AC→C\n(√(C)-B)÷(2A)→C\nC◢D+XC◢Y+MC◢\n-B÷A-C→B\nB=C⇒Goto 9\nB◢D+XB◢Y+MB◢\nLbl 9"
   },
   {
     "id": "F",

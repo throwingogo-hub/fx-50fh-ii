@@ -705,6 +705,7 @@ for (let i = 0; i < CONSTANTS.length; i++) {
   check('all recommended packs fit the authentic 680-byte memory', PROGRAM_PACKS.every(pack => packBytes(pack) <= 680), true);
   check('Core pack remains 478 bytes', packBytes(PROGRAM_PACKS.find(pack => pack.id === 'core')), 478);
   check('catalog search finds quadratic by topic', filterProgramCatalog('discriminant').map(program => program.id).join(','), 'P1');
+  check('catalog search finds the parameter-k intersection solver', filterProgramCatalog('parameter k').map(program => program.id).join(','), 'E');
   check('catalog category filter isolates finance programs', filterProgramCatalog('', 'Finance').map(program => program.id).join(','), 'C,L');
 }
 {
@@ -751,8 +752,17 @@ for (let i = 0; i < CONSTANTS.length; i++) {
     ['C rate branch', 'C', [3, 1000, 1210, 2], [10]],
     ['C starting-value branch', 'C', [4, 1210, 10, 2], [1000]],
     ['D combined populations', 'D', [2, 10, 2, 2, 14, 2], [12, Math.sqrt(8)]],
-    ['E secant branch', 'E', [-4, -2, -4, 0, 1], [5, 1, -1, 1]],
-    ['E tangent branch', 'E', [0, 0, -1, 0, 1], [0, 1]],
+    ['E parameter-k secant branch', 'E', [-4, -2, -4, 0, 1, 1, 0], [5, 5, 1, -1, -1, 1]],
+    ['E parameter-k tangent branch', 'E', [-4, -2, -4, 0, 1, 4, 0], [2, 2, 4]],
+    ['E numeric-x vertical-line branch', 'E', [-4, -2, -4, 2, 0, 0, 1], [4, 2, 4, -2, 2, -2]],
+    ['E affine-coordinate branch', 'E', [0, 0, -25, -3, 2, 5, -1], [
+      (11 + 2 * Math.sqrt(19)) / 5,
+      (7 + 4 * Math.sqrt(19)) / 5,
+      (14 - 2 * Math.sqrt(19)) / 5,
+      (11 - 2 * Math.sqrt(19)) / 5,
+      (7 - 4 * Math.sqrt(19)) / 5,
+      (14 + 2 * Math.sqrt(19)) / 5
+    ]],
     ['F arithmetic target branch', 'F', [1, 3, 2, 100], [10, 120]],
     ['F geometric target branch', 'F', [2, 2, 1.5, 50], [7, 64.34375]],
     ['G plan displacement', 'G', [3, 4, 0], [5, 5, 0, 36.869897645844]],
