@@ -180,39 +180,22 @@ export const PROGRAMS = Object.freeze([
     "source": "?→M\n?→A\n?→B\n?→C\n0→X\n0→Y\nA→D\nWhile Y<C\nX+1→X\nY+D→Y\nM=1⇒D+B→D\nM=2⇒DB→D\nWhileEnd\nX◢Y◢"
   },
   {
-    "id": "G",
-    "title": "Bearings and 3D Displacement",
-    "bytes": 114,
-    "mode": "COMP",
-    "category": "Geometry",
-    "topics": [
-      "bearing",
-      "elevation",
-      "3D",
-      "displacement"
-    ],
-    "summary": "Resolve bearings and elevation into horizontal and vertical displacement components.",
-    "inputs": "Distance, bearing and elevation information.",
-    "outputs": "Components, horizontal distance and spatial displacement.",
-    "example": "TYPE  A=3, B=4, C=0\nGET   horizontal 5, spatial 5, elevation 0°, bearing 36.86989765°",
-    "source": "Deg\n?→A\n?→B\n?→C\n√(A²+B²)→X\nX◢√(X²+C²)◢tan^-1(Abs(C)÷X)◢B=0⇒Goto 3\ntan^-1(A÷B)→Y\nB<0⇒Y+180→Y\nY<0⇒Y+360→Y\nY◢Goto 9\nLbl 3\n180-90A÷Abs(A)◢Lbl 9"
-  },
-  {
     "id": "H",
-    "title": "Cubic Synthetic Division",
-    "bytes": 95,
+    "title": "Complete Cubic Solver",
+    "bytes": 273,
     "mode": "COMP",
     "category": "Algebra",
     "topics": [
       "cubic",
-      "synthetic division",
-      "quadratic roots"
+      "cubic equation",
+      "cardano",
+      "three real roots"
     ],
-    "summary": "Reduce a cubic using one known root and solve the remaining quadratic.",
-    "inputs": "Cubic coefficients and one known root.",
-    "outputs": "Synthetic-division coefficients and remaining real roots.",
-    "example": "TYPE  A=1, B=-6, C=11, D=-6, X=1\nGET   remainder 0, roots 3 and 2",
-    "source": "?→A\n?→B\n?→C\n?→D\n?→X\nB+AX→B\nC+BX→C\nD+CX→D\nD◢D≠0⇒Goto 9\nB²-4AC→M\n(√(M)-B)÷2÷A→D\nD◢M=0⇒Goto 9\n-B÷A-D◢Lbl 9"
+    "summary": "Solve a cubic directly and return every distinct real root without requiring a known factor.",
+    "inputs": "All four coefficients of Ax³+Bx²+Cx+D=0.",
+    "outputs": "One, two or three distinct real roots.",
+    "example": "TYPE  A=1, B=6, C=11, M=6\nGET   roots -1, -2, -3",
+    "source": "?→A\n?→B\n?→C\n?→M\n2×B³÷(27×A³)-B×C÷(3×A²)+M÷A→D\nC÷A-B²÷(3×A²)→X\nB÷(3×A)→Y\n(D÷2)²+(X÷3)³→M\nM<0⇒Goto 1\nM=0⇒Goto 2\n∛((-D÷2+√(M)))+∛((-D÷2-√(M)))-Y◢\nGoto 9\nLbl 2\n∛((-D÷2))→A\n2×A-Y◢\nA=0⇒Goto 9\n-A-Y◢\nGoto 9\nLbl 1\nDeg\ncos^-1((3×D÷(2×X))×√((-3÷X)))÷3→M\n2×√((-X÷3))→A\nA×cos(M)-Y◢\nA×cos(M - 120)-Y◢\nA×cos(M - 240)-Y◢\nLbl 9"
   },
   {
     "id": "I",
@@ -285,9 +268,9 @@ export const PROGRAMS = Object.freeze([
   },
   {
     "id": "M",
-    "title": "Four Centres of a Right Triangle",
-    "bytes": 71,
-    "mode": "COMP",
+    "title": "Four Centres of Any Triangle",
+    "bytes": 385,
+    "mode": "REG",
     "category": "Geometry",
     "topics": [
       "centroid",
@@ -295,28 +278,11 @@ export const PROGRAMS = Object.freeze([
       "incentre",
       "orthocentre"
     ],
-    "summary": "Return all four triangle centres for the compact right-triangle OAB setup.",
-    "inputs": "The two axis intercept lengths defining the right triangle.",
-    "outputs": "Coordinates of G, O, I and H.",
-    "example": "TYPE  A=9, B=12, C=25\nGET   G=(34/3,4), H=(9,12), C=(12.5,0), I=(10,5)",
-    "source": "?→A\n?→B\n?→C\n(A+C)÷3◢B÷3◢A◢B◢C÷2◢0◢√(A²+B²)→D\n(D+BC÷D-C)÷2→M\nM(A+D)÷B◢M◢"
-  },
-  {
-    "id": "N",
-    "title": "Direct and Inverse Variation",
-    "bytes": 83,
-    "mode": "COMP",
-    "category": "Variation",
-    "topics": [
-      "direct variation",
-      "inverse variation",
-      "power law"
-    ],
-    "summary": "Find the variation constant and predict x or y for direct or inverse power models.",
-    "inputs": "Mode, powers, a known pair and the new x or y value.",
-    "outputs": "Variation constant and predicted value.",
-    "example": "TYPE  M=1, A=2, B=16, C=3, D=3\nGET   k=2, y=54",
-    "source": "?→M\n?→A\n?→B\n?→C\n?→D\nM=2⇒-D→D\nM=4⇒-D→D\nB÷A^(D)→X\nX◢M<3⇒XC^(D)→Y\nM>2⇒(C÷X)^(1÷D)→Y\nY◢"
+    "summary": "Return the centroid, incentre, orthocentre and circumcentre for any non-collinear triangle.",
+    "inputs": "Coordinates of all three vertices.",
+    "outputs": "Coordinates of G, I, H and O.",
+    "example": "TYPE  A=0, B=0, C=24, D=0, X=12, Y=9\nGET   G=(12,3), I=(12,4), H=(12,16), O=(12,-3.5)",
+    "source": "ClrStat\n?→A\n?→B\nA,B DT\n?→C\n?→D\nC,D DT\n?→X\n?→Y\nX,Y DT\nΣx÷3◢\nΣy÷3◢\n√((C-X)²+(D-Y)²)+√((X-A)²+(Y-B)²)+√((A-C)²+(B-D)²)→M\n(√((C-X)²+(D-Y)²)×A+√((X-A)²+(Y-B)²)×C+√((A-C)²+(B-D)²)×X)÷M◢\n(√((C-X)²+(D-Y)²)×B+√((X-A)²+(Y-B)²)×D+√((A-C)²+(B-D)²)×Y)÷M◢\n2×(A×(D-Y)+C×(Y-B)+X×(B-D))→M\nPol(((A²+B²)×(D-Y)+(C²+D²)×(Y-B)+(X²+Y²)×(B-D))÷M,((A²+B²)×(X-C)+(C²+D²)×(A-X)+(X²+Y²)×(C-A))÷M)\nRec(X,Y)\nΣx-2X◢\nΣy-2Y◢\nX◢\nY◢"
   }
 ]);
 
@@ -368,12 +334,12 @@ export const PROGRAM_PACKS = Object.freeze([
   {
     "id": "advanced",
     "name": "Advanced Section B / MCQ",
-    "description": "Intersections, sequence targets, 3D bearings and cubics.",
+    "description": "Parameter intersections, sequence targets, complete cubics and transformed roots.",
     "programIds": [
       "E",
       "F",
-      "G",
-      "H"
+      "H",
+      "J"
     ]
   },
   {
@@ -388,14 +354,14 @@ export const PROGRAM_PACKS = Object.freeze([
     ]
   },
   {
-    "id": "centres-variation",
-    "name": "Centres & variation",
-    "description": "Triangle centres, variation, quadratics and statistics.",
+    "id": "centres-algebra",
+    "name": "Centres & algebra",
+    "description": "General triangle centres with high-value algebra tools.",
     "programIds": [
       "M",
-      "N",
+      "A",
       "P1",
-      "D"
+      "J"
     ]
   }
 ]);

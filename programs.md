@@ -1,6 +1,6 @@
 # HKDSE Core programs for fx-50FH II
 
-These 18 programs are optional. They are available in the web calculator's
+These 16 programs are optional. They are available in the web calculator's
 **Program Studio → HKDSE Library**, but nothing installs automatically. A single
 program always asks for a destination slot, and an occupied slot or four-slot
 pack requires a second confirmation before anything is replaced.
@@ -10,8 +10,8 @@ Mathematics Compulsory Part calculations that are slow or error-prone to repeat
 by hand. The calculator already has direct `nPr`, `nCr`, SD/REG statistics and
 built-in formula functions, so the pack does not duplicate them.
 
-Every heading shows the exact Program Studio byte count. The complete 18-program
-library is **1,841B**; seven recommended four-slot packs fit within the authentic
+Every heading shows the exact Program Studio byte count. The complete 16-program
+library is **2,136B**; seven recommended four-slot packs fit within the authentic
 680-byte shared memory. Any deliberately removed diagnostic output or tighter
 input restriction is stated in the relevant section below.
 
@@ -29,7 +29,7 @@ Program Studio keeps one-step Undo after a Library, pack or backup install. Use
 ## Install manually
 
 1. Open Program Studio's **Editor** and select P1, P2, P3 or P4.
-2. Keep **Run mode** set to `COMP`.
+2. Set **Run mode** to the mode printed beside that program (`COMP` for most programs; `REG` for Extra M).
 3. Copy the entire matching code block below and paste it into **source**.
 4. Wait for **Structure OK**; the slot is saved automatically on this device.
 
@@ -280,14 +280,12 @@ None duplicates an existing program or a one-button calculator feature:
 | D | combined population statistics | combines summary data without the original observations |
 | E | line–circle intersections | finds tangent/secant points, not just circle properties |
 | F | first sequence sum reaching a target | P2 requires `n` to be known already |
-| G | bearings and 3D displacement | handles quadrant corrections and spatial components |
-| H | cubic synthetic division | reduces a cubic from one known root and finds the others |
+| H | complete cubic equations | finds every distinct real root without needing a known factor |
 | I | hypergeometric probability ranges | evaluates exact, at-least and at-most cases in one run |
 | J | transformed quadratic roots | forms new equations without first finding the original roots |
 | K | tangents from a point to a circle | returns both points of contact and the tangent length |
 | L | annuities and reducing-balance loans | handles regular payments, not just one-off compound growth |
-| M | four centres of a right triangle | returns all four centres for the compact DSE `OAB` setup |
-| N | direct and inverse variation | finds the constant and predicts either `x` or `y` for power models |
+| M | four centres of any triangle | returns G, I, H and O from three arbitrary non-collinear vertices |
 
 ### Suggested four-slot combinations
 
@@ -297,9 +295,9 @@ None duplicates an existing program or a one-button calculator feature:
 | Algebra and growth | Quadratic | Extra A | Sequences | Extra C | 352B |
 | Coordinate geometry | Coordinate | Extra B | Extra A | Trig | 469B |
 | Statistics and algebra | Sequences | Extra D | Extra A | Trig | 419B |
-| Advanced Section B / MCQ | Extra E | Extra F | Extra G | Extra H | 421B |
+| Advanced Section B / MCQ | Extra E | Extra F | Extra H | Extra J | 568B |
 | Paper 1 Section B power pack | Extra I | Extra J | Extra K | Extra L | 424B |
-| Centres and variation | Extra M | Extra N | Quadratic | Extra D | 307B |
+| Centres & algebra | Extra M | Extra A | Quadratic | Extra J | 600B |
 
 ## Extra A — Simultaneous 2×2 Solver (52B)
 
@@ -493,7 +491,7 @@ non-foundation-style questions found in Paper 2 Section B. They automate the
 arithmetic after you have formed the correct equation or model; they do not
 replace the working that Paper 1 requires.
 
-All four advanced programs occupy `421B`, leaving `259B` free for editing or
+All four advanced programs occupy `568B`, leaving `112B` free for editing or
 two small personal utilities.
 
 ## Extra E — Line–Circle Intersections (140B)
@@ -642,93 +640,48 @@ WhileEnd
 X◢Y◢
 ```
 
-## Extra G — Bearings and 3D Displacement (114B)
+## Extra H — Complete Cubic Solver (273B)
 
-Calculates a complete displacement in one run and switches to degrees
-automatically.
-
-### Inputs
-
-Enter east/west displacement at `A?`, north/south displacement at `B?`, and
-vertical displacement at `C?`:
-
-- east and north are positive;
-- west and south are negative.
-
-The four outputs are horizontal distance, spatial length, acute elevation or
-depression angle, then the three-figure bearing measured clockwise from north.
-The horizontal displacement must not be `(0,0)`.
-
-For a plan-only question, enter `C=0`; the first output is the required distance
-and the last output is the bearing. Ignore the repeated spatial length and the
-zero elevation angle.
+Solves a real cubic directly; unlike the previous Library program, it does not
+require you to know one root first. Write the equation as
 
 ```text
-TYPE  A=3, B=4, C=0
-GET   horizontal 5, spatial 5, elevation 0°, bearing 36.86989765°
-```
-
-For a 3D segment:
-
-```text
-TYPE  A=3, B=4, C=12
-GET   horizontal 5, spatial 13, elevation 67.38013505°, bearing 36.86989765°
-```
-
-### Copy this program
-
-```text
-Deg
-?→A
-?→B
-?→C
-√(A²+B²)→X
-X◢√(X²+C²)◢tan^-1(Abs(C)÷X)◢B=0⇒Goto 3
-tan^-1(A÷B)→Y
-B<0⇒Y+180→Y
-Y<0⇒Y+360→Y
-Y◢Goto 9
-Lbl 3
-180-90A÷Abs(A)◢Lbl 9
-```
-
-## Extra H — Cubic Synthetic Division (95B)
-
-Reduces a cubic polynomial when one root is already known, checks the remainder,
-then solves the remaining quadratic factor.
-
-Write the polynomial as
-
-```text
-Ax³ + Bx² + Cx + D
+Ax³ + Bx² + Cx + D = 0
 ```
 
 ### Inputs
 
 | Prompt | Enter |
 |---|---|
-| `A?`, `B?`, `C?`, `D?` | cubic coefficients, including any zero coefficient |
-| `X?` | known root |
+| `A?` | coefficient of `x³` (must be non-zero) |
+| `B?` | coefficient of `x²` |
+| `C?` | coefficient of `x` |
+| `M?` | constant `D` |
+
+`M` holds the constant because the calculator has no separate memory named `E`.
 
 ### Outputs
 
-1. Remainder
-2. If the remainder is zero: the remaining distinct real roots
+Every **distinct real root** is shown. The program uses Cardano's formula for
+one real root, a separate repeated-root branch when the discriminant is zero,
+and the trigonometric form for three real roots. Complex roots are intentionally
+not displayed because this is the real-number COMP version from the S5 list.
 
-A non-zero remainder means the supplied `X` is not a root. A negative
-discriminant means the quadratic factor has no additional real roots.
-
-### Example
-
-For `x³−6x²+11x−6` with known root `1`:
+### Examples
 
 ```text
-TYPE  A=1, B=-6, C=11, D=-6, X=1
-GET   remainder 0, roots 3 and 2
-```
+x³+6x²+11x+6=0
+TYPE  A=1, B=6, C=11, M=6
+GET   -1, -2, -3
 
-The adjacent `◢` commands below still pause separately; keeping them on one
-source line avoids unnecessary separator bytes.
+2x³+7x²+5x+1=0
+TYPE  A=2, B=7, C=5, M=1
+GET   approximately -0.381966, -0.5, -2.618034
+
+x³+2x²+2x+1=0
+TYPE  A=1, B=2, C=2, M=1
+GET   -1
+```
 
 ### Copy this program
 
@@ -736,16 +689,29 @@ source line avoids unnecessary separator bytes.
 ?→A
 ?→B
 ?→C
-?→D
-?→X
-B+AX→B
-C+BX→C
-D+CX→D
-D◢D≠0⇒Goto 9
-B²-4AC→M
-(√(M)-B)÷2÷A→D
-D◢M=0⇒Goto 9
--B÷A-D◢Lbl 9
+?→M
+2×B³÷(27×A³)-B×C÷(3×A²)+M÷A→D
+C÷A-B²÷(3×A²)→X
+B÷(3×A)→Y
+(D÷2)²+(X÷3)³→M
+M<0⇒Goto 1
+M=0⇒Goto 2
+∛((-D÷2+√(M)))+∛((-D÷2-√(M)))-Y◢
+Goto 9
+Lbl 2
+∛((-D÷2))→A
+2×A-Y◢
+A=0⇒Goto 9
+-A-Y◢
+Goto 9
+Lbl 1
+Deg
+cos^-1((3×D÷(2×X))×√((-3÷X)))÷3→M
+2×√((-X÷3))→A
+A×cos(M)-Y◢
+A×cos(M - 120)-Y◢
+A×cos(M - 240)-Y◢
+Lbl 9
 ```
 
 ## Paper 1 Section B power pack
@@ -990,27 +956,23 @@ Lbl 9
 Y◢
 ```
 
-## Extra M — Four Centres of a Right Triangle (71B)
+## Extra M — Four Centres of Any Triangle (385B)
 
-Returns all four centres for the short coordinate setup common in DSE
-questions:
+Returns all four classical centres for **any non-collinear triangle**, replacing
+the old Library program that only accepted one special right-triangle layout.
+This is the general version represented in the supplied S5 program list.
 
-```text
-O=(0,0), A=(a,b), B=(c,0), and angle OAB=90°
-```
-
-This is the special case used by the linked
-[82-byte four-centres video](https://www.youtube.com/watch?v=9NdcgqP22Ao), not
-an arbitrary three-point triangle solver. That restriction is exactly why it
-can be so short.
+Set this program's run mode to `REG`; it uses the calculator's linear-statistics
+registers internally to preserve the three coordinate pairs. `ClrStat` runs at
+the start, so existing statistics data is cleared.
 
 ### Inputs
 
 | Prompt | Enter |
 |---|---|
-| `A?` | x-coordinate `a` of the right-angle vertex A |
-| `B?` | y-coordinate `b` of A |
-| `C?` | x-coordinate `c` of the other vertex B=(c,0) |
+| `A?`, `B?` | first vertex `(x₁,y₁)` |
+| `C?`, `D?` | second vertex `(x₂,y₂)` |
+| `X?`, `Y?` | third vertex `(x₃,y₃)` |
 
 ### Outputs
 
@@ -1019,88 +981,54 @@ Eight answers appear as four consecutive coordinate pairs:
 | Pair | Centre | Property useful in written working |
 |---:|---|---|
 | 1 | centroid `G` | intersection of medians; divides each median `2:1` |
-| 2 | orthocentre `H` | the right-angle vertex A |
-| 3 | circumcentre `C` | midpoint of hypotenuse OB |
-| 4 | incentre `I` | equidistant from all three sides |
-
-### Example
-
-For the video's triangle `O=(0,0)`, `A=(9,12)`, `B=(25,0)`:
-
-```text
-TYPE  A=9, B=12, C=25
-GET   G=(34/3,4), H=(9,12), C=(12.5,0), I=(10,5)
-```
-
-The program assumes the stated orientation and right angle. Do not use it when
-all three vertices are arbitrary. In Paper 1, still show the relevant defining
-property above; the coordinates alone are normally only the calculation part.
-
-### Copy this program
-
-```text
-?→A
-?→B
-?→C
-(A+C)÷3◢B÷3◢A◢B◢C÷2◢0◢√(A²+B²)→D
-(D+BC÷D-C)÷2→M
-M(A+D)÷B◢M◢
-```
-
-## Extra N — Direct and Inverse Variation (83B)
-
-Handles the power models
-
-```text
-direct:   y = kx^n
-inverse:  y = k/x^n
-```
-
-It first finds and displays the constant `k`, then predicts either a new `y`
-or the corresponding positive `x`. Use a positive power `n` at `D?`.
-
-### Inputs and outputs
-
-| `M` | Model and unknown | `A?` | `B?` | `C?` | `D?` | Outputs |
-|---:|---|---|---|---|---|---|
-| `1` | direct; find new `y` | known `x` | known `y` | new `x` | power `n` | `k`, new `y` |
-| `2` | inverse; find new `y` | known `x` | known `y` | new `x` | power `n` | `k`, new `y` |
-| `3` | direct; find new `x` | known `x` | known `y` | target `y` | power `n` | `k`, new `x` |
-| `4` | inverse; find new `x` | known `x` | known `y` | target `y` | power `n` | `k`, new `x` |
+| 2 | incentre `I` | equidistant from the three sides |
+| 3 | orthocentre `H` | intersection of altitudes |
+| 4 | circumcentre `O` | equidistant from the three vertices |
 
 ### Examples
 
-If `y` varies directly as `x³` and `y=16` when `x=2`, find `y` when `x=3`:
+For `(0,0)`, `(24,0)` and `(12,9)`:
 
 ```text
-TYPE  M=1, A=2, B=16, C=3, D=3
-GET   k=2, y=54
+TYPE  A=0, B=0, C=24, D=0, X=12, Y=9
+GET   G=(12,3), I=(12,4), H=(12,16), O=(12,-3.5)
 ```
 
-If `y` varies inversely as `x²` and `y=12` when `x=2`:
+For the right triangle `(0,0)`, `(6,0)` and `(0,6)`:
 
 ```text
-TYPE  M=2, A=2, B=12, C=3, D=2  → GET k=48, y=5.333333333
-TYPE  M=4, A=2, B=12, C=3, D=2  → GET k=48, x=4 when target y=3
+TYPE  A=0, B=0, C=6, D=0, X=0, Y=6
+GET   G=(2,2), I=(1.757359313,1.757359313), H=(0,0), O=(3,3)
 ```
 
-Use non-zero values wherever the model divides by `x`, `y` or `k`. Modes 3
-and 4 return the principal positive solution expected in ordinary DSE variation
-questions.
+Collinear points do not define these four centres and produce `Math ERROR`. In
+Paper 1, still state the relevant geometric property; coordinates alone do not
+replace the required reasoning.
 
 ### Copy this program
 
 ```text
-?→M
+ClrStat
 ?→A
 ?→B
+A,B DT
 ?→C
 ?→D
-M=2⇒-D→D
-M=4⇒-D→D
-B÷A^(D)→X
-X◢M<3⇒XC^(D)→Y
-M>2⇒(C÷X)^(1÷D)→Y
+C,D DT
+?→X
+?→Y
+X,Y DT
+Σx÷3◢
+Σy÷3◢
+√((C-X)²+(D-Y)²)+√((X-A)²+(Y-B)²)+√((A-C)²+(B-D)²)→M
+(√((C-X)²+(D-Y)²)×A+√((X-A)²+(Y-B)²)×C+√((A-C)²+(B-D)²)×X)÷M◢
+(√((C-X)²+(D-Y)²)×B+√((X-A)²+(Y-B)²)×D+√((A-C)²+(B-D)²)×Y)÷M◢
+2×(A×(D-Y)+C×(Y-B)+X×(B-D))→M
+Pol(((A²+B²)×(D-Y)+(C²+D²)×(Y-B)+(X²+Y²)×(B-D))÷M,((A²+B²)×(X-C)+(C²+D²)×(A-X)+(X²+Y²)×(C-A))÷M)
+Rec(X,Y)
+Σx-2X◢
+Σy-2Y◢
+X◢
 Y◢
 ```
 

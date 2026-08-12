@@ -410,6 +410,19 @@ main {
 .library-eyebrow { margin: 0 0 5px; color: var(--orange); font: 800 9px/1.2 ui-monospace, monospace; letter-spacing: .1em; }
 .library-head h2 { margin: 0; font: 700 24px/1 "American Typewriter", Rockwell, serif; letter-spacing: -.035em; }
 .library-head p:not(.library-eyebrow) { max-width: 370px; margin: 8px 0 0; color: #656358; font-size: 11px; }
+.library-pdf-link {
+  display: inline-block;
+  min-height: 28px;
+  margin-top: 9px;
+  padding: 6px 9px;
+  border: 1px solid #6e796e;
+  border-radius: 4px;
+  background: rgba(255,255,255,.58);
+  color: #31473f;
+  font: 800 9px/1.5 ui-monospace, monospace;
+  text-decoration: none;
+}
+.library-pdf-link:hover { border-color: #3b5149; background: #e5eee8; }
 .library-memory { align-self: center; text-align: right; color: #4d5f57; font: 800 9px/1.2 ui-monospace, monospace; }
 .library-memory > div { height: 6px; margin-top: 7px; overflow: hidden; border-radius: 5px; background: #cdd2c8; }
 .library-memory i { display: block; width: 0; height: 100%; background: var(--green); transition: width 180ms ease-out, background 180ms ease-out; }

@@ -67,6 +67,7 @@ function runCatalogProgram(id, inputs) {
   const spec = PROGRAM_BY_ID.get(id);
   const parsed = parseProgramText(spec.source, spec.mode);
   const machine = new Machine();
+  machine.mode = spec.mode;
   const run = new Program(spec.mode, parsed.tokens).start(machine);
   const outputs = [];
   let inputIndex = 0;
@@ -685,9 +686,9 @@ for (let i = 0; i < CONSTANTS.length; i++) {
 {
   const guide = readFileSync(new URL('../programs.md', import.meta.url), 'utf8');
   const starts = [...guide.matchAll(/^## (P[1-4]|Extra [A-N])[^\n]*\((\d+)B\)/gm)];
-  check('program guide exposes byte counts for all 18 programs', starts.length, 18);
-  check('canonical program catalog exposes all 18 programs', PROGRAMS.length, 18);
-  check('canonical program ids are unique', new Set(PROGRAMS.map(program => program.id)).size, 18);
+  check('program guide exposes byte counts for all 16 curated programs', starts.length, 16);
+  check('canonical program catalog exposes all 16 curated programs', PROGRAMS.length, 16);
+  check('canonical program ids are unique', new Set(PROGRAMS.map(program => program.id)).size, 16);
   check('every catalog program has searchable metadata and an example', PROGRAMS.every(program =>
     program.title && program.category && program.summary && program.inputs && program.outputs && program.example && program.source), true);
   for (let i = 0; i < starts.length; i++) {
@@ -704,6 +705,8 @@ for (let i = 0; i < CONSTANTS.length; i++) {
     pack.programIds.length === 4 && pack.programIds.every(id => PROGRAM_BY_ID.has(id))), true);
   check('all recommended packs fit the authentic 680-byte memory', PROGRAM_PACKS.every(pack => packBytes(pack) <= 680), true);
   check('Core pack remains 478 bytes', packBytes(PROGRAM_PACKS.find(pack => pack.id === 'core')), 478);
+  check('source-PDF programs all have improved catalog equivalents', ['P1', 'A', 'H', 'P3', 'E', 'B', 'M'].every(id => PROGRAM_BY_ID.has(id)), true);
+  check('low-value bearings and variation extras were curated out', PROGRAM_BY_ID.has('G') || PROGRAM_BY_ID.has('N'), false);
   check('catalog search finds quadratic by topic', filterProgramCatalog('discriminant').map(program => program.id).join(','), 'P1');
   check('catalog search finds the parameter-k intersection solver', filterProgramCatalog('parameter k').map(program => program.id).join(','), 'E');
   check('catalog category filter isolates finance programs', filterProgramCatalog('', 'Finance').map(program => program.id).join(','), 'C,L');
@@ -765,9 +768,10 @@ for (let i = 0; i < CONSTANTS.length; i++) {
     ]],
     ['F arithmetic target branch', 'F', [1, 3, 2, 100], [10, 120]],
     ['F geometric target branch', 'F', [2, 2, 1.5, 50], [7, 64.34375]],
-    ['G plan displacement', 'G', [3, 4, 0], [5, 5, 0, 36.869897645844]],
-    ['G spatial displacement', 'G', [3, 4, 12], [5, 13, 67.38013505196, 36.869897645844]],
-    ['H cubic synthetic division', 'H', [1, -6, 11, -6, 1], [0, 3, 2]],
+    ['H cubic three-real-roots branch', 'H', [1, 6, 11, 6], [-1, -2, -3]],
+    ['H cubic one-real-root branch', 'H', [1, 2, 2, 1], [-1]],
+    ['H cubic repeated-root branch', 'H', [1, 0, -3, 2], [-2, 1]],
+    ['H cubic triple-root branch', 'H', [1, -3, 3, -1], [1]],
     ['I exact probability branch', 'I', [1, 5, 4, 2, 2], [5 / 18]],
     ['I at-least probability branch', 'I', [2, 5, 4, 2, 1], [5 / 6]],
     ['I at-most probability branch', 'I', [3, 5, 4, 2, 1], [13 / 18]],
@@ -777,11 +781,8 @@ for (let i = 0; i < CONSTANTS.length; i++) {
     ['L future savings branch', 'L', [1, 1000, 1, 12, 100], [2395.07533145167]],
     ['L loan payment branch', 'L', [2, 100000, .5, 240], [716.431058478335]],
     ['L outstanding loan branch', 'L', [3, 100000, .5, 12, 716.4310585], [97330.2011848522]],
-    ['M four centres', 'M', [9, 12, 25], [34 / 3, 4, 9, 12, 12.5, 0, 10, 5]],
-    ['N direct y branch', 'N', [1, 2, 16, 3, 3], [2, 54]],
-    ['N inverse y branch', 'N', [2, 2, 12, 3, 2], [48, 16 / 3]],
-    ['N direct x branch', 'N', [3, 2, 16, 54, 3], [2, 3]],
-    ['N inverse x branch', 'N', [4, 2, 12, 3, 2], [48, 4]]
+    ['M general triangle centres', 'M', [0, 0, 24, 0, 12, 9], [12, 3, 12, 4, 12, 16, 12, -3.5]],
+    ['M right-triangle centres', 'M', [0, 0, 6, 0, 0, 6], [2, 2, 6 - 3 * Math.sqrt(2), 6 - 3 * Math.sqrt(2), 0, 0, 3, 3]]
   ];
   for (const [name, id, inputs, outputs] of cases) nearMany(`program library: ${name}`, runCatalogProgram(id, inputs), outputs, 1e-8);
 }

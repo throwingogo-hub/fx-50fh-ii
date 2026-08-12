@@ -17,16 +17,14 @@ const META = {
   B: { category: 'Coordinate', topics: ['circle', 'three points', 'circumcircle'], summary: 'Build the general equation of the circle through three supplied points.', inputs: 'Coordinates of three non-collinear points.', outputs: 'Circle coefficients, centre and radius.' },
   C: { category: 'Finance', topics: ['growth', 'decay', 'exponential', 'compound'], summary: 'Solve for the missing value in exponential growth or decay models.', inputs: 'Mode plus the known starting value, final value, rate and time.', outputs: 'The selected unknown quantity.' },
   D: { category: 'Statistics', topics: ['combined mean', 'standard deviation', 'population'], summary: 'Combine two populations from summary statistics without the original observations.', inputs: 'Both population sizes, means and population standard deviations.', outputs: 'Combined mean and combined population standard deviation.' },
-  E: { category: 'Coordinate', topics: ['line circle', 'intersection', 'tangent', 'secant'], summary: 'Find both intersections of a non-vertical line and a circle.', inputs: 'Circle coefficients plus line slope and intercept.', outputs: 'The two intersection points, or the tangent point.' },
+  E: { category: 'Coordinate', topics: ['line circle', 'intersection', 'tangent', 'secant', 'parameter k', 'symbolic coordinate', 'vertical line'], summary: 'Solve parameter k and both intersections when either coordinate is a number or an affine expression in k.', inputs: 'Circle A/B/C, then x=D+Xk and y=Y+Mk.', outputs: 'Each real k value followed by its intersection coordinates.' },
   F: { category: 'Sequences', topics: ['sequence target', 'minimum n', 'series'], summary: 'Find the first term count whose arithmetic or geometric sum reaches a target.', inputs: 'Sequence type, sequence values and target sum.', outputs: 'The first qualifying n and its sum.' },
-  G: { category: 'Geometry', topics: ['bearing', 'elevation', '3D', 'displacement'], summary: 'Resolve bearings and elevation into horizontal and vertical displacement components.', inputs: 'Distance, bearing and elevation information.', outputs: 'Components, horizontal distance and spatial displacement.' },
-  H: { category: 'Algebra', topics: ['cubic', 'synthetic division', 'quadratic roots'], summary: 'Reduce a cubic using one known root and solve the remaining quadratic.', inputs: 'Cubic coefficients and one known root.', outputs: 'Synthetic-division coefficients and remaining real roots.' },
+  H: { category: 'Algebra', topics: ['cubic', 'cubic equation', 'cardano', 'three real roots'], summary: 'Solve a cubic directly without requiring a known factor.', inputs: 'All four cubic coefficients.', outputs: 'Every distinct real root.' },
   I: { category: 'Probability', topics: ['hypergeometric', 'without replacement', 'nCr'], summary: 'Evaluate exact, at-least or at-most probabilities without replacement.', inputs: 'Probability mode, population counts, draw count and target count.', outputs: 'The requested hypergeometric probability.' },
   J: { category: 'Algebra', topics: ['transformed roots', 'quadratic', 'vieta'], summary: 'Construct a new quadratic after applying a transformation to the original roots.', inputs: 'Original quadratic coefficients plus transformation mode and constants.', outputs: 'Coefficients of the transformed-root equation.' },
   K: { category: 'Coordinate', topics: ['circle tangent', 'point of contact', 'tangent length'], summary: 'Find both tangent points and the tangent length from an external point to a circle.', inputs: 'Circle data and the external point.', outputs: 'Two contact points and tangent length.' },
   L: { category: 'Finance', topics: ['annuity', 'loan', 'payment', 'compound interest'], summary: 'Calculate savings annuities and reducing-balance loan quantities.', inputs: 'Mode, payment, rate, term and known balance values.', outputs: 'The selected annuity or loan result.' },
-  M: { category: 'Geometry', topics: ['centroid', 'circumcentre', 'incentre', 'orthocentre'], summary: 'Return all four triangle centres for the compact right-triangle OAB setup.', inputs: 'The two axis intercept lengths defining the right triangle.', outputs: 'Coordinates of G, O, I and H.' },
-  N: { category: 'Variation', topics: ['direct variation', 'inverse variation', 'power law'], summary: 'Find the variation constant and predict x or y for direct or inverse power models.', inputs: 'Mode, powers, a known pair and the new x or y value.', outputs: 'Variation constant and predicted value.' }
+  M: { category: 'Geometry', topics: ['centroid', 'circumcentre', 'incentre', 'orthocentre'], summary: 'Return all four triangle centres for any non-collinear triangle.', inputs: 'Coordinates of all three vertices.', outputs: 'Coordinates of G, I, H and O.' }
 };
 
 const PACKS = [
@@ -34,9 +32,9 @@ const PACKS = [
   { id: 'algebra-growth', name: 'Algebra & growth', description: 'Quadratics, simultaneous equations, sequences and growth.', programIds: ['P1', 'A', 'P2', 'C'] },
   { id: 'coordinate', name: 'Coordinate geometry', description: 'Points, circles, equations and trig.', programIds: ['P3', 'B', 'A', 'P4'] },
   { id: 'statistics-algebra', name: 'Statistics & algebra', description: 'Sequences, combined statistics, systems and trig.', programIds: ['P2', 'D', 'A', 'P4'] },
-  { id: 'advanced', name: 'Advanced Section B / MCQ', description: 'Intersections, sequence targets, 3D bearings and cubics.', programIds: ['E', 'F', 'G', 'H'] },
+  { id: 'advanced', name: 'Advanced Section B / MCQ', description: 'Parameter intersections, sequence targets, complete cubics and transformed roots.', programIds: ['E', 'F', 'H', 'J'] },
   { id: 'paper1', name: 'Paper 1 Section B', description: 'Probability, transformed roots, tangents and finance.', programIds: ['I', 'J', 'K', 'L'] },
-  { id: 'centres-variation', name: 'Centres & variation', description: 'Triangle centres, variation, quadratics and statistics.', programIds: ['M', 'N', 'P1', 'D'] }
+  { id: 'centres-algebra', name: 'Centres & algebra', description: 'General triangle centres with high-value algebra tools.', programIds: ['M', 'A', 'P1', 'J'] }
 ];
 
 function getExample(body) {
@@ -59,7 +57,7 @@ function getExample(body) {
 function bootstrap() {
   const guide = readFileSync(guidePath, 'utf8');
   const starts = [...guide.matchAll(/^## (P[1-4]|Extra [A-N]) — (.+?) \((\d+)B\)$/gm)];
-  if (starts.length !== 18) throw new Error(`expected 18 program sections, found ${starts.length}`);
+  if (starts.length !== 16) throw new Error(`expected 16 curated program sections, found ${starts.length}`);
   const prefix = guide.slice(0, starts[0].index);
   const programs = starts.map((match, index) => {
     const segment = guide.slice(match.index, starts[index + 1]?.index ?? guide.length);
@@ -93,7 +91,7 @@ function bootstrap() {
 
 function loadCatalog() {
   const catalog = JSON.parse(readFileSync(catalogPath, 'utf8'));
-  if (catalog.version !== 1 || catalog.programs?.length !== 18) throw new Error('invalid program catalog');
+  if (catalog.version !== 1 || catalog.programs?.length !== 16) throw new Error('invalid program catalog');
   const ids = new Set();
   for (const program of catalog.programs) {
     if (ids.has(program.id)) throw new Error(`duplicate program id ${program.id}`);

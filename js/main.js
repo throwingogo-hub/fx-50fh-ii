@@ -5,7 +5,7 @@
 import { KEYS, SHELL_W, SHELL_H, PC_KEYS } from './keymap.js?v=studio-library-v1';
 import { LCD, GLASS } from './lcd.js';
 import { Machine } from './machine.js?v=studio-library-v1';
-import { setupProgramStudio } from './studio.js?v=parameter-k-v1';
+import { setupProgramStudio } from './studio.js?v=curated-library-v1';
 
 const shell = document.getElementById('shell');
 const canvas = document.getElementById('lcd');

@@ -6,9 +6,11 @@ scientific calculator that the HKEAA approves for the HKDSE.
 **[Open the calculator →](https://throwingogo-hub.github.io/fx-50fh-ii/)**
 
 Program Studio includes a searchable, memory-aware **HKDSE Program Library**:
-18 optional programs, seven recommended four-slot packs, protected installs,
+16 curated programs, seven recommended four-slot packs, protected installs,
 one-step undo and versioned export/import backup. The complete reference and
-manual-copy source remains in [programs.md](programs.md).
+manual-copy source remains in [programs.md](programs.md). A matching bilingual,
+print-ready edition is available as the
+[curated S5 Program Library PDF](output/pdf/fx-50fh-ii-s5-program-library.pdf).
 
 It is not a calculator app with a Casio skin. It is the fx-50FH II's own state
 machine — its six modes, its two-line display, its 680 bytes of program memory,
@@ -89,8 +91,8 @@ checkout can use any static-file server.
 
 ## Tests
 
-400 checks, including worked examples, operating limits, REPLAY/history
-navigation, Program Studio text/recovery/backup, all 18 catalog programs and
+394 checks, including worked examples, operating limits, REPLAY/history
+navigation, Program Studio text/recovery/backup, all 16 catalog programs and
 their documented branches, generated-guide parity, and exhaustive LCD menu-layout/glyph coverage derived from the user's guide, driven
 through the machine by key sequence rather than by calling the maths directly —
 so they exercise input, evaluation and formatting the way a person does.
@@ -101,7 +103,9 @@ npm test
 
 `programs.catalog.json` is the source of truth for the executable library.
 After changing it, run `npm run generate:programs`; `npm test` rejects stale
-`programs.md` or `js/program-catalog.generated.js` output.
+`programs.md` or `js/program-catalog.generated.js` output. Run
+`npm run generate:pdf` in an environment with ReportLab and the macOS CJK fonts
+to rebuild the matching print edition.
 
 ## Keyboard
 

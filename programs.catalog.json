@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "prefix": "# HKDSE Core programs for fx-50FH II\n\nThese 18 programs are optional. They are available in the web calculator's\n**Program Studio → HKDSE Library**, but nothing installs automatically. A single\nprogram always asks for a destination slot, and an occupied slot or four-slot\npack requires a second confirmation before anything is replaced.\n\nThe complete P1–P4 Core pack uses **478 of 680 bytes**. It focuses on HKDSE\nMathematics Compulsory Part calculations that are slow or error-prone to repeat\nby hand. The calculator already has direct `nPr`, `nCr`, SD/REG statistics and\nbuilt-in formula functions, so the pack does not duplicate them.\n\nEvery heading shows the exact Program Studio byte count. The complete 18-program\nlibrary is **1,841B**; seven recommended four-slot packs fit within the authentic\n680-byte shared memory. Any deliberately removed diagnostic output or tighter\ninput restriction is stated in the relevant section below.\n\n## Install from the in-app Library\n\n1. Open [Program Studio](https://throwingogo-hub.github.io/fx-50fh-ii/) and choose **HKDSE Library**.\n2. Search by topic or choose a category.\n3. Select the destination P1–P4 slot, then press **Install**.\n4. If the slot already contains a program, confirm the replacement once more.\n5. For a complete setup, choose one of the seven memory-safe four-slot packs.\n\nProgram Studio keeps one-step Undo after a Library, pack or backup install. Use\n**Export all** to download a versioned JSON backup before larger changes.\n\n## Install manually\n\n1. Open Program Studio's **Editor** and select P1, P2, P3 or P4.\n2. Keep **Run mode** set to `COMP`.\n3. Copy the entire matching code block below and paste it into **source**.\n4. Wait for **Structure OK**; the slot is saved automatically on this device.\n\n## Run a program\n\n- In Program Studio, select its slot and press **Run on calculator**; or\n- On the calculator home screen, press **Prog**, then press `1`, `2`, `3` or `4`.\n\nWhen the display shows `A?`, `B?`, `M?` or another variable prompt, enter the\nrequested value and press **EXE**. Each answer pauses on screen; press **EXE**\nagain to reveal the next answer. The calculator returns home after the last one.\n\nFor a negative input on the physical calculator, use the `(-)` key. In Program\nStudio source and the examples below, an ordinary minus sign is fine. Some `◢`\npauses are followed immediately by the next statement because an extra line\nbreak would consume another program byte.\n\n",
+  "prefix": "# HKDSE Core programs for fx-50FH II\n\nThese 16 programs are optional. They are available in the web calculator's\n**Program Studio → HKDSE Library**, but nothing installs automatically. A single\nprogram always asks for a destination slot, and an occupied slot or four-slot\npack requires a second confirmation before anything is replaced.\n\nThe complete P1–P4 Core pack uses **478 of 680 bytes**. It focuses on HKDSE\nMathematics Compulsory Part calculations that are slow or error-prone to repeat\nby hand. The calculator already has direct `nPr`, `nCr`, SD/REG statistics and\nbuilt-in formula functions, so the pack does not duplicate them.\n\nEvery heading shows the exact Program Studio byte count. The complete 16-program\nlibrary is **2,136B**; seven recommended four-slot packs fit within the authentic\n680-byte shared memory. Any deliberately removed diagnostic output or tighter\ninput restriction is stated in the relevant section below.\n\n## Install from the in-app Library\n\n1. Open [Program Studio](https://throwingogo-hub.github.io/fx-50fh-ii/) and choose **HKDSE Library**.\n2. Search by topic or choose a category.\n3. Select the destination P1–P4 slot, then press **Install**.\n4. If the slot already contains a program, confirm the replacement once more.\n5. For a complete setup, choose one of the seven memory-safe four-slot packs.\n\nProgram Studio keeps one-step Undo after a Library, pack or backup install. Use\n**Export all** to download a versioned JSON backup before larger changes.\n\n## Install manually\n\n1. Open Program Studio's **Editor** and select P1, P2, P3 or P4.\n2. Set **Run mode** to the mode printed beside that program (`COMP` for most programs; `REG` for Extra M).\n3. Copy the entire matching code block below and paste it into **source**.\n4. Wait for **Structure OK**; the slot is saved automatically on this device.\n\n## Run a program\n\n- In Program Studio, select its slot and press **Run on calculator**; or\n- On the calculator home screen, press **Prog**, then press `1`, `2`, `3` or `4`.\n\nWhen the display shows `A?`, `B?`, `M?` or another variable prompt, enter the\nrequested value and press **EXE**. Each answer pauses on screen; press **EXE**\nagain to reveal the next answer. The calculator returns home after the last one.\n\nFor a negative input on the physical calculator, use the `(-)` key. In Program\nStudio source and the examples below, an ordinary minus sign is fine. Some `◢`\npauses are followed immediately by the next statement because an extra line\nbreak would consume another program byte.\n\n",
   "packs": [
     {
       "id": "core",
@@ -49,12 +49,12 @@
     {
       "id": "advanced",
       "name": "Advanced Section B / MCQ",
-      "description": "Intersections, sequence targets, 3D bearings and cubics.",
+      "description": "Parameter intersections, sequence targets, complete cubics and transformed roots.",
       "programIds": [
         "E",
         "F",
-        "G",
-        "H"
+        "H",
+        "J"
       ]
     },
     {
@@ -69,14 +69,14 @@
       ]
     },
     {
-      "id": "centres-variation",
-      "name": "Centres & variation",
-      "description": "Triangle centres, variation, quadratics and statistics.",
+      "id": "centres-algebra",
+      "name": "Centres & algebra",
+      "description": "General triangle centres with high-value algebra tools.",
       "programIds": [
         "M",
-        "N",
+        "A",
         "P1",
-        "D"
+        "J"
       ]
     }
   ],
@@ -166,7 +166,7 @@
       "source": "Deg\n?→M\n?→D\nM=1⇒Goto 1\nM=2⇒Goto 2\ntan^-1(D)→X\nX<0⇒X+180→X\nX◢X+180◢X≠0⇒Goto 9\n360◢Goto 9\nLbl 1\nsin^-1(D)→X\nX<0⇒Goto 4\nX◢X=90⇒Goto 9\n180-X◢X≠0⇒Goto 9\n360◢Goto 9\nLbl 4\n180-X◢X=-90⇒Goto 9\n360+X◢Goto 9\nLbl 2\ncos^-1(D)→X\nX◢X=180⇒Goto 9\n360-X◢Lbl 9",
       "guideBody": "P4 finds every distinct solution for `0° ≤ θ ≤ 360°`. It switches the\ncalculator to degrees automatically.\n\n### Inputs\n\n| Prompt | Enter |\n|---|---|\n| `M?` | `1` for sine, `2` for cosine, or `3` for tangent |\n| `D?` | the isolated trig value |\n\nIsolate the trig function first. For example, `2sin θ = 1` becomes\n`sin θ = 0.5`, so enter `D=0.5`. For sine and cosine, `D` must be between\n`-1` and `1`.\n\n### Examples\n\n```text\n2sin θ=1   → TYPE M=1, D=0.5  → GET 30°, 150°\ncos θ=1    → TYPE M=2, D=1    → GET 0°, 360°\ntan θ=-1   → TYPE M=3, D=-1   → GET 135°, 315°\n```",
       "copyHeading": "Copy into P4",
-      "after": "\n\n## Extra swap-in library\n\nThe calculator has only four physical program slots. The programs below are\n**alternatives**, not another pack to install together with P1–P4. Copy an extra\nprogram into whichever slot you choose when a topic is useful, then restore the\nold source from this file later.\n\nNone duplicates an existing program or a one-button calculator feature:\n\n| Extra | Adds | Why it is different |\n|---|---|---|\n| A | simultaneous 2×2 equations | the fx-50FH II has no equation-solver mode |\n| B | circle through three points | P3 starts from a completed general equation |\n| C | growth and decay unknowns | solves for final value, time, rate or starting value |\n| D | combined population statistics | combines summary data without the original observations |\n| E | line–circle intersections | finds tangent/secant points, not just circle properties |\n| F | first sequence sum reaching a target | P2 requires `n` to be known already |\n| G | bearings and 3D displacement | handles quadrant corrections and spatial components |\n| H | cubic synthetic division | reduces a cubic from one known root and finds the others |\n| I | hypergeometric probability ranges | evaluates exact, at-least and at-most cases in one run |\n| J | transformed quadratic roots | forms new equations without first finding the original roots |\n| K | tangents from a point to a circle | returns both points of contact and the tangent length |\n| L | annuities and reducing-balance loans | handles regular payments, not just one-off compound growth |\n| M | four centres of a right triangle | returns all four centres for the compact DSE `OAB` setup |\n| N | direct and inverse variation | finds the constant and predicts either `x` or `y` for power models |\n\n### Suggested four-slot combinations\n\n| Focus | P1 | P2 | P3 | P4 | Total |\n|---|---|---|---|---|---:|\n| Original Core pack | Quadratic | Sequences | Coordinate | Trig | 478B |\n| Algebra and growth | Quadratic | Extra A | Sequences | Extra C | 352B |\n| Coordinate geometry | Coordinate | Extra B | Extra A | Trig | 469B |\n| Statistics and algebra | Sequences | Extra D | Extra A | Trig | 419B |\n| Advanced Section B / MCQ | Extra E | Extra F | Extra G | Extra H | 421B |\n| Paper 1 Section B power pack | Extra I | Extra J | Extra K | Extra L | 424B |\n| Centres and variation | Extra M | Extra N | Quadratic | Extra D | 307B |\n\n"
+      "after": "\n\n## Extra swap-in library\n\nThe calculator has only four physical program slots. The programs below are\n**alternatives**, not another pack to install together with P1–P4. Copy an extra\nprogram into whichever slot you choose when a topic is useful, then restore the\nold source from this file later.\n\nNone duplicates an existing program or a one-button calculator feature:\n\n| Extra | Adds | Why it is different |\n|---|---|---|\n| A | simultaneous 2×2 equations | the fx-50FH II has no equation-solver mode |\n| B | circle through three points | P3 starts from a completed general equation |\n| C | growth and decay unknowns | solves for final value, time, rate or starting value |\n| D | combined population statistics | combines summary data without the original observations |\n| E | line–circle intersections | finds tangent/secant points, not just circle properties |\n| F | first sequence sum reaching a target | P2 requires `n` to be known already |\n| H | complete cubic equations | finds every distinct real root without needing a known factor |\n| I | hypergeometric probability ranges | evaluates exact, at-least and at-most cases in one run |\n| J | transformed quadratic roots | forms new equations without first finding the original roots |\n| K | tangents from a point to a circle | returns both points of contact and the tangent length |\n| L | annuities and reducing-balance loans | handles regular payments, not just one-off compound growth |\n| M | four centres of any triangle | returns G, I, H and O from three arbitrary non-collinear vertices |\n\n### Suggested four-slot combinations\n\n| Focus | P1 | P2 | P3 | P4 | Total |\n|---|---|---|---|---|---:|\n| Original Core pack | Quadratic | Sequences | Coordinate | Trig | 478B |\n| Algebra and growth | Quadratic | Extra A | Sequences | Extra C | 352B |\n| Coordinate geometry | Coordinate | Extra B | Extra A | Trig | 469B |\n| Statistics and algebra | Sequences | Extra D | Extra A | Trig | 419B |\n| Advanced Section B / MCQ | Extra E | Extra F | Extra H | Extra J | 568B |\n| Paper 1 Section B power pack | Extra I | Extra J | Extra K | Extra L | 424B |\n| Centres & algebra | Extra M | Extra A | Quadratic | Extra J | 600B |\n\n"
     },
     {
       "id": "A",
@@ -250,7 +250,7 @@
       "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\n(AB+DX)÷(A+D)◢√((A(C²+B²)+D(Y²+X²))÷(A+D)-(Ans)²)◢",
       "guideBody": "Combines two groups when a question gives only each group's size, mean and\npopulation standard deviation. This is different from SD mode because the\noriginal observations are not required.\n\n### Inputs\n\n| Prompt | Enter |\n|---|---|\n| `A?` | first group size `n₁` |\n| `B?` | first group mean `μ₁` |\n| `C?` | first group population SD `σ₁` |\n| `D?` | second group size `n₂` |\n| `X?` | second group mean `μ₂` |\n| `Y?` | second group population SD `σ₂` |\n\n### Outputs\n\n1. Combined mean\n2. Combined population standard deviation\n\nUse population SD `σ`, not sample SD `s`.\n\n### Example\n\nTwo groups have `(n, μ, σ)=(2,10,2)` and `(2,14,2)`:\n\n```text\nTYPE  A=2, B=10, C=2, D=2, X=14, Y=2\nGET   combined mean 12, combined SD 2.828427125\n```",
       "copyHeading": "Copy this program",
-      "after": "\n\n## Advanced Section B / MCQ library\n\nThese four programs target longer Paper 1 Section B calculations and the\nnon-foundation-style questions found in Paper 2 Section B. They automate the\narithmetic after you have formed the correct equation or model; they do not\nreplace the working that Paper 1 requires.\n\nAll four advanced programs occupy `421B`, leaving `259B` free for editing or\ntwo small personal utilities.\n\n"
+      "after": "\n\n## Advanced Section B / MCQ library\n\nThese four programs target longer Paper 1 Section B calculations and the\nnon-foundation-style questions found in Paper 2 Section B. They automate the\narithmetic after you have formed the correct equation or model; they do not\nreplace the working that Paper 1 requires.\n\nAll four advanced programs occupy `568B`, leaving `112B` free for editing or\ntwo small personal utilities.\n\n"
     },
     {
       "id": "E",
@@ -299,45 +299,24 @@
       "after": "\n\n"
     },
     {
-      "id": "G",
-      "label": "Extra G",
-      "title": "Bearings and 3D Displacement",
-      "bytes": 114,
-      "mode": "COMP",
-      "category": "Geometry",
-      "topics": [
-        "bearing",
-        "elevation",
-        "3D",
-        "displacement"
-      ],
-      "summary": "Resolve bearings and elevation into horizontal and vertical displacement components.",
-      "inputs": "Distance, bearing and elevation information.",
-      "outputs": "Components, horizontal distance and spatial displacement.",
-      "example": "TYPE  A=3, B=4, C=0\nGET   horizontal 5, spatial 5, elevation 0°, bearing 36.86989765°",
-      "source": "Deg\n?→A\n?→B\n?→C\n√(A²+B²)→X\nX◢√(X²+C²)◢tan^-1(Abs(C)÷X)◢B=0⇒Goto 3\ntan^-1(A÷B)→Y\nB<0⇒Y+180→Y\nY<0⇒Y+360→Y\nY◢Goto 9\nLbl 3\n180-90A÷Abs(A)◢Lbl 9",
-      "guideBody": "Calculates a complete displacement in one run and switches to degrees\nautomatically.\n\n### Inputs\n\nEnter east/west displacement at `A?`, north/south displacement at `B?`, and\nvertical displacement at `C?`:\n\n- east and north are positive;\n- west and south are negative.\n\nThe four outputs are horizontal distance, spatial length, acute elevation or\ndepression angle, then the three-figure bearing measured clockwise from north.\nThe horizontal displacement must not be `(0,0)`.\n\nFor a plan-only question, enter `C=0`; the first output is the required distance\nand the last output is the bearing. Ignore the repeated spatial length and the\nzero elevation angle.\n\n```text\nTYPE  A=3, B=4, C=0\nGET   horizontal 5, spatial 5, elevation 0°, bearing 36.86989765°\n```\n\nFor a 3D segment:\n\n```text\nTYPE  A=3, B=4, C=12\nGET   horizontal 5, spatial 13, elevation 67.38013505°, bearing 36.86989765°\n```",
-      "copyHeading": "Copy this program",
-      "after": "\n\n"
-    },
-    {
       "id": "H",
       "label": "Extra H",
-      "title": "Cubic Synthetic Division",
-      "bytes": 95,
+      "title": "Complete Cubic Solver",
+      "bytes": 273,
       "mode": "COMP",
       "category": "Algebra",
       "topics": [
         "cubic",
-        "synthetic division",
-        "quadratic roots"
+        "cubic equation",
+        "cardano",
+        "three real roots"
       ],
-      "summary": "Reduce a cubic using one known root and solve the remaining quadratic.",
-      "inputs": "Cubic coefficients and one known root.",
-      "outputs": "Synthetic-division coefficients and remaining real roots.",
-      "example": "TYPE  A=1, B=-6, C=11, D=-6, X=1\nGET   remainder 0, roots 3 and 2",
-      "source": "?→A\n?→B\n?→C\n?→D\n?→X\nB+AX→B\nC+BX→C\nD+CX→D\nD◢D≠0⇒Goto 9\nB²-4AC→M\n(√(M)-B)÷2÷A→D\nD◢M=0⇒Goto 9\n-B÷A-D◢Lbl 9",
-      "guideBody": "Reduces a cubic polynomial when one root is already known, checks the remainder,\nthen solves the remaining quadratic factor.\n\nWrite the polynomial as\n\n```text\nAx³ + Bx² + Cx + D\n```\n\n### Inputs\n\n| Prompt | Enter |\n|---|---|\n| `A?`, `B?`, `C?`, `D?` | cubic coefficients, including any zero coefficient |\n| `X?` | known root |\n\n### Outputs\n\n1. Remainder\n2. If the remainder is zero: the remaining distinct real roots\n\nA non-zero remainder means the supplied `X` is not a root. A negative\ndiscriminant means the quadratic factor has no additional real roots.\n\n### Example\n\nFor `x³−6x²+11x−6` with known root `1`:\n\n```text\nTYPE  A=1, B=-6, C=11, D=-6, X=1\nGET   remainder 0, roots 3 and 2\n```\n\nThe adjacent `◢` commands below still pause separately; keeping them on one\nsource line avoids unnecessary separator bytes.",
+      "summary": "Solve a cubic directly and return every distinct real root without requiring a known factor.",
+      "inputs": "All four coefficients of Ax³+Bx²+Cx+D=0.",
+      "outputs": "One, two or three distinct real roots.",
+      "example": "TYPE  A=1, B=6, C=11, M=6\nGET   roots -1, -2, -3",
+      "source": "?→A\n?→B\n?→C\n?→M\n2×B³÷(27×A³)-B×C÷(3×A²)+M÷A→D\nC÷A-B²÷(3×A²)→X\nB÷(3×A)→Y\n(D÷2)²+(X÷3)³→M\nM<0⇒Goto 1\nM=0⇒Goto 2\n∛((-D÷2+√(M)))+∛((-D÷2-√(M)))-Y◢\nGoto 9\nLbl 2\n∛((-D÷2))→A\n2×A-Y◢\nA=0⇒Goto 9\n-A-Y◢\nGoto 9\nLbl 1\nDeg\ncos^-1((3×D÷(2×X))×√((-3÷X)))÷3→M\n2×√((-X÷3))→A\nA×cos(M)-Y◢\nA×cos(M - 120)-Y◢\nA×cos(M - 240)-Y◢\nLbl 9",
+      "guideBody": "Solves a real cubic directly; unlike the previous Library program, it does not\nrequire you to know one root first. Write the equation as\n\n```text\nAx³ + Bx² + Cx + D = 0\n```\n\n### Inputs\n\n| Prompt | Enter |\n|---|---|\n| `A?` | coefficient of `x³` (must be non-zero) |\n| `B?` | coefficient of `x²` |\n| `C?` | coefficient of `x` |\n| `M?` | constant `D` |\n\n`M` holds the constant because the calculator has no separate memory named `E`.\n\n### Outputs\n\nEvery **distinct real root** is shown. The program uses Cardano's formula for\none real root, a separate repeated-root branch when the discriminant is zero,\nand the trigonometric form for three real roots. Complex roots are intentionally\nnot displayed because this is the real-number COMP version from the S5 list.\n\n### Examples\n\n```text\nx³+6x²+11x+6=0\nTYPE  A=1, B=6, C=11, M=6\nGET   -1, -2, -3\n\n2x³+7x²+5x+1=0\nTYPE  A=2, B=7, C=5, M=1\nGET   approximately -0.381966, -0.5, -2.618034\n\nx³+2x²+2x+1=0\nTYPE  A=1, B=2, C=2, M=1\nGET   -1\n```",
       "copyHeading": "Copy this program",
       "after": "\n\n## Paper 1 Section B power pack\n\nThe next four programs are designed as one **424B alternative pack** for the\nlonger structured questions in Paper 1 Section B. They cover probability,\nalgebra, coordinate geometry and financial modelling while leaving `256B` free.\n\nThe programs supply numerical results and checks. In Paper 1, still write the\nformula, substitution and reasoning required by the question; a calculator\nanswer by itself does not earn the method marks.\n\n"
     },
@@ -429,9 +408,9 @@
     {
       "id": "M",
       "label": "Extra M",
-      "title": "Four Centres of a Right Triangle",
-      "bytes": 71,
-      "mode": "COMP",
+      "title": "Four Centres of Any Triangle",
+      "bytes": 385,
+      "mode": "REG",
       "category": "Geometry",
       "topics": [
         "centroid",
@@ -439,33 +418,12 @@
         "incentre",
         "orthocentre"
       ],
-      "summary": "Return all four triangle centres for the compact right-triangle OAB setup.",
-      "inputs": "The two axis intercept lengths defining the right triangle.",
-      "outputs": "Coordinates of G, O, I and H.",
-      "example": "TYPE  A=9, B=12, C=25\nGET   G=(34/3,4), H=(9,12), C=(12.5,0), I=(10,5)",
-      "source": "?→A\n?→B\n?→C\n(A+C)÷3◢B÷3◢A◢B◢C÷2◢0◢√(A²+B²)→D\n(D+BC÷D-C)÷2→M\nM(A+D)÷B◢M◢",
-      "guideBody": "Returns all four centres for the short coordinate setup common in DSE\nquestions:\n\n```text\nO=(0,0), A=(a,b), B=(c,0), and angle OAB=90°\n```\n\nThis is the special case used by the linked\n[82-byte four-centres video](https://www.youtube.com/watch?v=9NdcgqP22Ao), not\nan arbitrary three-point triangle solver. That restriction is exactly why it\ncan be so short.\n\n### Inputs\n\n| Prompt | Enter |\n|---|---|\n| `A?` | x-coordinate `a` of the right-angle vertex A |\n| `B?` | y-coordinate `b` of A |\n| `C?` | x-coordinate `c` of the other vertex B=(c,0) |\n\n### Outputs\n\nEight answers appear as four consecutive coordinate pairs:\n\n| Pair | Centre | Property useful in written working |\n|---:|---|---|\n| 1 | centroid `G` | intersection of medians; divides each median `2:1` |\n| 2 | orthocentre `H` | the right-angle vertex A |\n| 3 | circumcentre `C` | midpoint of hypotenuse OB |\n| 4 | incentre `I` | equidistant from all three sides |\n\n### Example\n\nFor the video's triangle `O=(0,0)`, `A=(9,12)`, `B=(25,0)`:\n\n```text\nTYPE  A=9, B=12, C=25\nGET   G=(34/3,4), H=(9,12), C=(12.5,0), I=(10,5)\n```\n\nThe program assumes the stated orientation and right angle. Do not use it when\nall three vertices are arbitrary. In Paper 1, still show the relevant defining\nproperty above; the coordinates alone are normally only the calculation part.",
-      "copyHeading": "Copy this program",
-      "after": "\n\n"
-    },
-    {
-      "id": "N",
-      "label": "Extra N",
-      "title": "Direct and Inverse Variation",
-      "bytes": 83,
-      "mode": "COMP",
-      "category": "Variation",
-      "topics": [
-        "direct variation",
-        "inverse variation",
-        "power law"
-      ],
-      "summary": "Find the variation constant and predict x or y for direct or inverse power models.",
-      "inputs": "Mode, powers, a known pair and the new x or y value.",
-      "outputs": "Variation constant and predicted value.",
-      "example": "TYPE  M=1, A=2, B=16, C=3, D=3\nGET   k=2, y=54",
-      "source": "?→M\n?→A\n?→B\n?→C\n?→D\nM=2⇒-D→D\nM=4⇒-D→D\nB÷A^(D)→X\nX◢M<3⇒XC^(D)→Y\nM>2⇒(C÷X)^(1÷D)→Y\nY◢",
-      "guideBody": "Handles the power models\n\n```text\ndirect:   y = kx^n\ninverse:  y = k/x^n\n```\n\nIt first finds and displays the constant `k`, then predicts either a new `y`\nor the corresponding positive `x`. Use a positive power `n` at `D?`.\n\n### Inputs and outputs\n\n| `M` | Model and unknown | `A?` | `B?` | `C?` | `D?` | Outputs |\n|---:|---|---|---|---|---|---|\n| `1` | direct; find new `y` | known `x` | known `y` | new `x` | power `n` | `k`, new `y` |\n| `2` | inverse; find new `y` | known `x` | known `y` | new `x` | power `n` | `k`, new `y` |\n| `3` | direct; find new `x` | known `x` | known `y` | target `y` | power `n` | `k`, new `x` |\n| `4` | inverse; find new `x` | known `x` | known `y` | target `y` | power `n` | `k`, new `x` |\n\n### Examples\n\nIf `y` varies directly as `x³` and `y=16` when `x=2`, find `y` when `x=3`:\n\n```text\nTYPE  M=1, A=2, B=16, C=3, D=3\nGET   k=2, y=54\n```\n\nIf `y` varies inversely as `x²` and `y=12` when `x=2`:\n\n```text\nTYPE  M=2, A=2, B=12, C=3, D=2  → GET k=48, y=5.333333333\nTYPE  M=4, A=2, B=12, C=3, D=2  → GET k=48, x=4 when target y=3\n```\n\nUse non-zero values wherever the model divides by `x`, `y` or `k`. Modes 3\nand 4 return the principal positive solution expected in ordinary DSE variation\nquestions.",
+      "summary": "Return the centroid, incentre, orthocentre and circumcentre for any non-collinear triangle.",
+      "inputs": "Coordinates of all three vertices.",
+      "outputs": "Coordinates of G, I, H and O.",
+      "example": "TYPE  A=0, B=0, C=24, D=0, X=12, Y=9\nGET   G=(12,3), I=(12,4), H=(12,16), O=(12,-3.5)",
+      "source": "ClrStat\n?→A\n?→B\nA,B DT\n?→C\n?→D\nC,D DT\n?→X\n?→Y\nX,Y DT\nΣx÷3◢\nΣy÷3◢\n√((C-X)²+(D-Y)²)+√((X-A)²+(Y-B)²)+√((A-C)²+(B-D)²)→M\n(√((C-X)²+(D-Y)²)×A+√((X-A)²+(Y-B)²)×C+√((A-C)²+(B-D)²)×X)÷M◢\n(√((C-X)²+(D-Y)²)×B+√((X-A)²+(Y-B)²)×D+√((A-C)²+(B-D)²)×Y)÷M◢\n2×(A×(D-Y)+C×(Y-B)+X×(B-D))→M\nPol(((A²+B²)×(D-Y)+(C²+D²)×(Y-B)+(X²+Y²)×(B-D))÷M,((A²+B²)×(X-C)+(C²+D²)×(A-X)+(X²+Y²)×(C-A))÷M)\nRec(X,Y)\nΣx-2X◢\nΣy-2Y◢\nX◢\nY◢",
+      "guideBody": "Returns all four classical centres for **any non-collinear triangle**, replacing\nthe old Library program that only accepted one special right-triangle layout.\nThis is the general version represented in the supplied S5 program list.\n\nSet this program's run mode to `REG`; it uses the calculator's linear-statistics\nregisters internally to preserve the three coordinate pairs. `ClrStat` runs at\nthe start, so existing statistics data is cleared.\n\n### Inputs\n\n| Prompt | Enter |\n|---|---|\n| `A?`, `B?` | first vertex `(x₁,y₁)` |\n| `C?`, `D?` | second vertex `(x₂,y₂)` |\n| `X?`, `Y?` | third vertex `(x₃,y₃)` |\n\n### Outputs\n\nEight answers appear as four consecutive coordinate pairs:\n\n| Pair | Centre | Property useful in written working |\n|---:|---|---|\n| 1 | centroid `G` | intersection of medians; divides each median `2:1` |\n| 2 | incentre `I` | equidistant from the three sides |\n| 3 | orthocentre `H` | intersection of altitudes |\n| 4 | circumcentre `O` | equidistant from the three vertices |\n\n### Examples\n\nFor `(0,0)`, `(24,0)` and `(12,9)`:\n\n```text\nTYPE  A=0, B=0, C=24, D=0, X=12, Y=9\nGET   G=(12,3), I=(12,4), H=(12,16), O=(12,-3.5)\n```\n\nFor the right triangle `(0,0)`, `(6,0)` and `(0,6)`:\n\n```text\nTYPE  A=0, B=0, C=6, D=0, X=0, Y=6\nGET   G=(2,2), I=(1.757359313,1.757359313), H=(0,0), O=(3,3)\n```\n\nCollinear points do not define these four centres and produce `Math ERROR`. In\nPaper 1, still state the relevant geometric property; coordinates alone do not\nreplace the required reasoning.",
       "copyHeading": "Copy this program",
       "after": "\n\n## Syllabus basis\n\nThe program choices come from the Education Bureau's\n[Explanatory Notes to the Mathematics Curriculum — Compulsory Part](https://www.edb.gov.hk/attachment/en/curriculum-development/kla/ma/curr/EN_CP_e.pdf),\nespecially quadratics, equations, exponential growth and decay, arithmetic and\ngeometric sequences, coordinate geometry, circle equations, trigonometric\nequations and measures of dispersion.\n\nThe [HKEAA Mathematics assessment framework](https://www.hkeaa.edu.hk/DocLibrary/HKDSE/Subject_Information/math/2026hkdse-e-math.pdf)\nexplains the examination structure and the broader Compulsory Part coverage in\nthe later sections of the papers.\n\nThe probability, roots-of-equations and circle work in this pack was also\nchecked against the structure of the official\n[2023 Paper 1 Level 5 exemplars](https://www.hkeaa.edu.hk/DocLibrary/HKDSE/Subject_Information/math/2023-Sample-MATH-CP-Level5-E-4792.pdf).\n\nThe Education Bureau's official materials identify the four triangle centres\nas the centroid, circumcentre, incentre and orthocentre, and discuss their\ncontinued use in HKDSE questions in\n[School Mathematics Newsletter Issue 28](https://www.edb.gov.hk/attachment/en/curriculum-development/kla/ma/res/smn_28.pdf).\n"
     }

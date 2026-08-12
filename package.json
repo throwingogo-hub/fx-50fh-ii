@@ -6,6 +6,7 @@
   "description": "A 1:1 working web recreation of the CASIO fx-50FH II programmable scientific calculator.",
   "scripts": {
     "generate:programs": "node tools/generate-programs.mjs generate",
+    "generate:pdf": "python3 tools/generate-program-library-pdf.py",
     "check:generated": "node tools/generate-programs.mjs check",
     "test": "npm run check:generated && node tests/run.js"
   }
