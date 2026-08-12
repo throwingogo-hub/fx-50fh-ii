@@ -12,6 +12,8 @@ import { StatStore } from '../js/stats.js';
 import { KEYS, SHELL_W, SHELL_H } from '../js/keymap.js';
 import { glyphLayers, hasGlyph, lcdTextCells } from '../js/font.js';
 import { formatProgramText, parseProgramText } from '../js/program-codec.js';
+import { PROGRAMS, PROGRAM_PACKS, PROGRAM_BY_ID } from '../js/program-catalog.generated.js';
+import { createProgramBackup, filterProgramCatalog, packBytes, parseProgramBackup } from '../js/studio.js';
 
 // ---- key sequence DSL -------------------------------------------------------
 // digits and operators are literal; @ prefixes SHIFT, # prefixes ALPHA,
@@ -55,6 +57,36 @@ function near(name, got, want, eps = 1e-9) {
   check(name, Math.abs(got - want) <= eps * Math.max(1, Math.abs(want)), true);
 }
 
+function nearMany(name, got, want, eps = 1e-9) {
+  const matches = got.length === want.length && got.every((value, index) =>
+    Math.abs(value - want[index]) <= eps * Math.max(1, Math.abs(want[index])));
+  check(name, matches ? got.length : got, want.length);
+}
+
+function runCatalogProgram(id, inputs) {
+  const spec = PROGRAM_BY_ID.get(id);
+  const parsed = parseProgramText(spec.source, spec.mode);
+  const machine = new Machine();
+  const run = new Program(spec.mode, parsed.tokens).start(machine);
+  const outputs = [];
+  let inputIndex = 0;
+  let state = run.step();
+  let guard = 0;
+  while (!state.done && guard++ < 10000) {
+    if (state.kind === 'input') {
+      if (inputIndex >= inputs.length) throw new Error(`${id} asked for unexpected input ${state.varName}`);
+      run.provide(inputs[inputIndex++]);
+    } else if (state.kind === 'output') {
+      outputs.push(state.value.re);
+      run.resume();
+    }
+    state = run.step();
+  }
+  if (guard >= 10000) throw new Error(`${id} did not finish`);
+  if (inputIndex !== inputs.length) throw new Error(`${id} used ${inputIndex}/${inputs.length} inputs`);
+  return outputs;
+}
+
 /** Run a key sequence on a fresh machine (or the supplied one) and read line 2. */
 function shown(m) {
   const v = m.view();
@@ -94,6 +126,19 @@ check('every key has a spoken base label', KEYS.every((key) => typeof key.base =
 check('every hotspot stays inside the fitted shell', KEYS.every((key) =>
   key.x >= 0 && key.y >= 0 && key.w > 0 && key.h > 0 &&
   key.x + key.w <= SHELL_W && key.y + key.h <= SHELL_H), true);
+{
+  const mobileScale = (390 * .86) / SHELL_W;
+  check('every physical key keeps a 24px mobile target at 390px', KEYS.every(key =>
+    key.w * mobileScale >= 24 && key.h * mobileScale >= 24), true);
+  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const css = readFileSync(new URL('../css/style.css', import.meta.url), 'utf8');
+  check('Program Studio exposes Editor and Library tabpanels',
+    html.includes('id="studio-editor-view"') && html.includes('id="program-library-view"'), true);
+  check('Program Studio exposes versioned backup controls',
+    html.includes('data-studio-action="export-backup"') && html.includes('data-studio-action="import-backup"'), true);
+  check('mobile column layout cancels the desktop Studio flex basis',
+    /@media \(max-width: 820px\)[\s\S]*?#studio \{ flex: none; margin-top: 0; \}/.test(css), true);
+}
 
 // ---- shared LCD menu layout ------------------------------------------------
 {
@@ -641,6 +686,10 @@ for (let i = 0; i < CONSTANTS.length; i++) {
   const guide = readFileSync(new URL('../programs.md', import.meta.url), 'utf8');
   const starts = [...guide.matchAll(/^## (P[1-4]|Extra [A-N])[^\n]*\((\d+)B\)/gm)];
   check('program guide exposes byte counts for all 18 programs', starts.length, 18);
+  check('canonical program catalog exposes all 18 programs', PROGRAMS.length, 18);
+  check('canonical program ids are unique', new Set(PROGRAMS.map(program => program.id)).size, 18);
+  check('every catalog program has searchable metadata and an example', PROGRAMS.every(program =>
+    program.title && program.category && program.summary && program.inputs && program.outputs && program.example && program.source), true);
   for (let i = 0; i < starts.length; i++) {
     const section = guide.slice(starts[i].index, starts[i + 1]?.index ?? guide.length);
     const copy = section.slice(section.lastIndexOf('### Copy'));
@@ -648,7 +697,83 @@ for (let i = 0; i < CONSTANTS.length; i++) {
     const parsed = parseProgramText(source, 'COMP');
     check(`${starts[i][1]} guide source parses`, parsed.errors.length, 0);
     check(`${starts[i][1]} guide byte label is exact`, parsed.bytes, Number(starts[i][2]));
+    const id = starts[i][1].startsWith('Extra ') ? starts[i][1].slice(6) : starts[i][1];
+    check(`${id} guide source matches the canonical catalog`, source, PROGRAM_BY_ID.get(id).source);
   }
+  check('all recommended packs contain four real programs', PROGRAM_PACKS.every(pack =>
+    pack.programIds.length === 4 && pack.programIds.every(id => PROGRAM_BY_ID.has(id))), true);
+  check('all recommended packs fit the authentic 680-byte memory', PROGRAM_PACKS.every(pack => packBytes(pack) <= 680), true);
+  check('Core pack remains 478 bytes', packBytes(PROGRAM_PACKS.find(pack => pack.id === 'core')), 478);
+  check('catalog search finds quadratic by topic', filterProgramCatalog('discriminant').map(program => program.id).join(','), 'P1');
+  check('catalog category filter isolates finance programs', filterProgramCatalog('', 'Finance').map(program => program.id).join(','), 'C,L');
+}
+{
+  const drafts = [
+    { mode: 'COMP', source: PROGRAM_BY_ID.get('P1').source },
+    { mode: 'COMP', source: '' },
+    { mode: 'BASE', source: 'Dec' },
+    { mode: 'COMP', source: 'If 1\nThen 2' }
+  ];
+  const machine = new Machine();
+  machine.setStudioProgram(0, 'COMP', parseProgramText(drafts[0].source, 'COMP').tokenIds);
+  const backup = createProgramBackup(drafts, machine.programSnapshot(), '2026-08-13T00:00:00.000Z');
+  const restored = parseProgramBackup(JSON.stringify(backup));
+  check('versioned backup round-trips all four raw drafts', JSON.stringify(restored.drafts), JSON.stringify(drafts));
+  check('versioned backup retains calculator snapshot tokens', restored.machine.slots[0].tokens.length > 0, true);
+  let rejected = false;
+  try { parseProgramBackup({ format: 'other', version: 1, drafts: [], machine: null }); } catch { rejected = true; }
+  check('backup import rejects the wrong format', rejected, true);
+}
+{
+  const machine = new Machine();
+  machine.setStudioProgram(0, 'COMP', ['1']);
+  const oversized = { version: 1, slots: Array.from({ length: 4 }, () => ({ mode: 'COMP', tokens: Array(200).fill('1') })) };
+  check('snapshot restore rejects more than 680 shared bytes', machine.restoreProgramSnapshot(oversized), false);
+  check('rejected snapshot leaves existing programs untouched', machine.programs[0].tokens[0].id, '1');
+}
+{
+  const cases = [
+    ['P1 documented roots', 'P1', [1, -5, 6], [1, 2.5, -.25, 3, 2]],
+    ['P1 repeated root branch', 'P1', [1, -2, 1], [0, 1, 0, 1]],
+    ['P1 no-real-root branch', 'P1', [1, 0, 1], [-4, 0, 1]],
+    ['P2 arithmetic branch', 'P2', [1, 2, 3, 5], [14, 40]],
+    ['P2 finite geometric branch', 'P2', [2, 3, 2, 4], [24, 45]],
+    ['P2 infinite geometric branch', 'P2', [3, 6, .5], [12]],
+    ['P3 two-point branch', 'P3', [1, 0, 0, 3, 4], [5, 1.5, 2, 4 / 3]],
+    ['P3 circle branch', 'P3', [2, -4, 6, -12], [2, -3, 5]],
+    ['P4 sine branch', 'P4', [1, .5], [30, 150]],
+    ['P4 cosine boundary branch', 'P4', [2, 1], [0, 360]],
+    ['P4 negative tangent branch', 'P4', [3, -1], [135, 315]],
+    ['A simultaneous equations', 'A', [2, 1, 7, 1, -1, 2], [3, 1]],
+    ['B circle through three points', 'B', [0, 0, 4, 0, 0, 6], [2, 3, Math.sqrt(13)]],
+    ['C final-value branch', 'C', [1, 1000, 5, 3], [1157.625]],
+    ['C periods branch', 'C', [2, 1000, 10, 1210], [2]],
+    ['C rate branch', 'C', [3, 1000, 1210, 2], [10]],
+    ['C starting-value branch', 'C', [4, 1210, 10, 2], [1000]],
+    ['D combined populations', 'D', [2, 10, 2, 2, 14, 2], [12, Math.sqrt(8)]],
+    ['E secant branch', 'E', [-4, -2, -4, 0, 1], [5, 1, -1, 1]],
+    ['E tangent branch', 'E', [0, 0, -1, 0, 1], [0, 1]],
+    ['F arithmetic target branch', 'F', [1, 3, 2, 100], [10, 120]],
+    ['F geometric target branch', 'F', [2, 2, 1.5, 50], [7, 64.34375]],
+    ['G plan displacement', 'G', [3, 4, 0], [5, 5, 0, 36.869897645844]],
+    ['G spatial displacement', 'G', [3, 4, 12], [5, 13, 67.38013505196, 36.869897645844]],
+    ['H cubic synthetic division', 'H', [1, -6, 11, -6, 1], [0, 3, 2]],
+    ['I exact probability branch', 'I', [1, 5, 4, 2, 2], [5 / 18]],
+    ['I at-least probability branch', 'I', [2, 5, 4, 2, 1], [5 / 6]],
+    ['I at-most probability branch', 'I', [3, 5, 4, 2, 1], [13 / 18]],
+    ['J affine roots branch', 'J', [1, 1, -5, 6, 2, 1], [-12, 35]],
+    ['J squared roots branch', 'J', [2, 1, -5, 6], [-13, 36]],
+    ['K external tangents', 'K', [0, 0, 5, 13, 0], [12, 25 / 13, 60 / 13, 25 / 13, -60 / 13]],
+    ['L future savings branch', 'L', [1, 1000, 1, 12, 100], [2395.07533145167]],
+    ['L loan payment branch', 'L', [2, 100000, .5, 240], [716.431058478335]],
+    ['L outstanding loan branch', 'L', [3, 100000, .5, 12, 716.4310585], [97330.2011848522]],
+    ['M four centres', 'M', [9, 12, 25], [34 / 3, 4, 9, 12, 12.5, 0, 10, 5]],
+    ['N direct y branch', 'N', [1, 2, 16, 3, 3], [2, 54]],
+    ['N inverse y branch', 'N', [2, 2, 12, 3, 2], [48, 16 / 3]],
+    ['N direct x branch', 'N', [3, 2, 16, 54, 3], [2, 3]],
+    ['N inverse x branch', 'N', [4, 2, 12, 3, 2], [48, 4]]
+  ];
+  for (const [name, id, inputs, outputs] of cases) nearMany(`program library: ${name}`, runCatalogProgram(id, inputs), outputs, 1e-8);
 }
 {
   const commandsRoundTrip = Object.entries(TOK)

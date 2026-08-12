@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>CASIO fx-50FH II — web</title>
 <meta name="description" content="A 1:1 working web recreation of the CASIO fx-50FH II (H.K.E.A.A. approved) programmable scientific calculator: all six modes, 23 built-in formulas, 40 scientific constants, base-n, statistics and the BASIC-like program mode.">
-<link rel="stylesheet" href="css/style.css?v=green-cutout-9206630d">
+<link rel="stylesheet" href="css/style.css?v=studio-library-v2">
 </head>
 <body>
 
@@ -35,53 +35,112 @@
         <span id="studio-save-state" class="save-state" role="status">saved</span>
       </header>
 
-      <div id="program-slots" class="program-slots" role="tablist" aria-label="Program slots">
-        <button type="button" role="tab" data-slot="0" aria-selected="true"><b>P1</b><span>empty</span></button>
-        <button type="button" role="tab" data-slot="1" aria-selected="false"><b>P2</b><span>empty</span></button>
-        <button type="button" role="tab" data-slot="2" aria-selected="false"><b>P3</b><span>empty</span></button>
-        <button type="button" role="tab" data-slot="3" aria-selected="false"><b>P4</b><span>empty</span></button>
+      <div id="studio-view-tabs" class="studio-view-tabs" role="tablist" aria-label="Program Studio views">
+        <button id="editor-tab" type="button" role="tab" aria-selected="true" aria-controls="studio-editor-view" tabindex="0">Editor</button>
+        <button id="library-tab" type="button" role="tab" aria-selected="false" aria-controls="program-library-view" tabindex="-1">HKDSE Library <span>18</span></button>
       </div>
 
-      <div class="studio-editor-card">
-        <div class="editor-topline">
-          <label for="studio-mode">Run mode
-            <select id="studio-mode">
-              <option>COMP</option><option>CMPLX</option><option>BASE</option>
-              <option>SD</option><option>REG</option>
-            </select>
-          </label>
-          <div class="copy-tools">
-            <button type="button" data-studio-action="copy">Copy</button>
-            <button type="button" data-studio-action="paste">Paste</button>
+      <div id="studio-editor-view" role="tabpanel" aria-labelledby="editor-tab">
+        <div class="studio-management">
+          <span>Four on-device slots</span>
+          <div>
+            <button type="button" data-studio-action="export-backup">Export all</button>
+            <button type="button" data-studio-action="import-backup">Import backup</button>
+            <button id="studio-undo" type="button" data-studio-action="undo-install" hidden>Undo install</button>
+            <input id="studio-backup-file" type="file" accept="application/json,.json" hidden>
           </div>
         </div>
 
-        <label class="editor-label" for="program-source">P1 source</label>
-        <textarea id="program-source" rows="10" spellcheck="false" autocapitalize="off"
-          placeholder="?→A&#10;A×2.54◢" aria-describedby="program-feedback"></textarea>
-
-        <div class="editor-status">
-          <output id="program-feedback" aria-live="polite">Empty program — ready.</output>
-          <span id="program-bytes">0 / 680 bytes</span>
+        <div id="program-slots" class="program-slots" role="tablist" aria-label="Program slots">
+          <button id="slot-tab-1" type="button" role="tab" data-slot="0" aria-selected="true" aria-controls="program-editor-panel" tabindex="0"><b>P1</b><span>empty</span></button>
+          <button id="slot-tab-2" type="button" role="tab" data-slot="1" aria-selected="false" aria-controls="program-editor-panel" tabindex="-1"><b>P2</b><span>empty</span></button>
+          <button id="slot-tab-3" type="button" role="tab" data-slot="2" aria-selected="false" aria-controls="program-editor-panel" tabindex="-1"><b>P3</b><span>empty</span></button>
+          <button id="slot-tab-4" type="button" role="tab" data-slot="3" aria-selected="false" aria-controls="program-editor-panel" tabindex="-1"><b>P4</b><span>empty</span></button>
         </div>
-        <div class="byte-track" aria-hidden="true"><i id="byte-fill"></i></div>
 
-        <div class="studio-primary-actions">
-          <button type="button" class="run-program" data-studio-action="run">Run on calculator</button>
-          <button type="button" data-studio-action="edit-calculator">Edit with keys</button>
-          <button type="button" class="danger-link" data-studio-action="clear">Clear P1</button>
+        <div id="program-editor-panel" class="studio-editor-card" role="tabpanel" aria-labelledby="slot-tab-1">
+          <div class="editor-topline">
+            <label for="studio-mode">Run mode
+              <select id="studio-mode">
+                <option>COMP</option><option>CMPLX</option><option>BASE</option>
+                <option>SD</option><option>REG</option>
+              </select>
+            </label>
+            <div class="copy-tools">
+              <button type="button" data-studio-action="copy">Copy</button>
+              <button type="button" data-studio-action="paste">Paste</button>
+            </div>
+          </div>
+
+          <label class="editor-label" for="program-source">P1 source</label>
+          <textarea id="program-source" rows="10" spellcheck="false" autocapitalize="off"
+            placeholder="?→A&#10;A×2.54◢" aria-describedby="program-feedback"></textarea>
+
+          <div class="editor-status">
+            <output id="program-feedback" aria-live="polite">Empty program — ready.</output>
+            <span id="program-bytes">0 / 680 bytes</span>
+          </div>
+          <div class="byte-track" aria-hidden="true"><i id="byte-fill"></i></div>
+
+          <div class="studio-primary-actions">
+            <button type="button" class="run-program" data-studio-action="run">Run on calculator</button>
+            <button type="button" data-studio-action="edit-calculator">Edit with keys</button>
+            <button type="button" class="danger-link" data-studio-action="clear">Clear P1</button>
+          </div>
         </div>
+
+        <div class="command-drawer">
+          <div class="drawer-heading">
+            <h2>Command shelf</h2>
+            <span>inserts at cursor</span>
+          </div>
+          <div id="command-palette"></div>
+        </div>
+
+        <p class="studio-footnote"><b>Recovery:</b> calculator-key edits and Studio edits are autosaved. Export all four slots before clearing browser data.</p>
       </div>
 
-      <div class="command-drawer">
-        <div class="drawer-heading">
-          <h2>Command shelf</h2>
-          <span>inserts at cursor</span>
-        </div>
-        <div id="command-palette"></div>
-      </div>
+      <section id="program-library-view" class="program-library" role="tabpanel" aria-labelledby="library-tab" hidden>
+        <header class="library-head">
+          <div>
+            <p class="library-eyebrow">18 TESTED PROGRAMS · 7 FOUR-SLOT PACKS</p>
+            <h2>HKDSE Program Library</h2>
+            <p>Choose deliberately. Nothing installs or replaces a slot until you confirm it.</p>
+          </div>
+          <div class="library-memory" aria-label="Program memory usage">
+            <span id="library-memory-label">0 / 680B used</span>
+            <div aria-hidden="true"><i id="library-memory-fill"></i></div>
+          </div>
+        </header>
 
-      <p class="studio-footnote"><b>Recovery:</b> calculator-key edits and Studio edits are autosaved. Copy important programs elsewhere before clearing browser data.</p>
+        <div class="library-controls">
+          <label class="library-search" for="library-search">
+            <span>Find a topic</span>
+            <input id="library-search" type="search" placeholder="quadratic, circle, finance…" autocomplete="off">
+          </label>
+          <label class="library-destination" for="library-slot">
+            <span>Install into</span>
+            <select id="library-slot"><option value="0">P1</option><option value="1">P2</option><option value="2">P3</option><option value="3">P4</option></select>
+          </label>
+        </div>
+        <div id="library-filters" class="library-filters" role="toolbar" aria-label="Filter programs by topic"></div>
+        <output id="library-status" class="library-status" aria-live="polite">Choose a program or a four-slot pack.</output>
+
+        <section class="pack-shelf" aria-labelledby="pack-title">
+          <div class="drawer-heading">
+            <h2 id="pack-title">Four-slot packs</h2>
+            <span>memory-safe combinations</span>
+          </div>
+          <div id="program-packs" class="program-packs"></div>
+        </section>
+
+        <div class="library-results-heading">
+          <h2>Swap-in programs</h2>
+          <output id="library-result-count">18 programs</output>
+        </div>
+        <div id="program-library-grid" class="program-library-grid"></div>
+        <p id="library-empty" class="library-empty" hidden>No matching program. Try a broader topic.</p>
+      </section>
     </section>
   </div>
 
@@ -111,7 +170,9 @@
         EDIT / RUN / DEL.</li>
       <li><b>Program Studio</b> → write or paste normal program text, insert
         commands, see shared byte usage, and run or continue editing with the calculator keys.
-        All four slots and active drafts are autosaved on this device.</li>
+        All four slots and active drafts are autosaved on this device. The <b>HKDSE Library</b>
+        provides 18 tested programs and seven four-slot packs with overwrite confirmation,
+        Undo, and versioned export/import backup.</li>
       <li>In BASE mode: x² = DEC, ^ = HEX, log = BIN, ln = OCT, and x⁻¹ opens
         the LOGIC menu.</li>
       <li>In SD/REG: M+ is DT, SHIFT M+ is CL, SHIFT 1 is S-SUM,
@@ -127,6 +188,6 @@
   </section>
 </main>
 
-<script type="module" src="js/main.js"></script>
+<script type="module" src="js/main.js?v=studio-library-v1"></script>
 </body>
 </html>

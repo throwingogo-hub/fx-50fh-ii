@@ -46,10 +46,10 @@ export const KEYS = [
   k('ON', 660, 630, 92, 72, { base: 'ON' }),
 
   // ---- program / formula row ----------------------------------------------
-  k('PROG', 124, 769, 94, 62, { base: 'Prog', shift: 'EXIT', orange: true }),
-  k('FMLA', 230, 769, 94, 62, { base: 'FMLA', shift: 'LOOK', orange: true }),
-  k('RECIP', 557, 768, 96, 62, { base: 'x⁻¹', shift: 'x!', basen: 'LOGIC' }),
-  k('CUBE', 662, 768, 96, 62, { base: 'x³', shift: '∛(' }),
+  k('PROG', 124, 768, 94, 64, { base: 'Prog', shift: 'EXIT', orange: true }),
+  k('FMLA', 230, 768, 94, 64, { base: 'FMLA', shift: 'LOOK', orange: true }),
+  k('RECIP', 557, 767, 96, 64, { base: 'x⁻¹', shift: 'x!', basen: 'LOGIC' }),
+  k('CUBE', 662, 767, 96, 64, { base: 'x³', shift: '∛(' }),
 
   // ---- function rows -------------------------------------------------------
   ...row6(R.fn1, [

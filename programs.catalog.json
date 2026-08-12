@@ -1,0 +1,470 @@
+{
+  "version": 1,
+  "prefix": "# HKDSE Core programs for fx-50FH II\n\nThese 18 programs are optional. They are available in the web calculator's\n**Program Studio → HKDSE Library**, but nothing installs automatically. A single\nprogram always asks for a destination slot, and an occupied slot or four-slot\npack requires a second confirmation before anything is replaced.\n\nThe complete P1–P4 Core pack uses **478 of 680 bytes**. It focuses on HKDSE\nMathematics Compulsory Part calculations that are slow or error-prone to repeat\nby hand. The calculator already has direct `nPr`, `nCr`, SD/REG statistics and\nbuilt-in formula functions, so the pack does not duplicate them.\n\nEvery heading shows the exact Program Studio byte count. The complete 18-program\nlibrary is **1,812B**; seven recommended four-slot packs fit within the authentic\n680-byte shared memory. Any deliberately removed diagnostic output or tighter\ninput restriction is stated in the relevant section below.\n\n## Install from the in-app Library\n\n1. Open [Program Studio](https://throwingogo-hub.github.io/fx-50fh-ii/) and choose **HKDSE Library**.\n2. Search by topic or choose a category.\n3. Select the destination P1–P4 slot, then press **Install**.\n4. If the slot already contains a program, confirm the replacement once more.\n5. For a complete setup, choose one of the seven memory-safe four-slot packs.\n\nProgram Studio keeps one-step Undo after a Library, pack or backup install. Use\n**Export all** to download a versioned JSON backup before larger changes.\n\n## Install manually\n\n1. Open Program Studio's **Editor** and select P1, P2, P3 or P4.\n2. Keep **Run mode** set to `COMP`.\n3. Copy the entire matching code block below and paste it into **source**.\n4. Wait for **Structure OK**; the slot is saved automatically on this device.\n\n## Run a program\n\n- In Program Studio, select its slot and press **Run on calculator**; or\n- On the calculator home screen, press **Prog**, then press `1`, `2`, `3` or `4`.\n\nWhen the display shows `A?`, `B?`, `M?` or another variable prompt, enter the\nrequested value and press **EXE**. Each answer pauses on screen; press **EXE**\nagain to reveal the next answer. The calculator returns home after the last one.\n\nFor a negative input on the physical calculator, use the `(-)` key. In Program\nStudio source and the examples below, an ordinary minus sign is fine. Some `◢`\npauses are followed immediately by the next statement because an extra line\nbreak would consume another program byte.\n\n",
+  "packs": [
+    {
+      "id": "core",
+      "name": "Original Core",
+      "description": "The balanced everyday pack.",
+      "programIds": [
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ]
+    },
+    {
+      "id": "algebra-growth",
+      "name": "Algebra & growth",
+      "description": "Quadratics, simultaneous equations, sequences and growth.",
+      "programIds": [
+        "P1",
+        "A",
+        "P2",
+        "C"
+      ]
+    },
+    {
+      "id": "coordinate",
+      "name": "Coordinate geometry",
+      "description": "Points, circles, equations and trig.",
+      "programIds": [
+        "P3",
+        "B",
+        "A",
+        "P4"
+      ]
+    },
+    {
+      "id": "statistics-algebra",
+      "name": "Statistics & algebra",
+      "description": "Sequences, combined statistics, systems and trig.",
+      "programIds": [
+        "P2",
+        "D",
+        "A",
+        "P4"
+      ]
+    },
+    {
+      "id": "advanced",
+      "name": "Advanced Section B / MCQ",
+      "description": "Intersections, sequence targets, 3D bearings and cubics.",
+      "programIds": [
+        "E",
+        "F",
+        "G",
+        "H"
+      ]
+    },
+    {
+      "id": "paper1",
+      "name": "Paper 1 Section B",
+      "description": "Probability, transformed roots, tangents and finance.",
+      "programIds": [
+        "I",
+        "J",
+        "K",
+        "L"
+      ]
+    },
+    {
+      "id": "centres-variation",
+      "name": "Centres & variation",
+      "description": "Triangle centres, variation, quadratics and statistics.",
+      "programIds": [
+        "M",
+        "N",
+        "P1",
+        "D"
+      ]
+    }
+  ],
+  "programs": [
+    {
+      "id": "P1",
+      "label": "P1",
+      "title": "Quadratic X-Ray",
+      "bytes": 80,
+      "mode": "COMP",
+      "category": "Algebra",
+      "topics": [
+        "quadratic",
+        "discriminant",
+        "vertex",
+        "roots"
+      ],
+      "summary": "Diagnose a quadratic in one run: discriminant, vertex and every real root.",
+      "inputs": "Coefficients a, b and c.",
+      "outputs": "Discriminant, vertex coordinates and real roots.",
+      "example": "TYPE  A=1, B=-5, C=6\nGET   Δ=1, h=2.5, k=-0.25, roots 3 and 2",
+      "source": "?→A\n?→B\n?→C\nB²-4AC→D\nD◢-B÷2÷A◢-D÷4÷A◢D<0⇒Goto 9\n(√(D)-B)÷2÷A→C\nC◢D=0⇒Goto 9\n-B÷A-C◢Lbl 9",
+      "guideBody": "Use P1 for a quadratic equation\n\n```text\nax² + bx + c = 0\n```\n\n### Inputs\n\n| Prompt | Enter |\n|---|---|\n| `A?` | coefficient `a` of `x²` |\n| `B?` | coefficient `b` of `x` |\n| `C?` | constant `c` |\n\n### Outputs\n\nThe answers appear in this order:\n\n1. Discriminant `Δ = b² − 4ac`\n2. Vertex x-coordinate `h`\n3. Vertex y-coordinate `k`\n4. First real root\n5. Second real root\n\nIf `Δ < 0`, P1 stops after the vertex because there are no real roots. If\n`Δ = 0`, the repeated root is shown once.\n\n### Example\n\nFor `x² − 5x + 6 = 0`:\n\n```text\nTYPE  A=1, B=-5, C=6\nGET   Δ=1, h=2.5, k=-0.25, roots 3 and 2\n```",
+      "copyHeading": "Copy into P1",
+      "after": "\n\n"
+    },
+    {
+      "id": "P2",
+      "label": "P2",
+      "title": "Sequence Engine",
+      "bytes": 110,
+      "mode": "COMP",
+      "category": "Sequences",
+      "topics": [
+        "arithmetic sequence",
+        "geometric sequence",
+        "series"
+      ],
+      "summary": "Calculate terms and sums for arithmetic, finite geometric and infinite geometric sequences.",
+      "inputs": "Sequence type, first term, difference or ratio, and n when required.",
+      "outputs": "The requested term and sum.",
+      "example": "TYPE  M=1, A=2, B=3, C=5\nGET   T₅=14, S₅=40",
+      "source": "?→M\n?→A\n?→B\nM=3⇒A÷(1-B)→X\nM=3⇒Goto 9\n?→C\nM=1⇒A+(C-1)B→D\nM=2⇒AB^(C-1)→D\nD◢M=1⇒C(A+D)÷2→X\nM=2⇒(A-BD)÷(1-B)→X\nLbl 9\nX◢",
+      "guideBody": "P2 begins with `M?`. This selects the type of sequence.\n\n### Inputs and outputs\n\n| `M` | Calculation | Remaining inputs | Outputs |\n|---:|---|---|---|\n| `1` | Arithmetic progression | `A` first term, `B` common difference, `C=n` | `Tₙ`, then `Sₙ` |\n| `2` | Finite geometric progression | `A` first term, `B` common ratio, `C=n` | `Tₙ`, then `Sₙ` |\n| `3` | Infinite geometric progression | `A` first term, `B` common ratio | `S∞` |\n\nUse `M=3` only when `|B| < 1`. For `M=2`, use `B≠1`; a constant GP is\nquicker by hand: `Tₙ=A`, `Sₙ=AC`.\n\n### Examples\n\nArithmetic progression with `a=2`, `d=3`, `n=5`:\n\n```text\nTYPE  M=1, A=2, B=3, C=5\nGET   T₅=14, S₅=40\n```\n\nFinite geometric progression with `a=3`, `r=2`, `n=4`:\n\n```text\nTYPE  M=2, A=3, B=2, C=4\nGET   T₄=24, S₄=45\n```\n\nInfinite geometric progression with `a=6`, `r=0.5`:\n\n```text\nTYPE  M=3, A=6, B=0.5\nGET   S∞=12\n```",
+      "copyHeading": "Copy into P2",
+      "after": "\n\n"
+    },
+    {
+      "id": "P3",
+      "label": "P3",
+      "title": "Coordinate Lab",
+      "bytes": 104,
+      "mode": "COMP",
+      "category": "Coordinate",
+      "topics": [
+        "distance",
+        "midpoint",
+        "slope",
+        "circle"
+      ],
+      "summary": "Handle two-point coordinate geometry or recover a circle from its general equation.",
+      "inputs": "A mode plus point coordinates or circle coefficients.",
+      "outputs": "Distance, midpoint, slope, or circle centre and radius.",
+      "example": "TYPE  M=1, A=0, B=0, C=3, D=4\nGET   distance 5, midpoint (1.5,2), slope 1.333333333",
+      "source": "?→M\n?→A\n?→B\n?→C\nM=2⇒Goto 2\n?→D\nC-A→X\nD-B→Y\n√(X²+Y²)◢(A+C)÷2◢(B+D)÷2◢Y÷X◢Goto 9\nLbl 2\n-A÷2◢-B÷2◢√(A²+B²-4C)÷2◢Lbl 9",
+      "guideBody": "P3 begins with `M?`. Choose two-point geometry or a circle equation.\n\n### Mode 1 — two points\n\nEnter:\n\n| Prompt | Enter |\n|---|---|\n| `M?` | `1` |\n| `A?`, `B?` | first point `(x₁,y₁)` |\n| `C?`, `D?` | second point `(x₂,y₂)` |\n\nOutputs: distance, midpoint x-coordinate, midpoint y-coordinate, then slope.\nA vertical line produces `Math ERROR` at the slope, after the first three useful\nanswers have already appeared.\n\nExample for `(0,0)` and `(3,4)`:\n\n```text\nTYPE  M=1, A=0, B=0, C=3, D=4\nGET   distance 5, midpoint (1.5,2), slope 1.333333333\n```\n\n### Mode 2 — circle equation\n\nWrite the equation as\n\n```text\nx² + y² + Dx + Ey + F = 0\n```\n\nThen enter `M=2`, coefficient `D` at `A?`, coefficient `E` at `B?`, and\ncoefficient `F` at `C?`. The outputs are centre `h`, centre `k`, then radius `r`.\n\nExample for `x² + y² − 4x + 6y − 12 = 0`:\n\n```text\nTYPE  M=2, A=-4, B=6, C=-12\nGET   centre (2,-3), radius 5\n```",
+      "copyHeading": "Copy into P3",
+      "after": "\n\n"
+    },
+    {
+      "id": "P4",
+      "label": "P4",
+      "title": "Trig 360",
+      "bytes": 184,
+      "mode": "COMP",
+      "category": "Trigonometry",
+      "topics": [
+        "trig equation",
+        "sine",
+        "cosine",
+        "tangent"
+      ],
+      "summary": "Return every solution from 0° to 360° after a trig equation has been isolated.",
+      "inputs": "Function selector and isolated sine, cosine or tangent value.",
+      "outputs": "All valid angles in the interval.",
+      "example": "2sin θ=1   → TYPE M=1, D=0.5  → GET 30°, 150°\ncos θ=1    → TYPE M=2, D=1    → GET 0°, 360°\ntan θ=-1   → TYPE M=3, D=-1   → GET 135°, 315°",
+      "source": "Deg\n?→M\n?→D\nM=1⇒Goto 1\nM=2⇒Goto 2\ntan^-1(D)→X\nX<0⇒X+180→X\nX◢X+180◢X≠0⇒Goto 9\n360◢Goto 9\nLbl 1\nsin^-1(D)→X\nX<0⇒Goto 4\nX◢X=90⇒Goto 9\n180-X◢X≠0⇒Goto 9\n360◢Goto 9\nLbl 4\n180-X◢X=-90⇒Goto 9\n360+X◢Goto 9\nLbl 2\ncos^-1(D)→X\nX◢X=180⇒Goto 9\n360-X◢Lbl 9",
+      "guideBody": "P4 finds every distinct solution for `0° ≤ θ ≤ 360°`. It switches the\ncalculator to degrees automatically.\n\n### Inputs\n\n| Prompt | Enter |\n|---|---|\n| `M?` | `1` for sine, `2` for cosine, or `3` for tangent |\n| `D?` | the isolated trig value |\n\nIsolate the trig function first. For example, `2sin θ = 1` becomes\n`sin θ = 0.5`, so enter `D=0.5`. For sine and cosine, `D` must be between\n`-1` and `1`.\n\n### Examples\n\n```text\n2sin θ=1   → TYPE M=1, D=0.5  → GET 30°, 150°\ncos θ=1    → TYPE M=2, D=1    → GET 0°, 360°\ntan θ=-1   → TYPE M=3, D=-1   → GET 135°, 315°\n```",
+      "copyHeading": "Copy into P4",
+      "after": "\n\n## Extra swap-in library\n\nThe calculator has only four physical program slots. The programs below are\n**alternatives**, not another pack to install together with P1–P4. Copy an extra\nprogram into whichever slot you choose when a topic is useful, then restore the\nold source from this file later.\n\nNone duplicates an existing program or a one-button calculator feature:\n\n| Extra | Adds | Why it is different |\n|---|---|---|\n| A | simultaneous 2×2 equations | the fx-50FH II has no equation-solver mode |\n| B | circle through three points | P3 starts from a completed general equation |\n| C | growth and decay unknowns | solves for final value, time, rate or starting value |\n| D | combined population statistics | combines summary data without the original observations |\n| E | line–circle intersections | finds tangent/secant points, not just circle properties |\n| F | first sequence sum reaching a target | P2 requires `n` to be known already |\n| G | bearings and 3D displacement | handles quadrant corrections and spatial components |\n| H | cubic synthetic division | reduces a cubic from one known root and finds the others |\n| I | hypergeometric probability ranges | evaluates exact, at-least and at-most cases in one run |\n| J | transformed quadratic roots | forms new equations without first finding the original roots |\n| K | tangents from a point to a circle | returns both points of contact and the tangent length |\n| L | annuities and reducing-balance loans | handles regular payments, not just one-off compound growth |\n| M | four centres of a right triangle | returns all four centres for the compact DSE `OAB` setup |\n| N | direct and inverse variation | finds the constant and predicts either `x` or `y` for power models |\n\n### Suggested four-slot combinations\n\n| Focus | P1 | P2 | P3 | P4 | Total |\n|---|---|---|---|---|---:|\n| Original Core pack | Quadratic | Sequences | Coordinate | Trig | 478B |\n| Algebra and growth | Quadratic | Extra A | Sequences | Extra C | 352B |\n| Coordinate geometry | Coordinate | Extra B | Extra A | Trig | 469B |\n| Statistics and algebra | Sequences | Extra D | Extra A | Trig | 419B |\n| Advanced Section B / MCQ | Extra E | Extra F | Extra G | Extra H | 392B |\n| Paper 1 Section B power pack | Extra I | Extra J | Extra K | Extra L | 424B |\n| Centres and variation | Extra M | Extra N | Quadratic | Extra D | 307B |\n\n"
+    },
+    {
+      "id": "A",
+      "label": "Extra A",
+      "title": "Simultaneous 2×2 Solver",
+      "bytes": 52,
+      "mode": "COMP",
+      "category": "Algebra",
+      "topics": [
+        "simultaneous equations",
+        "linear equations"
+      ],
+      "summary": "Solve a two-by-two system when the calculator has no equation-solver mode.",
+      "inputs": "The six coefficients from two linear equations.",
+      "outputs": "The unique x and y solution.",
+      "example": "TYPE  A=2, B=1, C=7, D=1, X=-1, Y=2\nGET   x=3, y=1",
+      "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\nAX-BD→M\n(CX-BY)÷M◢(AY-CD)÷M◢",
+      "guideBody": "Solves two linear equations written as\n\n```text\nAx + By = C\nDx + Xy = Y\n```\n\nThe letters `X` and `Y` on the second equation are calculator memory names;\nthey mean the coefficient of `y` and the right-hand side respectively.\n\n### Inputs\n\n| Prompt | Enter |\n|---|---|\n| `A?`, `B?`, `C?` | the three values in the first equation |\n| `D?`, `X?`, `Y?` | the three values in the second equation |\n\n### Outputs\n\n1. Solution `x`\n2. Solution `y`\n\nIf the determinant is `0`, there is no unique solution and the calculator\nshows `Math ERROR`.\n\n### Example\n\nFor `2x+y=7` and `x−y=2`:\n\n```text\nTYPE  A=2, B=1, C=7, D=1, X=-1, Y=2\nGET   x=3, y=1\n```",
+      "copyHeading": "Copy this program",
+      "after": "\n\n"
+    },
+    {
+      "id": "B",
+      "label": "Extra B",
+      "title": "Circle Through Three Points",
+      "bytes": 129,
+      "mode": "COMP",
+      "category": "Coordinate",
+      "topics": [
+        "circle",
+        "three points",
+        "circumcircle"
+      ],
+      "summary": "Build the general equation of the circle through three supplied points.",
+      "inputs": "Coordinates of three non-collinear points.",
+      "outputs": "Circle coefficients, centre and radius.",
+      "example": "TYPE  A=0, B=0, C=4, D=0, X=0, Y=6\nGET   centre (2,3), radius 3.605551275",
+      "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\nC-A→C\nD-B→D\nX-A→X\nY-B→Y\n(C(X²+Y²)-X(C²+D²))÷2÷(CY-DX)→M\n((C²+D²)Y-(X²+Y²)D)÷2÷(CY-DX)→C\nA+C◢B+M◢√(C²+M²)◢",
+      "guideBody": "Finds the centre and radius of the unique circle through three supplied points.\nUnlike P3 mode 2, you do not need to derive the general circle equation first.\n\n### Inputs\n\n| Prompt | Enter |\n|---|---|\n| `A?`, `B?` | first point `(x₁,y₁)` |\n| `C?`, `D?` | second point `(x₂,y₂)` |\n| `X?`, `Y?` | third point `(x₃,y₃)` |\n\n### Outputs\n\n1. Centre x-coordinate `h`\n2. Centre y-coordinate `k`\n3. Radius `r`\n\nThree collinear points do not define a circle and produce `Math ERROR`.\n\n### Example\n\nFor the points `(0,0)`, `(4,0)` and `(0,6)`:\n\n```text\nTYPE  A=0, B=0, C=4, D=0, X=0, Y=6\nGET   centre (2,3), radius 3.605551275\n```",
+      "copyHeading": "Copy this program",
+      "after": "\n\n"
+    },
+    {
+      "id": "C",
+      "label": "Extra C",
+      "title": "Growth and Decay Solver",
+      "bytes": 110,
+      "mode": "COMP",
+      "category": "Finance",
+      "topics": [
+        "growth",
+        "decay",
+        "exponential",
+        "compound"
+      ],
+      "summary": "Solve for the missing value in exponential growth or decay models.",
+      "inputs": "Mode plus the known starting value, final value, rate and time.",
+      "outputs": "The selected unknown quantity.",
+      "example": "TYPE  M=1, A=1000, B=5, C=3     → GET 1157.625\nTYPE  M=2, A=1000, B=10, C=1210 → GET 2 periods\nTYPE  M=3, A=1000, B=1210, C=2  → GET 10%\nTYPE  M=4, A=1210, B=10, C=2    → GET 1000",
+      "source": "?→M\n?→A\n?→B\n?→C\nM=1⇒A(1+B÷100)^(C)→X\nM=2⇒log(C÷A)÷log(1+B÷100)→X\nM=3⇒100((B÷A)^(1÷C)-1)→X\nM=4⇒A÷(1+B÷100)^(C)→X\nX◢",
+      "guideBody": "Uses the model\n\n```text\nfinal = start × (1 + rate/100)^periods\n```\n\nEnter a negative percentage rate for decay. The program begins with `M?`, which\nselects the unknown quantity.\n\n### Inputs and outputs\n\n| `M` | Find | Enter at `A?` | Enter at `B?` | Enter at `C?` | Output |\n|---:|---|---|---|---|---|\n| `1` | final value | start | rate % | periods | final |\n| `2` | number of periods | start | rate % | final | periods |\n| `3` | rate | start | final | periods | rate % |\n| `4` | starting value | final | rate % | periods | start |\n\n### Examples\n\n```text\nTYPE  M=1, A=1000, B=5, C=3     → GET 1157.625\nTYPE  M=2, A=1000, B=10, C=1210 → GET 2 periods\nTYPE  M=3, A=1000, B=1210, C=2  → GET 10%\nTYPE  M=4, A=1210, B=10, C=2    → GET 1000\n```",
+      "copyHeading": "Copy this program",
+      "after": "\n\n"
+    },
+    {
+      "id": "D",
+      "label": "Extra D",
+      "title": "Combined Population Statistics",
+      "bytes": 73,
+      "mode": "COMP",
+      "category": "Statistics",
+      "topics": [
+        "combined mean",
+        "standard deviation",
+        "population"
+      ],
+      "summary": "Combine two populations from summary statistics without the original observations.",
+      "inputs": "Both population sizes, means and population standard deviations.",
+      "outputs": "Combined mean and combined population standard deviation.",
+      "example": "TYPE  A=2, B=10, C=2, D=2, X=14, Y=2\nGET   combined mean 12, combined SD 2.828427125",
+      "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\n(AB+DX)÷(A+D)◢√((A(C²+B²)+D(Y²+X²))÷(A+D)-(Ans)²)◢",
+      "guideBody": "Combines two groups when a question gives only each group's size, mean and\npopulation standard deviation. This is different from SD mode because the\noriginal observations are not required.\n\n### Inputs\n\n| Prompt | Enter |\n|---|---|\n| `A?` | first group size `n₁` |\n| `B?` | first group mean `μ₁` |\n| `C?` | first group population SD `σ₁` |\n| `D?` | second group size `n₂` |\n| `X?` | second group mean `μ₂` |\n| `Y?` | second group population SD `σ₂` |\n\n### Outputs\n\n1. Combined mean\n2. Combined population standard deviation\n\nUse population SD `σ`, not sample SD `s`.\n\n### Example\n\nTwo groups have `(n, μ, σ)=(2,10,2)` and `(2,14,2)`:\n\n```text\nTYPE  A=2, B=10, C=2, D=2, X=14, Y=2\nGET   combined mean 12, combined SD 2.828427125\n```",
+      "copyHeading": "Copy this program",
+      "after": "\n\n## Advanced Section B / MCQ library\n\nThese four programs target longer Paper 1 Section B calculations and the\nnon-foundation-style questions found in Paper 2 Section B. They automate the\narithmetic after you have formed the correct equation or model; they do not\nreplace the working that Paper 1 requires.\n\nAll four advanced programs occupy `392B`, leaving `288B` free for editing or\ntwo small personal utilities.\n\n"
+    },
+    {
+      "id": "E",
+      "label": "Extra E",
+      "title": "Line–Circle Intersections",
+      "bytes": 111,
+      "mode": "COMP",
+      "category": "Coordinate",
+      "topics": [
+        "line circle",
+        "intersection",
+        "tangent",
+        "secant"
+      ],
+      "summary": "Find both intersections of a non-vertical line and a circle.",
+      "inputs": "Circle coefficients plus line slope and intercept.",
+      "outputs": "The two intersection points, or the tangent point.",
+      "example": "TYPE  A=-4, B=-2, C=-4, X=0, Y=1\nGET   points (5,1) and (-1,1)",
+      "source": "?→A\n?→B\n?→C\n?→X\n?→Y\n2XY+A+BX→D\nD²-4(1+X²)(Y²+BY+C)→M\n2(1+X²)→A\n(√(M)-D)÷A→C\nC◢XC+Y◢M=0⇒Goto 9\n-2D÷A-C→C\nC◢XC+Y◢Lbl 9",
+      "guideBody": "Finds the intersection points of a circle and a non-vertical straight line.\nWrite the two equations as\n\n```text\nx² + y² + Ax + By + C = 0\ny = Xx + Y\n```\n\nHere `X` is the line's slope and `Y` is its y-intercept.\n\n### Inputs\n\n| Prompt | Enter |\n|---|---|\n| `A?`, `B?`, `C?` | coefficients of the circle equation |\n| `X?` | slope of the line |\n| `Y?` | y-intercept of the line |\n\n### Outputs\n\n1. First point `x₁`, then `y₁`\n2. Second point `x₂`, then `y₂`\n\nIf the discriminant is negative, there is no real intersection and the\ncalculator shows `Math ERROR`. If it is zero, the line is tangent and only one\npoint is shown. A vertical line `x=k` must first be handled algebraically\nbecause it cannot be written as `y=Xx+Y`.\n\n### Examples\n\nFor `x²+y²−4x−2y−4=0` and `y=1`:\n\n```text\nTYPE  A=-4, B=-2, C=-4, X=0, Y=1\nGET   points (5,1) and (-1,1)\n```\n\nFor the same circle and tangent `y=4`:\n\n```text\nTYPE  A=-4, B=-2, C=-4, X=0, Y=4\nGET   tangent point (2,4)\n```",
+      "copyHeading": "Copy this program",
+      "after": "\n\n"
+    },
+    {
+      "id": "F",
+      "label": "Extra F",
+      "title": "Sequence Target Solver",
+      "bytes": 72,
+      "mode": "COMP",
+      "category": "Sequences",
+      "topics": [
+        "sequence target",
+        "minimum n",
+        "series"
+      ],
+      "summary": "Find the first term count whose arithmetic or geometric sum reaches a target.",
+      "inputs": "Sequence type, sequence values and target sum.",
+      "outputs": "The first qualifying n and its sum.",
+      "example": "TYPE  M=1, A=3, B=2, C=100\nGET   n=10, S₁₀=120",
+      "source": "?→M\n?→A\n?→B\n?→C\n0→X\n0→Y\nA→D\nWhile Y<C\nX+1→X\nY+D→Y\nM=1⇒D+B→D\nM=2⇒DB→D\nWhileEnd\nX◢Y◢",
+      "guideBody": "Finds the **smallest positive integer `n`** for which a partial sum reaches or\nexceeds a target. This is useful when a Section B question asks “after how many\nterms/months…” rather than giving `n`.\n\n### Inputs\n\n| Prompt | Enter |\n|---|---|\n| `M?` | `1` for AP or `2` for GP |\n| `A?` | first term |\n| `B?` | common difference for AP, or common ratio for GP |\n| `C?` | target sum |\n\n### Outputs\n\n1. Smallest qualifying `n`\n2. The corresponding sum `Sₙ`, useful for checking the inequality\n\nUse a sequence with increasing positive partial sums and a reachable target.\nOtherwise the search can end in `Time ERROR`.\n\n### Examples\n\nFor an AP with `a=3`, `d=2`, find the first `Sₙ≥100`:\n\n```text\nTYPE  M=1, A=3, B=2, C=100\nGET   n=10, S₁₀=120\n```\n\nFor a GP with `a=2`, `r=1.5`, find the first `Sₙ≥50`:\n\n```text\nTYPE  M=2, A=2, B=1.5, C=50\nGET   n=7, S₇=64.34375\n```",
+      "copyHeading": "Copy this program",
+      "after": "\n\n"
+    },
+    {
+      "id": "G",
+      "label": "Extra G",
+      "title": "Bearings and 3D Displacement",
+      "bytes": 114,
+      "mode": "COMP",
+      "category": "Geometry",
+      "topics": [
+        "bearing",
+        "elevation",
+        "3D",
+        "displacement"
+      ],
+      "summary": "Resolve bearings and elevation into horizontal and vertical displacement components.",
+      "inputs": "Distance, bearing and elevation information.",
+      "outputs": "Components, horizontal distance and spatial displacement.",
+      "example": "TYPE  A=3, B=4, C=0\nGET   horizontal 5, spatial 5, elevation 0°, bearing 36.86989765°",
+      "source": "Deg\n?→A\n?→B\n?→C\n√(A²+B²)→X\nX◢√(X²+C²)◢tan^-1(Abs(C)÷X)◢B=0⇒Goto 3\ntan^-1(A÷B)→Y\nB<0⇒Y+180→Y\nY<0⇒Y+360→Y\nY◢Goto 9\nLbl 3\n180-90A÷Abs(A)◢Lbl 9",
+      "guideBody": "Calculates a complete displacement in one run and switches to degrees\nautomatically.\n\n### Inputs\n\nEnter east/west displacement at `A?`, north/south displacement at `B?`, and\nvertical displacement at `C?`:\n\n- east and north are positive;\n- west and south are negative.\n\nThe four outputs are horizontal distance, spatial length, acute elevation or\ndepression angle, then the three-figure bearing measured clockwise from north.\nThe horizontal displacement must not be `(0,0)`.\n\nFor a plan-only question, enter `C=0`; the first output is the required distance\nand the last output is the bearing. Ignore the repeated spatial length and the\nzero elevation angle.\n\n```text\nTYPE  A=3, B=4, C=0\nGET   horizontal 5, spatial 5, elevation 0°, bearing 36.86989765°\n```\n\nFor a 3D segment:\n\n```text\nTYPE  A=3, B=4, C=12\nGET   horizontal 5, spatial 13, elevation 67.38013505°, bearing 36.86989765°\n```",
+      "copyHeading": "Copy this program",
+      "after": "\n\n"
+    },
+    {
+      "id": "H",
+      "label": "Extra H",
+      "title": "Cubic Synthetic Division",
+      "bytes": 95,
+      "mode": "COMP",
+      "category": "Algebra",
+      "topics": [
+        "cubic",
+        "synthetic division",
+        "quadratic roots"
+      ],
+      "summary": "Reduce a cubic using one known root and solve the remaining quadratic.",
+      "inputs": "Cubic coefficients and one known root.",
+      "outputs": "Synthetic-division coefficients and remaining real roots.",
+      "example": "TYPE  A=1, B=-6, C=11, D=-6, X=1\nGET   remainder 0, roots 3 and 2",
+      "source": "?→A\n?→B\n?→C\n?→D\n?→X\nB+AX→B\nC+BX→C\nD+CX→D\nD◢D≠0⇒Goto 9\nB²-4AC→M\n(√(M)-B)÷2÷A→D\nD◢M=0⇒Goto 9\n-B÷A-D◢Lbl 9",
+      "guideBody": "Reduces a cubic polynomial when one root is already known, checks the remainder,\nthen solves the remaining quadratic factor.\n\nWrite the polynomial as\n\n```text\nAx³ + Bx² + Cx + D\n```\n\n### Inputs\n\n| Prompt | Enter |\n|---|---|\n| `A?`, `B?`, `C?`, `D?` | cubic coefficients, including any zero coefficient |\n| `X?` | known root |\n\n### Outputs\n\n1. Remainder\n2. If the remainder is zero: the remaining distinct real roots\n\nA non-zero remainder means the supplied `X` is not a root. A negative\ndiscriminant means the quadratic factor has no additional real roots.\n\n### Example\n\nFor `x³−6x²+11x−6` with known root `1`:\n\n```text\nTYPE  A=1, B=-6, C=11, D=-6, X=1\nGET   remainder 0, roots 3 and 2\n```\n\nThe adjacent `◢` commands below still pause separately; keeping them on one\nsource line avoids unnecessary separator bytes.",
+      "copyHeading": "Copy this program",
+      "after": "\n\n## Paper 1 Section B power pack\n\nThe next four programs are designed as one **424B alternative pack** for the\nlonger structured questions in Paper 1 Section B. They cover probability,\nalgebra, coordinate geometry and financial modelling while leaving `256B` free.\n\nThe programs supply numerical results and checks. In Paper 1, still write the\nformula, substitution and reasoning required by the question; a calculator\nanswer by itself does not earn the method marks.\n\n"
+    },
+    {
+      "id": "I",
+      "label": "Extra I",
+      "title": "Without-Replacement Probability",
+      "bytes": 130,
+      "mode": "COMP",
+      "category": "Probability",
+      "topics": [
+        "hypergeometric",
+        "without replacement",
+        "nCr"
+      ],
+      "summary": "Evaluate exact, at-least or at-most probabilities without replacement.",
+      "inputs": "Probability mode, population counts, draw count and target count.",
+      "outputs": "The requested hypergeometric probability.",
+      "example": "TYPE  M=1, A=5, B=4, C=2, D=2  → GET P(exactly 2 red)=0.2777777778 = 5/18\nTYPE  M=2, A=5, B=4, C=2, D=1  → GET P(at least 1 red)=0.8333333333 = 5/6\nTYPE  M=3, A=5, B=4, C=2, D=1  → GET P(at most 1 red)=0.7222222222 = 13/18",
+      "source": "?→M\n?→A\n?→B\n?→C\n?→D\n0→X\nC-B>0⇒C-B→X\nC→Y\nA<C⇒A→Y\nM=1⇒D→X\nM=1⇒D→Y\nM=2⇒D>X⇒D→X\nM=3⇒D<Y⇒D→Y\n0→M\nWhile X≤Y\nA nCr X B nCr(C-X)÷(A+B)nCr C M+\nX+1→X\nWhileEnd\nM◢",
+      "guideBody": "Uses the hypergeometric model for a population containing two types of item.\nIt finds the probability of drawing exactly, at least or at most a specified\nnumber of type-A items when all items are drawn together **without replacement**.\n\n### Inputs\n\n| Prompt | Enter |\n|---|---|\n| `M?` | `1` for exactly, `2` for at least, or `3` for at most |\n| `A?` | number of type-A items in the population |\n| `B?` | number of other items in the population |\n| `C?` | total number of items drawn |\n| `D?` | required number of type-A items |\n\n### Output\n\nThe single output is the required probability. For `M=1`, enter a feasible\nvalue of `D`: `max(0,C-B) ≤ D ≤ min(A,C)`. Counts must be non-negative integers.\nThis version uses the calculator's native `nCr` operation, avoiding the old\nfactorial expansion and its `69!` limit.\n\n### Examples\n\nA box contains 5 red and 4 black balls, and 2 balls are drawn together:\n\n```text\nTYPE  M=1, A=5, B=4, C=2, D=2  → GET P(exactly 2 red)=0.2777777778 = 5/18\nTYPE  M=2, A=5, B=4, C=2, D=1  → GET P(at least 1 red)=0.8333333333 = 5/6\nTYPE  M=3, A=5, B=4, C=2, D=1  → GET P(at most 1 red)=0.7222222222 = 13/18\n```\n\nFor written working, show the combination expression. For example, the first\nanswer is `5C2 / 9C2`; Extra I is the fast arithmetic check and range-summer.",
+      "copyHeading": "Copy this program",
+      "after": "\n\n"
+    },
+    {
+      "id": "J",
+      "label": "Extra J",
+      "title": "Transformed-Roots Builder",
+      "bytes": 83,
+      "mode": "COMP",
+      "category": "Algebra",
+      "topics": [
+        "transformed roots",
+        "quadratic",
+        "vieta"
+      ],
+      "summary": "Construct a new quadratic after applying a transformation to the original roots.",
+      "inputs": "Original quadratic coefficients plus transformation mode and constants.",
+      "outputs": "Coefficients of the transformed-root equation.",
+      "example": "TYPE  M=1, A=1, B=-5, C=6, X=2, Y=1\nGET   P=-12, Q=35\nWRITE z²-12z+35=0",
+      "source": "?→M\n?→A\n?→B\n?→C\nM=2⇒Goto 2\n?→X\n?→Y\nXB÷A-2Y◢X²C÷A-YAns-Y²◢Goto 9\nLbl 2\nC÷A→X\n2X-(B÷A)²◢X²◢Lbl 9",
+      "guideBody": "Start with a quadratic\n\n```text\nAx² + Bx + C = 0\n```\n\nwhose roots are `α` and `β`. Extra J forms a new **monic** quadratic without\ncalculating `α` and `β` separately. This avoids rounding errors and is useful\nwhen a Section B question asks for an equation with related roots.\n\n### Mode 1 — roots `Xα+Y` and `Xβ+Y`\n\nEnter `M=1`, followed by the original coefficients `A`, `B`, `C`, then the\nmultiplier `X` and shift `Y`.\n\nOutputs the coefficients `P`, then `Q`, of\n\n```text\nz² + Pz + Q = 0\n```\n\nExample: `x²-5x+6=0` has roots `α,β`. Form the equation whose roots are\n`2α+1, 2β+1`:\n\n```text\nTYPE  M=1, A=1, B=-5, C=6, X=2, Y=1\nGET   P=-12, Q=35\nWRITE z²-12z+35=0\n```\n\n### Mode 2 — roots `α²` and `β²`\n\nEnter `M=2` and the original coefficients `A`, `B`, `C`. The outputs are again\n`P`, then `Q`, in `z²+Pz+Q=0`.\n\n```text\nTYPE  M=2, A=1, B=-5, C=6\nGET   P=-13, Q=36\nWRITE z²-13z+36=0\n```",
+      "copyHeading": "Copy this program",
+      "after": "\n\n"
+    },
+    {
+      "id": "K",
+      "label": "Extra K",
+      "title": "Tangents from a Point to a Circle",
+      "bytes": 104,
+      "mode": "COMP",
+      "category": "Coordinate",
+      "topics": [
+        "circle tangent",
+        "point of contact",
+        "tangent length"
+      ],
+      "summary": "Find both tangent points and the tangent length from an external point to a circle.",
+      "inputs": "Circle data and the external point.",
+      "outputs": "Two contact points and tangent length.",
+      "example": "TYPE  A=0, B=0, C=5, D=13, X=0\nGET   tangent length 12\n      contact points (1.923076923,4.615384615)\n                     (1.923076923,-4.615384615)",
+      "source": "?→A\n?→B\n?→C\n?→D\n?→X\nD-A→D\nX-B→X\nD²+X²→M\n√((M)-C²)→Y\nY◢C÷M→M\nA+M(CD-XY)◢B+M(CX+DY)◢A+M(CD+XY)◢B+M(CX-DY)◢",
+      "guideBody": "For a circle with centre `(h,k)`, radius `r`, and a supplied point `(p,q)`,\nExtra K finds the tangent length and both points of contact. The supplied point\nmay be outside or on the circle.\n\n### Inputs\n\n| Prompt | Enter |\n|---|---|\n| `A?` | centre x-coordinate `h` |\n| `B?` | centre y-coordinate `k` |\n| `C?` | radius `r` |\n| `D?` | external point x-coordinate `p` |\n| `X?` | external point y-coordinate `q` |\n\n### Outputs\n\n1. Tangent length\n2. First contact point `x₁`, then `y₁`\n3. Second contact point `x₂`, then `y₂`\n\nIf the supplied point lies on the circle, the tangent length is `0` and that\nsame contact point appears twice. If it lies inside the circle, the calculator\nshows `Math ERROR` because no real tangent exists.\n\n### Example\n\nFor the circle `x²+y²=25` and the point `(13,0)`:\n\n```text\nTYPE  A=0, B=0, C=5, D=13, X=0\nGET   tangent length 12\n      contact points (1.923076923,4.615384615)\n                     (1.923076923,-4.615384615)\n```\n\nUse each contact point with the supplied point to form the two tangent-line\nequations. Keep extra calculator digits until the final answer.",
+      "copyHeading": "Copy this program",
+      "after": "\n\n"
+    },
+    {
+      "id": "L",
+      "label": "Extra L",
+      "title": "Annuity and Loan Engine",
+      "bytes": 107,
+      "mode": "COMP",
+      "category": "Finance",
+      "topics": [
+        "annuity",
+        "loan",
+        "payment",
+        "compound interest"
+      ],
+      "summary": "Calculate savings annuities and reducing-balance loan quantities.",
+      "inputs": "Mode, payment, rate, term and known balance values.",
+      "outputs": "The selected annuity or loan result.",
+      "example": "TYPE  M=1, A=1000, B=1, C=12, D=100\nGET   future value 2395.075331",
+      "source": "?→M\n?→A\n?→B\nB÷100→B\n?→C\n(1+B)^(C)→X\nM=2⇒AB÷(1-1÷X)→Y\nM=2⇒Goto 9\n?→D\nM=1⇒AX+D(X-1)÷B→Y\nM=3⇒AX-D(X-1)÷B→Y\nLbl 9\nY◢",
+      "guideBody": "Uses a constant percentage interest rate per payment period and payments made\nat the **end** of each period. Enter the rate per period, not automatically the\nannual rate: for a nominal annual rate of 6% compounded monthly, enter `B=0.5`.\nThe interest rate must be non-zero.\n\n### Inputs and outputs\n\n| `M` | Find | `A?` | `B?` | `C?` | `D?` | Output |\n|---:|---|---|---|---|---|---|\n| `1` | future savings value | starting balance | rate % per period | number of periods | regular deposit | future value |\n| `2` | regular loan payment | original loan | rate % per period | total payments | — | payment |\n| `3` | outstanding loan | original loan | rate % per period | payments already made | regular payment | balance |\n\n### Examples\n\nStart with `$1000`, then deposit `$100` at the end of each month for 12 months\nat 1% per month:\n\n```text\nTYPE  M=1, A=1000, B=1, C=12, D=100\nGET   future value 2395.075331\n```\n\nRepay a `$100000` loan over 240 monthly payments at 0.5% per month:\n\n```text\nTYPE  M=2, A=100000, B=0.5, C=240\nGET   monthly payment 716.4310585\n```\n\nAfter 12 payments of that amount:\n\n```text\nTYPE  M=3, A=100000, B=0.5, C=12, D=716.4310585\nGET   outstanding balance 97330.20118\n```",
+      "copyHeading": "Copy this program",
+      "after": "\n\n"
+    },
+    {
+      "id": "M",
+      "label": "Extra M",
+      "title": "Four Centres of a Right Triangle",
+      "bytes": 71,
+      "mode": "COMP",
+      "category": "Geometry",
+      "topics": [
+        "centroid",
+        "circumcentre",
+        "incentre",
+        "orthocentre"
+      ],
+      "summary": "Return all four triangle centres for the compact right-triangle OAB setup.",
+      "inputs": "The two axis intercept lengths defining the right triangle.",
+      "outputs": "Coordinates of G, O, I and H.",
+      "example": "TYPE  A=9, B=12, C=25\nGET   G=(34/3,4), H=(9,12), C=(12.5,0), I=(10,5)",
+      "source": "?→A\n?→B\n?→C\n(A+C)÷3◢B÷3◢A◢B◢C÷2◢0◢√(A²+B²)→D\n(D+BC÷D-C)÷2→M\nM(A+D)÷B◢M◢",
+      "guideBody": "Returns all four centres for the short coordinate setup common in DSE\nquestions:\n\n```text\nO=(0,0), A=(a,b), B=(c,0), and angle OAB=90°\n```\n\nThis is the special case used by the linked\n[82-byte four-centres video](https://www.youtube.com/watch?v=9NdcgqP22Ao), not\nan arbitrary three-point triangle solver. That restriction is exactly why it\ncan be so short.\n\n### Inputs\n\n| Prompt | Enter |\n|---|---|\n| `A?` | x-coordinate `a` of the right-angle vertex A |\n| `B?` | y-coordinate `b` of A |\n| `C?` | x-coordinate `c` of the other vertex B=(c,0) |\n\n### Outputs\n\nEight answers appear as four consecutive coordinate pairs:\n\n| Pair | Centre | Property useful in written working |\n|---:|---|---|\n| 1 | centroid `G` | intersection of medians; divides each median `2:1` |\n| 2 | orthocentre `H` | the right-angle vertex A |\n| 3 | circumcentre `C` | midpoint of hypotenuse OB |\n| 4 | incentre `I` | equidistant from all three sides |\n\n### Example\n\nFor the video's triangle `O=(0,0)`, `A=(9,12)`, `B=(25,0)`:\n\n```text\nTYPE  A=9, B=12, C=25\nGET   G=(34/3,4), H=(9,12), C=(12.5,0), I=(10,5)\n```\n\nThe program assumes the stated orientation and right angle. Do not use it when\nall three vertices are arbitrary. In Paper 1, still show the relevant defining\nproperty above; the coordinates alone are normally only the calculation part.",
+      "copyHeading": "Copy this program",
+      "after": "\n\n"
+    },
+    {
+      "id": "N",
+      "label": "Extra N",
+      "title": "Direct and Inverse Variation",
+      "bytes": 83,
+      "mode": "COMP",
+      "category": "Variation",
+      "topics": [
+        "direct variation",
+        "inverse variation",
+        "power law"
+      ],
+      "summary": "Find the variation constant and predict x or y for direct or inverse power models.",
+      "inputs": "Mode, powers, a known pair and the new x or y value.",
+      "outputs": "Variation constant and predicted value.",
+      "example": "TYPE  M=1, A=2, B=16, C=3, D=3\nGET   k=2, y=54",
+      "source": "?→M\n?→A\n?→B\n?→C\n?→D\nM=2⇒-D→D\nM=4⇒-D→D\nB÷A^(D)→X\nX◢M<3⇒XC^(D)→Y\nM>2⇒(C÷X)^(1÷D)→Y\nY◢",
+      "guideBody": "Handles the power models\n\n```text\ndirect:   y = kx^n\ninverse:  y = k/x^n\n```\n\nIt first finds and displays the constant `k`, then predicts either a new `y`\nor the corresponding positive `x`. Use a positive power `n` at `D?`.\n\n### Inputs and outputs\n\n| `M` | Model and unknown | `A?` | `B?` | `C?` | `D?` | Outputs |\n|---:|---|---|---|---|---|---|\n| `1` | direct; find new `y` | known `x` | known `y` | new `x` | power `n` | `k`, new `y` |\n| `2` | inverse; find new `y` | known `x` | known `y` | new `x` | power `n` | `k`, new `y` |\n| `3` | direct; find new `x` | known `x` | known `y` | target `y` | power `n` | `k`, new `x` |\n| `4` | inverse; find new `x` | known `x` | known `y` | target `y` | power `n` | `k`, new `x` |\n\n### Examples\n\nIf `y` varies directly as `x³` and `y=16` when `x=2`, find `y` when `x=3`:\n\n```text\nTYPE  M=1, A=2, B=16, C=3, D=3\nGET   k=2, y=54\n```\n\nIf `y` varies inversely as `x²` and `y=12` when `x=2`:\n\n```text\nTYPE  M=2, A=2, B=12, C=3, D=2  → GET k=48, y=5.333333333\nTYPE  M=4, A=2, B=12, C=3, D=2  → GET k=48, x=4 when target y=3\n```\n\nUse non-zero values wherever the model divides by `x`, `y` or `k`. Modes 3\nand 4 return the principal positive solution expected in ordinary DSE variation\nquestions.",
+      "copyHeading": "Copy this program",
+      "after": "\n\n## Syllabus basis\n\nThe program choices come from the Education Bureau's\n[Explanatory Notes to the Mathematics Curriculum — Compulsory Part](https://www.edb.gov.hk/attachment/en/curriculum-development/kla/ma/curr/EN_CP_e.pdf),\nespecially quadratics, equations, exponential growth and decay, arithmetic and\ngeometric sequences, coordinate geometry, circle equations, trigonometric\nequations and measures of dispersion.\n\nThe [HKEAA Mathematics assessment framework](https://www.hkeaa.edu.hk/DocLibrary/HKDSE/Subject_Information/math/2026hkdse-e-math.pdf)\nexplains the examination structure and the broader Compulsory Part coverage in\nthe later sections of the papers.\n\nThe probability, roots-of-equations and circle work in this pack was also\nchecked against the structure of the official\n[2023 Paper 1 Level 5 exemplars](https://www.hkeaa.edu.hk/DocLibrary/HKDSE/Subject_Information/math/2023-Sample-MATH-CP-Level5-E-4792.pdf).\n\nThe Education Bureau's official materials identify the four triangle centres\nas the centroid, circumcentre, incentre and orthocentre, and discuss their\ncontinued use in HKDSE questions in\n[School Mathematics Newsletter Issue 28](https://www.edb.gov.hk/attachment/en/curriculum-development/kla/ma/res/smn_28.pdf).\n"
+    }
+  ]
+}

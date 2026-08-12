@@ -1,31 +1,37 @@
 # HKDSE Core programs for fx-50FH II
 
-These programs are optional. They are **not built into the web calculator** and
-will never replace your program slots automatically. Copy only the programs you
-want into [Program Studio](https://throwingogo-hub.github.io/fx-50fh-ii/).
+These 18 programs are optional. They are available in the web calculator's
+**Program Studio → HKDSE Library**, but nothing installs automatically. A single
+program always asks for a destination slot, and an occupied slot or four-slot
+pack requires a second confirmation before anything is replaced.
 
-The complete P1–P4 pack uses **478 of 680 bytes** when pasted into Program
-Studio. It focuses on calculations from the HKDSE Mathematics Compulsory Part
-that are slow or error-prone to repeat by hand. The calculator already has
-direct `nPr`, `nCr`, SD/REG statistics and built-in formula functions, so this
-pack does not waste memory duplicating them.
+The complete P1–P4 Core pack uses **478 of 680 bytes**. It focuses on HKDSE
+Mathematics Compulsory Part calculations that are slow or error-prone to repeat
+by hand. The calculator already has direct `nPr`, `nCr`, SD/REG statistics and
+built-in formula functions, so the pack does not duplicate them.
 
-Every heading shows the exact Program Studio byte count. The July compact pass
-reduced the complete 18-program library from **2,522B to 1,812B** (710B, or
-28%). Any deliberately removed diagnostic output or tighter input restriction
-is stated in the relevant section below.
+Every heading shows the exact Program Studio byte count. The complete 18-program
+library is **1,812B**; seven recommended four-slot packs fit within the authentic
+680-byte shared memory. Any deliberately removed diagnostic output or tighter
+input restriction is stated in the relevant section below.
 
-## Install a program
+## Install from the in-app Library
 
-1. Open **Program Studio** below the calculator.
-2. Select the destination slot: P1, P2, P3 or P4.
-3. Keep **Run mode** set to `COMP`.
-4. Copy the entire matching code block below and paste it into **source**.
-5. Wait for **Structure OK**. The slot is saved automatically on this device.
-6. Repeat only for the other programs you want.
+1. Open [Program Studio](https://throwingogo-hub.github.io/fx-50fh-ii/) and choose **HKDSE Library**.
+2. Search by topic or choose a category.
+3. Select the destination P1–P4 slot, then press **Install**.
+4. If the slot already contains a program, confirm the replacement once more.
+5. For a complete setup, choose one of the seven memory-safe four-slot packs.
 
-Installing a program manually replaces only the selected slot. Copy any
-important existing source somewhere safe first.
+Program Studio keeps one-step Undo after a Library, pack or backup install. Use
+**Export all** to download a versioned JSON backup before larger changes.
+
+## Install manually
+
+1. Open Program Studio's **Editor** and select P1, P2, P3 or P4.
+2. Keep **Run mode** set to `COMP`.
+3. Copy the entire matching code block below and paste it into **source**.
+4. Wait for **Structure OK**; the slot is saved automatically on this device.
 
 ## Run a program
 
@@ -37,12 +43,9 @@ requested value and press **EXE**. Each answer pauses on screen; press **EXE**
 again to reveal the next answer. The calculator returns home after the last one.
 
 For a negative input on the physical calculator, use the `(-)` key. In Program
-Studio source and the examples below, an ordinary minus sign is fine.
-
-Some output pauses `◢` are followed immediately by the next statement on the
-same source line. This is intentional: `◢` already ends the preceding statement,
-so adding a line break there wastes one program byte. Paste the blocks exactly
-as shown if you want the stated byte counts.
+Studio source and the examples below, an ordinary minus sign is fine. Some `◢`
+pauses are followed immediately by the next statement because an extra line
+break would consume another program byte.
 
 ## P1 — Quadratic X-Ray (80B)
 

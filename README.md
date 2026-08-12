@@ -5,8 +5,10 @@ scientific calculator that the HKEAA approves for the HKDSE.
 
 **[Open the calculator →](https://throwingogo-hub.github.io/fx-50fh-ii/)**
 
-Optional HKDSE Core programs are documented in [programs.md](programs.md).
-They are copied manually and are never installed by the calculator.
+Program Studio includes a searchable, memory-aware **HKDSE Program Library**:
+18 optional programs, seven recommended four-slot packs, protected installs,
+one-step undo and versioned export/import backup. The complete reference and
+manual-copy source remains in [programs.md](programs.md).
 
 It is not a calculator app with a Casio skin. It is the fx-50FH II's own state
 machine — its six modes, its two-line display, its 680 bytes of program memory,
@@ -54,6 +56,9 @@ Everything the keyboard is printed with is implemented:
   `Dec`/`Hex`/`Bin`/`Oct` and `DT`. Program Studio adds normal copy/paste text,
   command insertion, byte and structure checks, direct run/edit controls, and
   automatic on-device recovery for all four slots—including active key-editor drafts.
+  Its HKDSE Library searches by topic, previews inputs/outputs/examples, installs
+  a program into an explicitly selected slot, confirms replacements, loads seven
+  memory-safe packs, and supports one-step undo plus versioned backup/restore.
 - **Errors** — `Math`, `Syntax`, `Stack`, `Arg`, `Go`, `Nesting`, `Memory` and
   `Data Full`,
   and pressing `◄` or `►` on an error jumps the cursor to the character that
@@ -71,25 +76,32 @@ of the real one.
 
 ## Running it
 
-There is no build step and there are no dependencies. Serve the folder over
-HTTP (ES modules will not load from `file://`):
+There is no build step and there are no runtime dependencies. Serve the folder
+over HTTP because ES modules will not load from `file://`. In the full Developer
+workspace, run the shared server from `~/Developer/`:
 
 ```bash
-python3 -m http.server 8000
+ai-workspace/server/run.sh
 ```
 
-Then open `http://localhost:8000/`.
+Then open `http://127.0.0.1:8142/projects/web/fx-50fh-ii/`. A standalone
+checkout can use any static-file server.
 
 ## Tests
 
-284 checks, including worked examples, operating limits, REPLAY/history navigation, Program Studio text/recovery, and exhaustive LCD menu-layout/glyph
-coverage derived from the user's guide, driven
+397 checks, including worked examples, operating limits, REPLAY/history
+navigation, Program Studio text/recovery/backup, all 18 catalog programs and
+their documented branches, generated-guide parity, and exhaustive LCD menu-layout/glyph coverage derived from the user's guide, driven
 through the machine by key sequence rather than by calling the maths directly —
 so they exercise input, evaluation and formatting the way a person does.
 
 ```bash
-node tests/run.js
+npm test
 ```
+
+`programs.catalog.json` is the source of truth for the executable library.
+After changing it, run `npm run generate:programs`; `npm test` rejects stale
+`programs.md` or `js/program-catalog.generated.js` output.
 
 ## Keyboard
 

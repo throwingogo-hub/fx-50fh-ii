@@ -2,10 +2,10 @@
 // hotspot per real key, a canvas laid exactly over the glass, and the physical
 // keyboard mapped onto the same key ids.
 
-import { KEYS, SHELL_W, SHELL_H, PC_KEYS } from './keymap.js';
+import { KEYS, SHELL_W, SHELL_H, PC_KEYS } from './keymap.js?v=studio-library-v1';
 import { LCD, GLASS } from './lcd.js';
-import { Machine } from './machine.js';
-import { setupProgramStudio } from './studio.js';
+import { Machine } from './machine.js?v=studio-library-v1';
+import { setupProgramStudio } from './studio.js?v=studio-library-v1';
 
 const shell = document.getElementById('shell');
 const canvas = document.getElementById('lcd');
@@ -127,8 +127,6 @@ function frame(now) {
       accessibleDisplay.textContent = announcement;
       lastAnnouncement = announcement;
     }
-    document.body.classList.toggle('shifted', machine.shift);
-    document.body.classList.toggle('alphaed', machine.alpha);
     dirty = false;
   }
   requestAnimationFrame(frame);
@@ -138,9 +136,28 @@ requestAnimationFrame(frame);
 // ---- help panel -------------------------------------------------------------
 const help = document.getElementById('help');
 const helpToggle = document.getElementById('help-toggle');
-helpToggle.addEventListener('click', () => {
-  help.hidden = !help.hidden;
-  helpToggle.setAttribute('aria-expanded', String(!help.hidden));
+let helpAnimation = null;
+helpToggle.addEventListener('click', async () => {
+  const opening = help.hidden;
+  helpToggle.setAttribute('aria-expanded', String(opening));
+  helpAnimation?.cancel();
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches || typeof help.animate !== 'function') {
+    help.hidden = !opening;
+    return;
+  }
+  if (opening) help.hidden = false;
+  const height = help.scrollHeight;
+  help.style.overflow = 'hidden';
+  helpAnimation = help.animate(
+    opening
+      ? [{ height: '0px', opacity: 0 }, { height: `${height}px`, opacity: 1 }]
+      : [{ height: `${height}px`, opacity: 1 }, { height: '0px', opacity: 0 }],
+    { duration: opening ? 220 : 160, easing: opening ? 'cubic-bezier(.2,.8,.2,1)' : 'cubic-bezier(.4,0,1,1)' }
+  );
+  try { await helpAnimation.finished; } catch { return; }
+  if (!opening) help.hidden = true;
+  help.style.removeProperty('overflow');
+  helpAnimation = null;
 });
 
 window.fx = machine;   // handy for poking at state from the console

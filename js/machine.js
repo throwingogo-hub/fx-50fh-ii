@@ -1328,7 +1328,12 @@ export class Machine {
     } catch {
       return false;
     }
+    if (restored.reduce((sum, program) => sum + (program ? bytesOf(program.tokens) : 0), 0) > PROGRAM_MEMORY) return false;
     this.programs = restored;
+    if (this.prog) {
+      this.prog = null;
+      this.clearEntry();
+    }
     return true;
   }
 
