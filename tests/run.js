@@ -88,6 +88,30 @@ function runCatalogProgram(id, inputs) {
   return outputs;
 }
 
+function runCatalogProgramWithKeys(id, inputSequences) {
+  const spec = PROGRAM_BY_ID.get(id);
+  const parsed = parseProgramText(spec.source, spec.mode);
+  const machine = new Machine();
+  machine.setStudioProgram(0, spec.mode, parsed.tokenIds);
+  machine.runProgram(0);
+  const outputs = [];
+  let inputIndex = 0;
+  let guard = 0;
+  while (machine.prog && guard++ < 10000) {
+    const state = machine.prog.state;
+    if (state.kind === 'input') {
+      if (inputIndex >= inputSequences.length) throw new Error(`${id} asked for unexpected input ${state.varName}`);
+      send(machine, `${inputSequences[inputIndex++]}=`);
+    } else if (state.kind === 'output') {
+      outputs.push(state.value.re);
+      send(machine, '=');
+    }
+  }
+  if (guard >= 10000) throw new Error(`${id} did not finish`);
+  if (inputIndex !== inputSequences.length) throw new Error(`${id} used ${inputIndex}/${inputSequences.length} key inputs`);
+  return outputs;
+}
+
 /** Run a key sequence on a fresh machine (or the supplied one) and read line 2. */
 function shown(m) {
   const v = m.view();
@@ -708,7 +732,7 @@ for (let i = 0; i < CONSTANTS.length; i++) {
   check('source-PDF programs all have improved catalog equivalents', ['P1', 'A', 'H', 'P3', 'E', 'B', 'M'].every(id => PROGRAM_BY_ID.has(id)), true);
   check('low-value bearings and variation extras were curated out', PROGRAM_BY_ID.has('G') || PROGRAM_BY_ID.has('N'), false);
   check('catalog search finds quadratic by topic', filterProgramCatalog('discriminant').map(program => program.id).join(','), 'P1');
-  check('catalog search finds the parameter-k intersection solver', filterProgramCatalog('parameter k').map(program => program.id).join(','), 'E');
+  check('catalog search finds the coefficient-k intersection solver', filterProgramCatalog('parameter k').map(program => program.id).join(','), 'E');
   check('catalog category filter isolates finance programs', filterProgramCatalog('', 'Finance').map(program => program.id).join(','), 'C,L');
 }
 {
@@ -755,17 +779,17 @@ for (let i = 0; i < CONSTANTS.length; i++) {
     ['C rate branch', 'C', [3, 1000, 1210, 2], [10]],
     ['C starting-value branch', 'C', [4, 1210, 10, 2], [1000]],
     ['D combined populations', 'D', [2, 10, 2, 2, 14, 2], [12, Math.sqrt(8)]],
-    ['E parameter-k secant branch', 'E', [-4, -2, -4, 0, 1, 1, 0], [5, 5, 1, -1, -1, 1]],
-    ['E parameter-k tangent branch', 'E', [-4, -2, -4, 0, 1, 4, 0], [2, 2, 4]],
-    ['E numeric-x vertical-line branch', 'E', [-4, -2, -4, 2, 0, 0, 1], [4, 2, 4, -2, 2, -2]],
-    ['E affine-coordinate branch', 'E', [0, 0, -25, -3, 2, 5, -1], [
-      (11 + 2 * Math.sqrt(19)) / 5,
-      (7 + 4 * Math.sqrt(19)) / 5,
-      (14 - 2 * Math.sqrt(19)) / 5,
-      (11 - 2 * Math.sqrt(19)) / 5,
-      (7 - 4 * Math.sqrt(19)) / 5,
-      (14 + 2 * Math.sqrt(19)) / 5
+    ['E k in both circle and line coefficients', 'E', [1, 1, 1, -4, 1, 1, 0], [
+      Math.sqrt(2), -Math.sqrt(2), -Math.sqrt(2), Math.sqrt(2)
     ]],
+    ['E non-unit coefficient-k case', 'E', [2, 2, 1, -4, 1, 2, 0], [
+      (-3 + Math.sqrt(89)) / 5, (3 - Math.sqrt(89)) / 10,
+      (-3 - Math.sqrt(89)) / 5, (3 + Math.sqrt(89)) / 10
+    ]],
+    ['E vertical-line branch with k circle coefficient', 'E', [2, 2, 1, -4, 1, 0, -1], [
+      1, (-1 + Math.sqrt(5)) / 2, 1, (-1 - Math.sqrt(5)) / 2
+    ]],
+    ['E coefficient-k tangent branch', 'E', [2, 0, 0, -4, 0, 1, -2], [0, 2]],
     ['F arithmetic target branch', 'F', [1, 3, 2, 100], [10, 120]],
     ['F geometric target branch', 'F', [2, 2, 1.5, 50], [7, 64.34375]],
     ['H cubic three-real-roots branch', 'H', [1, 6, 11, 6], [-1, -2, -3]],
@@ -785,6 +809,9 @@ for (let i = 0; i < CONSTANTS.length; i++) {
     ['M right-triangle centres', 'M', [0, 0, 6, 0, 0, 6], [2, 2, 6 - 3 * Math.sqrt(2), 6 - 3 * Math.sqrt(2), 0, 0, 3, 3]]
   ];
   for (const [name, id, inputs, outputs] of cases) nearMany(`program library: ${name}`, runCatalogProgram(id, inputs), outputs, 1e-8);
+  nearMany('program library: E accepts coefficient k through physical M-memory keys',
+    runCatalogProgramWithKeys('E', ['1', '#[MPLUS]', '1', '[NEG]4', '1', '#[MPLUS]', '0']),
+    [Math.sqrt(2), -Math.sqrt(2), -Math.sqrt(2), Math.sqrt(2)], 1e-8);
 }
 {
   const commandsRoundTrip = Object.entries(TOK)

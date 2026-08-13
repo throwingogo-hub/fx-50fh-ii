@@ -91,7 +91,7 @@ checkout can use any static-file server.
 
 ## Tests
 
-394 checks, including worked examples, operating limits, REPLAY/history
+395 checks, including worked examples, operating limits, REPLAY/history
 navigation, Program Studio text/recovery/backup, all 16 catalog programs and
 their documented branches, generated-guide parity, and exhaustive LCD menu-layout/glyph coverage derived from the user's guide, driven
 through the machine by key sequence rather than by calling the maths directly —

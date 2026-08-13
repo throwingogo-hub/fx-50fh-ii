@@ -11,7 +11,7 @@ by hand. The calculator already has direct `nPr`, `nCr`, SD/REG statistics and
 built-in formula functions, so the pack does not duplicate them.
 
 Every heading shows the exact Program Studio byte count. The complete 16-program
-library is **2,136B**; seven recommended four-slot packs fit within the authentic
+library is **2,207B**; seven recommended four-slot packs fit within the authentic
 680-byte shared memory. Any deliberately removed diagnostic output or tighter
 input restriction is stated in the relevant section below.
 
@@ -278,7 +278,7 @@ None duplicates an existing program or a one-button calculator feature:
 | B | circle through three points | P3 starts from a completed general equation |
 | C | growth and decay unknowns | solves for final value, time, rate or starting value |
 | D | combined population statistics | combines summary data without the original observations |
-| E | line–circle intersections | finds tangent/secant points, not just circle properties |
+| E | line–circle intersections | finds tangent/secant points when `k` appears in equation coefficients |
 | F | first sequence sum reaching a target | P2 requires `n` to be known already |
 | H | complete cubic equations | finds every distinct real root without needing a known factor |
 | I | hypergeometric probability ranges | evaluates exact, at-least and at-most cases in one run |
@@ -295,7 +295,7 @@ None duplicates an existing program or a one-button calculator feature:
 | Algebra and growth | Quadratic | Extra A | Sequences | Extra C | 352B |
 | Coordinate geometry | Coordinate | Extra B | Extra A | Trig | 469B |
 | Statistics and algebra | Sequences | Extra D | Extra A | Trig | 419B |
-| Advanced Section B / MCQ | Extra E | Extra F | Extra H | Extra J | 568B |
+| Advanced Section B / MCQ | Extra E | Extra F | Extra H | Extra J | 639B |
 | Paper 1 Section B power pack | Extra I | Extra J | Extra K | Extra L | 424B |
 | Centres & algebra | Extra M | Extra A | Quadratic | Extra J | 600B |
 
@@ -491,94 +491,102 @@ non-foundation-style questions found in Paper 2 Section B. They automate the
 arithmetic after you have formed the correct equation or model; they do not
 replace the working that Paper 1 requires.
 
-All four advanced programs occupy `568B`, leaving `112B` free for editing or
-two small personal utilities.
+All four advanced programs occupy `639B`, leaving `41B` free for editing.
 
-## Extra E — Line–Circle Intersections (140B)
+## Extra E — Line–Circle Intersections (211B)
 
-Finds the intersection points of a circle when a coordinate contains an
-unknown parameter such as `k`. Write the circle and the point on the straight
-line as
+Finds the **numerical intersection point(s)** when `k` appears in a
+coefficient of the circle equation or the straight-line equation. Write the
+equations as
 
 ```text
 x² + y² + Ax + By + C = 0
-x = D + Xk
-y = Y + Mk
+Dx + Xy + Y = 0
 ```
 
-This affine form accepts numbers and `k` in either coordinate:
+The program stores the chosen numerical value of `k` in calculator memory `M`.
+At every later prompt, enter either a number or an expression containing `M`:
 
-| Coordinate in the question | Constant | Coefficient of `k` |
-|---|---:|---:|
-| `x=3` | `D=3` | `X=0` |
-| `x=k` | `D=0` | `X=1` |
-| `x=2k−3` | `D=-3` | `X=2` |
-| `y=4` | `Y=4` | `M=0` |
-| `y=k` | `Y=0` | `M=1` |
-| `y=−k+5` | `Y=5` | `M=-1` |
+| Coefficient in the question | Enter at that prompt |
+|---|---|
+| `k` | `M` |
+| `2k−3` | `2M−3` |
+| ordinary number `5` | `5` |
+
+Therefore the example forms map like this:
+
+```text
+x²+y²+kx+y+f=0  →  A=M, B=1, C=f
+x+ky+c=0        →  D=1, X=M, Y=c
+```
 
 ### Inputs
 
 | Prompt | Enter |
 |---|---|
-| `A?`, `B?`, `C?` | coefficients of the circle equation |
-| `D?` | constant part of `x` |
-| `X?` | coefficient of `k` in `x` |
-| `Y?` | constant part of `y` |
-| `M?` | coefficient of `k` in `y` |
+| `M?` | the numerical value of `k` |
+| `A?`, `B?`, `C?` | circle coefficients; each may contain `M` |
+| `D?`, `X?`, `Y?` | line coefficients; each may contain `M` |
+
+The line coefficients `D` and `X` cannot both be zero. Because the fx-50FH II
+is not a symbolic CAS, `k` must be assigned a numerical value; the program
+cannot print general answers still containing an unresolved `k`.
 
 ### Outputs
 
-For each real intersection, the answers appear as `k`, then `x`, then `y`. A
-tangent produces one triplet; a secant produces two. If the resulting quadratic
-has no real root, the calculator shows `Math ERROR`. At least one of `X` or `M`
-must be non-zero, because otherwise the supplied coordinates describe one fixed
-point rather than a line.
+Each real intersection appears as an `x` value followed by its `y` value. A
+tangent produces one pair; a secant produces two pairs. If there is no real
+intersection, the calculator shows `Math ERROR`. Vertical lines are supported.
 
 ### Examples
 
-For `x²+y²−4x−2y−4=0`, `x=k` and `y=1`:
+For `x²+y²+kx+y−4=0` and `x+ky=0`, take `k=1`:
 
 ```text
-TYPE  A=-4, B=-2, C=-4, D=0, X=1, Y=1, M=0
-GET   k=5, point (5,1)
-      k=-1, point (-1,1)
+TYPE  M=1, A=M, B=1, C=-4, D=1, X=M, Y=0
+GET   (√2,-√2), (-√2,√2)
 ```
 
-The same input form handles a vertical line. For `x=2` and `y=k`:
+At the physical `A?` and `X?` prompts, press `ALPHA` then `M+` to enter `M`.
+For `k=2`, the same equations use exactly the same coefficient entries; only
+the first input changes to `M=2`.
+
+For the vertical line `x=1` with circle `x²+y²+2x+y−4=0`:
 
 ```text
-TYPE  A=-4, B=-2, C=-4, D=2, X=0, Y=0, M=1
-GET   k=4, point (2,4)
-      k=-2, point (2,-2)
-```
-
-For the tangent `x=k`, `y=4`:
-
-```text
-TYPE  A=-4, B=-2, C=-4, D=0, X=1, Y=4, M=0
-GET   k=2, tangent point (2,4)
+TYPE  M=2, A=M, B=1, C=-4, D=1, X=0, Y=-1
+GET   (1,(-1+√5)/2), (1,(-1−√5)/2)
 ```
 
 ### Copy this program
 
 ```text
+?→M
 ?→A
 ?→B
 ?→C
 ?→D
 ?→X
 ?→Y
-?→M
-D²+Y²+AD+BY+C→C
-2(DX+YM)+AX+BM→B
-X²+M²→A
-B²-4AC→C
-(√(C)-B)÷(2A)→C
-C◢D+XC◢Y+MC◢
--B÷A-C→B
-B=C⇒Goto 9
-B◢D+XB◢Y+MB◢
+X=0⇒Goto 1
+Y²-BXY+CX²→C
+AX²+2DY-BDX→B
+X²+D²→A
+B²-4AC→M
+(√(M)-B)÷(2A)→C
+C◢(-DC-Y)÷X◢
+-B÷A-C→M
+M=C⇒Goto 9
+M◢(-Y-DM)÷X◢
+Goto 9
+Lbl 1
+-Y÷D→X
+B²-4(X²+AX+C)→M
+(√(M)-B)÷2→C
+X◢C◢
+-B-C→M
+M=C⇒Goto 9
+X◢M◢
 Lbl 9
 ```
 

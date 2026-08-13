@@ -144,7 +144,7 @@ export const PROGRAMS = Object.freeze([
   {
     "id": "E",
     "title": "Line–Circle Intersections",
-    "bytes": 140,
+    "bytes": 211,
     "mode": "COMP",
     "category": "Coordinate",
     "topics": [
@@ -153,14 +153,14 @@ export const PROGRAMS = Object.freeze([
       "tangent",
       "secant",
       "parameter k",
-      "symbolic coordinate",
+      "coefficient containing k",
       "vertical line"
     ],
-    "summary": "Solve parameter k and both intersections when either coordinate is a number or an affine expression in k.",
-    "inputs": "Circle A/B/C, then x=D+Xk and y=Y+Mk. For a number n use (n,0); for k use (0,1).",
-    "outputs": "Each real k value followed by its intersection coordinates, or the single tangent result.",
-    "example": "TYPE  A=-4, B=-2, C=-4, D=0, X=1, Y=1, M=0\nGET   k=5, point (5,1); k=-1, point (-1,1)",
-    "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\n?→M\nD²+Y²+AD+BY+C→C\n2(DX+YM)+AX+BM→B\nX²+M²→A\nB²-4AC→C\n(√(C)-B)÷(2A)→C\nC◢D+XC◢Y+MC◢\n-B÷A-C→B\nB=C⇒Goto 9\nB◢D+XB◢Y+MB◢\nLbl 9"
+    "summary": "Find the numerical intersection points when k appears in a circle or straight-line coefficient.",
+    "inputs": "First enter k at M, then coefficients of x²+y²+Ax+By+C=0 and Dx+Xy+Y=0; any coefficient may be a number or an expression in M.",
+    "outputs": "One or two numerical (x,y) intersection pairs; a tangent produces one pair.",
+    "example": "For x²+y²+kx+y−4=0 and x+ky=0, TYPE M=1, A=M, B=1, C=-4, D=1, X=M, Y=0\nGET   (√2,-√2), (-√2,√2)",
+    "source": "?→M\n?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\nX=0⇒Goto 1\nY²-BXY+CX²→C\nAX²+2DY-BDX→B\nX²+D²→A\nB²-4AC→M\n(√(M)-B)÷(2A)→C\nC◢(-DC-Y)÷X◢\n-B÷A-C→M\nM=C⇒Goto 9\nM◢(-Y-DM)÷X◢\nGoto 9\nLbl 1\n-Y÷D→X\nB²-4(X²+AX+C)→M\n(√(M)-B)÷2→C\nX◢C◢\n-B-C→M\nM=C⇒Goto 9\nX◢M◢\nLbl 9"
   },
   {
     "id": "F",
@@ -334,7 +334,7 @@ export const PROGRAM_PACKS = Object.freeze([
   {
     "id": "advanced",
     "name": "Advanced Section B / MCQ",
-    "description": "Parameter intersections, sequence targets, complete cubics and transformed roots.",
+    "description": "Coefficient-k intersections, sequence targets, complete cubics and transformed roots.",
     "programIds": [
       "E",
       "F",
