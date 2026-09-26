@@ -56,8 +56,8 @@ function getExample(body) {
 
 function bootstrap() {
   const guide = readFileSync(guidePath, 'utf8');
-  const starts = [...guide.matchAll(/^## (P[1-4]|Extra [A-N]) — (.+?) \((\d+)B\)$/gm)];
-  if (starts.length !== 16) throw new Error(`expected 16 curated program sections, found ${starts.length}`);
+  const starts = [...guide.matchAll(/^## (P[1-4]|Extra [A-Z]) — (.+?) \((\d+)B\)$/gm)];
+  if (!starts.length) throw new Error('no curated program sections found');
   const prefix = guide.slice(0, starts[0].index);
   const programs = starts.map((match, index) => {
     const segment = guide.slice(match.index, starts[index + 1]?.index ?? guide.length);
@@ -91,7 +91,7 @@ function bootstrap() {
 
 function loadCatalog() {
   const catalog = JSON.parse(readFileSync(catalogPath, 'utf8'));
-  if (catalog.version !== 1 || catalog.programs?.length !== 16) throw new Error('invalid program catalog');
+  if (catalog.version !== 1 || !catalog.programs?.length) throw new Error('invalid program catalog');
   const ids = new Set();
   for (const program of catalog.programs) {
     if (ids.has(program.id)) throw new Error(`duplicate program id ${program.id}`);

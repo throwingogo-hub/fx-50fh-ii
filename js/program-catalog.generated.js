@@ -5,7 +5,7 @@ export const PROGRAMS = Object.freeze([
   {
     "id": "P1",
     "title": "Quadratic X-Ray",
-    "bytes": 80,
+    "bytes": 61,
     "mode": "COMP",
     "category": "Algebra",
     "topics": [
@@ -18,12 +18,12 @@ export const PROGRAMS = Object.freeze([
     "inputs": "Coefficients a, b and c.",
     "outputs": "Discriminant, vertex coordinates and real roots.",
     "example": "TYPE  A=1, B=-5, C=6\nGET   Δ=1, h=2.5, k=-0.25, roots 3 and 2",
-    "source": "?→A\n?→B\n?→C\nB²-4AC→D\nD◢-B÷2÷A◢-D÷4÷A◢D<0⇒Goto 9\n(√(D)-B)÷2÷A→C\nC◢D=0⇒Goto 9\n-B÷A-C◢Lbl 9"
+    "source": "?→A\n?→B\n?→C\nB²-4AC→D◢-B÷2÷A→X◢-D÷4÷A◢If D≥0\nThen X+√(D)÷2÷A◢2X-Ans"
   },
   {
     "id": "P2",
     "title": "Sequence Engine",
-    "bytes": 110,
+    "bytes": 85,
     "mode": "COMP",
     "category": "Sequences",
     "topics": [
@@ -35,12 +35,12 @@ export const PROGRAMS = Object.freeze([
     "inputs": "Sequence type, first term, difference or ratio, and n when required.",
     "outputs": "The requested term and sum.",
     "example": "TYPE  M=1, A=2, B=3, C=5\nGET   T₅=14, S₅=40",
-    "source": "?→M\n?→A\n?→B\nM=3⇒A÷(1-B)→X\nM=3⇒Goto 9\n?→C\nM=1⇒A+(C-1)B→D\nM=2⇒AB^(C-1)→D\nD◢M=1⇒C(A+D)÷2→X\nM=2⇒(A-BD)÷(1-B)→X\nLbl 9\nX◢"
+    "source": "?→M\n?→A\n?→B\n0→D\nM<3⇒?→C\nM=1⇒A+(C-1)B→D\nM=2⇒AB^(C-1→D\nD◢C(A+D)÷2→X\nM≠1⇒(A-BD)÷(1-B→X\nX"
   },
   {
     "id": "P3",
     "title": "Coordinate Lab",
-    "bytes": 104,
+    "bytes": 100,
     "mode": "COMP",
     "category": "Coordinate",
     "topics": [
@@ -51,14 +51,14 @@ export const PROGRAMS = Object.freeze([
     ],
     "summary": "Handle two-point coordinate geometry or recover a circle from its general equation.",
     "inputs": "A mode plus point coordinates or circle coefficients.",
-    "outputs": "Distance, midpoint, slope, or circle centre and radius.",
-    "example": "TYPE  M=1, A=0, B=0, C=3, D=4\nGET   distance 5, midpoint (1.5,2), slope 1.333333333",
-    "source": "?→M\n?→A\n?→B\n?→C\nM=2⇒Goto 2\n?→D\nC-A→X\nD-B→Y\n√(X²+Y²)◢(A+C)÷2◢(B+D)÷2◢Y÷X◢Goto 9\nLbl 2\n-A÷2◢-B÷2◢√(A²+B²-4C)÷2◢Lbl 9"
+    "outputs": "Distance, midpoint, slope and intercept, or circle centre and radius.",
+    "example": "TYPE  M=1, A=0, B=0, C=3, D=4\nGET   distance 5, midpoint (1.5,2), slope 1.333333333, intercept 0",
+    "source": "?→M\n?→A\n?→B\n?→C\nIf M=2\nThen -A÷2◢-B÷2◢√(A²+B²-4C)÷2\nElse ?→D\nC-A→X\nD-B→Y\n√(X²+Y²)◢(A+C)÷2◢(B+D)÷2◢Y÷X◢B-AAns"
   },
   {
     "id": "P4",
     "title": "Trig 360",
-    "bytes": 184,
+    "bytes": 103,
     "mode": "COMP",
     "category": "Trigonometry",
     "topics": [
@@ -71,12 +71,12 @@ export const PROGRAMS = Object.freeze([
     "inputs": "Function selector and isolated sine, cosine or tangent value.",
     "outputs": "All valid angles in the interval.",
     "example": "2sin θ=1   → TYPE M=1, D=0.5  → GET 30°, 150°\ncos θ=1    → TYPE M=2, D=1    → GET 0°, 360°\ntan θ=-1   → TYPE M=3, D=-1   → GET 135°, 315°",
-    "source": "Deg\n?→M\n?→D\nM=1⇒Goto 1\nM=2⇒Goto 2\ntan^-1(D)→X\nX<0⇒X+180→X\nX◢X+180◢X≠0⇒Goto 9\n360◢Goto 9\nLbl 1\nsin^-1(D)→X\nX<0⇒Goto 4\nX◢X=90⇒Goto 9\n180-X◢X≠0⇒Goto 9\n360◢Goto 9\nLbl 4\n180-X◢X=-90⇒Goto 9\n360+X◢Goto 9\nLbl 2\ncos^-1(D)→X\nX◢X=180⇒Goto 9\n360-X◢Lbl 9"
+    "source": "Deg\n?→M\n?→D\nsin⁻¹(D(M<3→B\ntan⁻¹(D(M=3))-90(M=2→C\n-1E-99→X\nFor 0→A To 3\nC+180A+B(-1)^(A→Y\nIf (Y>X)(Y≤360\nThen Y→X◢IfEnd\nNext\nX"
   },
   {
     "id": "A",
     "title": "Simultaneous 2×2 Solver",
-    "bytes": 52,
+    "bytes": 51,
     "mode": "COMP",
     "category": "Algebra",
     "topics": [
@@ -87,12 +87,12 @@ export const PROGRAMS = Object.freeze([
     "inputs": "The six coefficients from two linear equations.",
     "outputs": "The unique x and y solution.",
     "example": "TYPE  A=2, B=1, C=7, D=1, X=-1, Y=2\nGET   x=3, y=1",
-    "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\nAX-BD→M\n(CX-BY)÷M◢(AY-CD)÷M◢"
+    "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\nAX-BD→M\n(CX-BY)÷M◢(AY-CD)÷M"
   },
   {
     "id": "B",
     "title": "Circle Through Three Points",
-    "bytes": 129,
+    "bytes": 114,
     "mode": "COMP",
     "category": "Coordinate",
     "topics": [
@@ -100,16 +100,16 @@ export const PROGRAMS = Object.freeze([
       "three points",
       "circumcircle"
     ],
-    "summary": "Build the general equation of the circle through three supplied points.",
+    "summary": "Find the centre and radius of the circle through three supplied points.",
     "inputs": "Coordinates of three non-collinear points.",
-    "outputs": "Circle coefficients, centre and radius.",
+    "outputs": "Circle centre and radius.",
     "example": "TYPE  A=0, B=0, C=4, D=0, X=0, Y=6\nGET   centre (2,3), radius 3.605551275",
-    "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\nC-A→C\nD-B→D\nX-A→X\nY-B→Y\n(C(X²+Y²)-X(C²+D²))÷2÷(CY-DX)→M\n((C²+D²)Y-(X²+Y²)D)÷2÷(CY-DX)→C\nA+C◢B+M◢√(C²+M²)◢"
+    "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\nC-A→C\nD-B→D\nX-A→X\nY-B→Y\n(CX+DY)÷(CY-DX→M\nPol((C+X-M(Y-D))÷2,(D+Y-M(C-X))÷2→M\nRec(M,Y\nA+X◢B+Y◢M"
   },
   {
     "id": "C",
     "title": "Growth and Decay Solver",
-    "bytes": 110,
+    "bytes": 73,
     "mode": "COMP",
     "category": "Finance",
     "topics": [
@@ -118,16 +118,16 @@ export const PROGRAMS = Object.freeze([
       "exponential",
       "compound"
     ],
-    "summary": "Solve for the missing value in exponential growth or decay models.",
+    "summary": "Solve for the final value, time or rate in exponential growth or decay; negative time discounts back.",
     "inputs": "Mode plus the known starting value, final value, rate and time.",
     "outputs": "The selected unknown quantity.",
-    "example": "TYPE  M=1, A=1000, B=5, C=3     → GET 1157.625\nTYPE  M=2, A=1000, B=10, C=1210 → GET 2 periods\nTYPE  M=3, A=1000, B=1210, C=2  → GET 10%\nTYPE  M=4, A=1210, B=10, C=2    → GET 1000",
-    "source": "?→M\n?→A\n?→B\n?→C\nM=1⇒A(1+B÷100)^(C)→X\nM=2⇒log(C÷A)÷log(1+B÷100)→X\nM=3⇒100((B÷A)^(1÷C)-1)→X\nM=4⇒A÷(1+B÷100)^(C)→X\nX◢"
+    "example": "TYPE  M=1, A=1000, B=5, C=3        → GET 1157.625\nTYPE  M=2, A=1000, B=10, C=1210    → GET 2 periods\nTYPE  M=3, A=1000, B=1210, C=2     → GET 10%\nTYPE  M=1, A=1157.625, B=5, C=-3   → GET start 1000",
+    "source": "?→M\n?→A\n?→B\n?→C\n1+B÷100→Y\nM=1⇒AY^(C→X\nM=2⇒log(Y,C÷A→X\nM=3⇒100(Cˣ√(B÷A)-1→X\nX"
   },
   {
     "id": "D",
     "title": "Combined Population Statistics",
-    "bytes": 73,
+    "bytes": 67,
     "mode": "COMP",
     "category": "Statistics",
     "topics": [
@@ -139,12 +139,12 @@ export const PROGRAMS = Object.freeze([
     "inputs": "Both population sizes, means and population standard deviations.",
     "outputs": "Combined mean and combined population standard deviation.",
     "example": "TYPE  A=2, B=10, C=2, D=2, X=14, Y=2\nGET   combined mean 12, combined SD 2.828427125",
-    "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\n(AB+DX)÷(A+D)◢√((A(C²+B²)+D(Y²+X²))÷(A+D)-(Ans)²)◢"
+    "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\nA+D→M\n(AB+DX)÷M◢√((A(C²+B²)+D(Y²+X²))÷M-Ans²"
   },
   {
     "id": "E",
     "title": "Line–Circle Intersections",
-    "bytes": 211,
+    "bytes": 124,
     "mode": "COMP",
     "category": "Coordinate",
     "topics": [
@@ -159,13 +159,13 @@ export const PROGRAMS = Object.freeze([
     "summary": "Find the numerical intersection points when k appears in a circle or straight-line coefficient.",
     "inputs": "First enter k at M, then coefficients of x²+y²+Ax+By+C=0 and Dx+Xy+Y=0; any coefficient may be a number or an expression in M.",
     "outputs": "One or two numerical (x,y) intersection pairs; a tangent produces one pair.",
-    "example": "For x²+y²+kx+y−4=0 and x+ky=0, TYPE M=1, A=M, B=1, C=-4, D=1, X=M, Y=0\nGET   (√2,-√2), (-√2,√2)",
-    "source": "?→M\n?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\nX=0⇒Goto 1\nY²-BXY+CX²→C\nAX²+2DY-BDX→B\nX²+D²→A\nB²-4AC→M\n(√(M)-B)÷(2A)→C\nC◢(-DC-Y)÷X◢\n-B÷A-C→M\nM=C⇒Goto 9\nM◢(-Y-DM)÷X◢\nGoto 9\nLbl 1\n-Y÷D→X\nB²-4(X²+AX+C)→M\n(√(M)-B)÷2→C\nX◢C◢\n-B-C→M\nM=C⇒Goto 9\nX◢M◢\nLbl 9"
+    "example": "TYPE  M=1, A=M, B=1, C=-4, D=1, X=M, Y=0\nGET   (-√2,√2), (√2,-√2)",
+    "source": "?→M\n?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\n-A÷2→A\n-B÷2→B\nA²+B²-C→C\nD²+X²→M\n(AD+BX+Y)÷M→Y\nA-YD→A\nB-YX→B\n√(C÷M-Y²→C\nA-CX◢B+CD◢If C\nThen A+CX◢B-CD"
   },
   {
     "id": "F",
     "title": "Sequence Target Solver",
-    "bytes": 72,
+    "bytes": 62,
     "mode": "COMP",
     "category": "Sequences",
     "topics": [
@@ -177,12 +177,12 @@ export const PROGRAMS = Object.freeze([
     "inputs": "Sequence type, sequence values and target sum.",
     "outputs": "The first qualifying n and its sum.",
     "example": "TYPE  M=1, A=3, B=2, C=100\nGET   n=10, S₁₀=120",
-    "source": "?→M\n?→A\n?→B\n?→C\n0→X\n0→Y\nA→D\nWhile Y<C\nX+1→X\nY+D→Y\nM=1⇒D+B→D\nM=2⇒DB→D\nWhileEnd\nX◢Y◢"
+    "source": "ClrMemory\n?→M\n?→A\n?→B\n?→C\nWhile Y<C\nX+1→X\nY+A→Y\nM=1⇒A+B→A\nM=2⇒AB→A\nWhileEnd\nX◢Y"
   },
   {
     "id": "H",
     "title": "Complete Cubic Solver",
-    "bytes": 273,
+    "bytes": 134,
     "mode": "COMP",
     "category": "Algebra",
     "topics": [
@@ -193,14 +193,14 @@ export const PROGRAMS = Object.freeze([
     ],
     "summary": "Solve a cubic directly and return every distinct real root without requiring a known factor.",
     "inputs": "All four coefficients of Ax³+Bx²+Cx+D=0.",
-    "outputs": "One, two or three distinct real roots.",
-    "example": "TYPE  A=1, B=6, C=11, M=6\nGET   roots -1, -2, -3",
-    "source": "?→A\n?→B\n?→C\n?→M\n2×B³÷(27×A³)-B×C÷(3×A²)+M÷A→D\nC÷A-B²÷(3×A²)→X\nB÷(3×A)→Y\n(D÷2)²+(X÷3)³→M\nM<0⇒Goto 1\nM=0⇒Goto 2\n∛((-D÷2+√(M)))+∛((-D÷2-√(M)))-Y◢\nGoto 9\nLbl 2\n∛((-D÷2))→A\n2×A-Y◢\nA=0⇒Goto 9\n-A-Y◢\nGoto 9\nLbl 1\nDeg\ncos^-1((3×D÷(2×X))×√((-3÷X)))÷3→M\n2×√((-X÷3))→A\nA×cos(M)-Y◢\nA×cos(M - 120)-Y◢\nA×cos(M - 240)-Y◢\nLbl 9"
+    "outputs": "Every real root.",
+    "example": "x³+6x²+11x+6=0\nTYPE  A=1, B=6, C=11, M=6\nGET   -1, -2, -3\n\n2x³+7x²+5x+1=0\nTYPE  A=2, B=7, C=5, M=1\nGET   approximately -0.381966, -0.5, -2.618034\n\nx³+2x²+2x+1=0\nTYPE  A=1, B=2, C=2, M=1\nGET   -1\n\nx³−3x+2=0   (roots 1, 1, −2)\nTYPE  A=1, B=0, C=-3, M=2\nGET   1, -2, 1",
+    "source": "Deg\n?→A\n?→B\n?→C\n?→M\nB÷3÷A→B\nB²-C÷3÷A→X\nB³-(BC-M)÷2÷A→D\nD²-X³→M\nIf M≤0\nThen Pol(-D,√(-M\nFor 0→M To 2\n2∛(X)cos(Y÷3-120M)-B◢Next\nElse √(M→M\n∛(M-D)-∛(D+M)-B"
   },
   {
     "id": "I",
     "title": "Without-Replacement Probability",
-    "bytes": 130,
+    "bytes": 86,
     "mode": "COMP",
     "category": "Probability",
     "topics": [
@@ -208,16 +208,16 @@ export const PROGRAMS = Object.freeze([
       "without replacement",
       "nCr"
     ],
-    "summary": "Evaluate exact, at-least or at-most probabilities without replacement.",
-    "inputs": "Probability mode, population counts, draw count and target count.",
-    "outputs": "The requested hypergeometric probability.",
-    "example": "TYPE  M=1, A=5, B=4, C=2, D=2  → GET P(exactly 2 red)=0.2777777778 = 5/18\nTYPE  M=2, A=5, B=4, C=2, D=1  → GET P(at least 1 red)=0.8333333333 = 5/6\nTYPE  M=3, A=5, B=4, C=2, D=1  → GET P(at most 1 red)=0.7222222222 = 13/18",
-    "source": "?→M\n?→A\n?→B\n?→C\n?→D\n0→X\nC-B>0⇒C-B→X\nC→Y\nA<C⇒A→Y\nM=1⇒D→X\nM=1⇒D→Y\nM=2⇒D>X⇒D→X\nM=3⇒D<Y⇒D→Y\n0→M\nWhile X≤Y\nA nCr X B nCr(C-X)÷(A+B)nCr C M+\nX+1→X\nWhileEnd\nM◢"
+    "summary": "Evaluate exact, at-least and at-most probabilities without replacement in one run.",
+    "inputs": "Population counts, draw count and target count.",
+    "outputs": "P(exactly), P(at least) and P(at most).",
+    "example": "TYPE  A=5, B=4, C=2, D=2  → GET 0.2777777778, 0.2777777778, 1\nTYPE  A=5, B=4, C=2, D=1  → GET 0.5555555556, 0.8333333333, 0.7222222222",
+    "source": "?→A\n?→B\n?→C\n?→D\n(A+B)nCr C→Y\n0→M\nFor (C-B)(C>B→X To D\nA nCr X B nCr(C-X)÷Y M+\nNext\nA nCr D B nCr(C-D)÷Y◢1-M+Ans◢M"
   },
   {
     "id": "J",
     "title": "Transformed-Roots Builder",
-    "bytes": 83,
+    "bytes": 73,
     "mode": "COMP",
     "category": "Algebra",
     "topics": [
@@ -229,12 +229,12 @@ export const PROGRAMS = Object.freeze([
     "inputs": "Original quadratic coefficients plus transformation mode and constants.",
     "outputs": "Coefficients of the transformed-root equation.",
     "example": "TYPE  M=1, A=1, B=-5, C=6, X=2, Y=1\nGET   P=-12, Q=35\nWRITE z²-12z+35=0",
-    "source": "?→M\n?→A\n?→B\n?→C\nM=2⇒Goto 2\n?→X\n?→Y\nXB÷A-2Y◢X²C÷A-YAns-Y²◢Goto 9\nLbl 2\nC÷A→X\n2X-(B÷A)²◢X²◢Lbl 9"
+    "source": "?→M\n?→A\n?→B\n?→C\nIf M=1\nThen ?→X\n?→Y\nXB÷A-2Y◢X²C÷A-YAns-Y²\nElse C÷A→X\n2X-(B÷A)²◢X²"
   },
   {
     "id": "K",
     "title": "Tangents from a Point to a Circle",
-    "bytes": 104,
+    "bytes": 97,
     "mode": "COMP",
     "category": "Coordinate",
     "topics": [
@@ -246,12 +246,12 @@ export const PROGRAMS = Object.freeze([
     "inputs": "Circle data and the external point.",
     "outputs": "Two contact points and tangent length.",
     "example": "TYPE  A=0, B=0, C=5, D=13, X=0\nGET   tangent length 12\n      contact points (1.923076923,4.615384615)\n                     (1.923076923,-4.615384615)",
-    "source": "?→A\n?→B\n?→C\n?→D\n?→X\nD-A→D\nX-B→X\nD²+X²→M\n√((M)-C²)→Y\nY◢C÷M→M\nA+M(CD-XY)◢B+M(CX+DY)◢A+M(CD+XY)◢B+M(CX-DY)◢"
+    "source": "?→A\n?→B\n?→C\n?→D\n?→X\nD-A→D\nX-B→X\nD²+X²→M\n√(M-C²→Y◢C÷M→M\nA+M(CD-XY)◢B+M(CX+DY)◢A+M(CD+XY)◢B+M(CX-DY"
   },
   {
     "id": "L",
     "title": "Annuity and Loan Engine",
-    "bytes": 107,
+    "bytes": 53,
     "mode": "COMP",
     "category": "Finance",
     "topics": [
@@ -261,15 +261,15 @@ export const PROGRAMS = Object.freeze([
       "compound interest"
     ],
     "summary": "Calculate savings annuities and reducing-balance loan quantities.",
-    "inputs": "Mode, payment, rate, term and known balance values.",
-    "outputs": "The selected annuity or loan result.",
-    "example": "TYPE  M=1, A=1000, B=1, C=12, D=100\nGET   future value 2395.075331",
-    "source": "?→M\n?→A\n?→B\nB÷100→B\n?→C\n(1+B)^(C)→X\nM=2⇒AB÷(1-1÷X)→Y\nM=2⇒Goto 9\n?→D\nM=1⇒AX+D(X-1)÷B→Y\nM=3⇒AX-D(X-1)÷B→Y\nLbl 9\nY◢"
+    "inputs": "Balance or loan, rate, term, then the regular payment.",
+    "outputs": "Level loan payment, then the balance after the term.",
+    "example": "TYPE  A=1000, B=1, C=12   → GET 88.84878868 (payment, ignore)\nTYPE  D=100               → GET future value 2395.075331",
+    "source": "?→A\n?→B\n?→C\nB%→B\n(1+B)^(C→X\nABX÷(X-1)◢?→D\nAX+D(X-1)÷B"
   },
   {
     "id": "M",
     "title": "Four Centres of Any Triangle",
-    "bytes": 385,
+    "bytes": 217,
     "mode": "REG",
     "category": "Geometry",
     "topics": [
@@ -282,7 +282,125 @@ export const PROGRAMS = Object.freeze([
     "inputs": "Coordinates of all three vertices.",
     "outputs": "Coordinates of G, I, H and O.",
     "example": "TYPE  A=0, B=0, C=24, D=0, X=12, Y=9\nGET   G=(12,3), I=(12,4), H=(12,16), O=(12,-3.5)",
-    "source": "ClrStat\n?→A\n?→B\nA,B DT\n?→C\n?→D\nC,D DT\n?→X\n?→Y\nX,Y DT\nΣx÷3◢\nΣy÷3◢\n√((C-X)²+(D-Y)²)+√((X-A)²+(Y-B)²)+√((A-C)²+(B-D)²)→M\n(√((C-X)²+(D-Y)²)×A+√((X-A)²+(Y-B)²)×C+√((A-C)²+(B-D)²)×X)÷M◢\n(√((C-X)²+(D-Y)²)×B+√((X-A)²+(Y-B)²)×D+√((A-C)²+(B-D)²)×Y)÷M◢\n2×(A×(D-Y)+C×(Y-B)+X×(B-D))→M\nPol(((A²+B²)×(D-Y)+(C²+D²)×(Y-B)+(X²+Y²)×(B-D))÷M,((A²+B²)×(X-C)+(C²+D²)×(A-X)+(X²+Y²)×(C-A))÷M)\nRec(X,Y)\nΣx-2X◢\nΣy-2Y◢\nX◢\nY◢"
+    "source": "ClrStat\n?→A\n?→B\nA,B DT\n?→C\n?→D\n?→X\n?→Y\nC-A→C\nD-B→D\nX-A→X\nY-B→Y\nΣx+(C+X)÷3◢Σy+(D+Y)÷3◢√(X²+Y²→A\n√(C²+D²→B\nA+B+√((C-X)²+(D-Y)²→M\nΣx+(AC+BX)÷M◢Σy+(AD+BY)÷M◢(CX+DY)÷(CY-DX→M\nΣx+M(Y-D◢Σy+M(C-X◢Σx+(C+X-M(Y-D))÷2◢Σy+(D+Y-M(C-X))÷2"
+  },
+  {
+    "id": "Q",
+    "title": "Triangle Solver",
+    "mode": "COMP",
+    "category": "Trigonometry",
+    "topics": [
+      "sine rule",
+      "cosine rule",
+      "triangle",
+      "SSS",
+      "SAS",
+      "area",
+      "heron"
+    ],
+    "summary": "Solve any triangle from three sides or two sides and the included angle.",
+    "inputs": "Mode, then sides a and b, and side c or the included angle C.",
+    "outputs": "Side c, all three angles and the area.",
+    "source": "Deg\n?→M\n?→A\n?→B\n?→C\nM=2⇒√(A²+B²-2ABcos(C→C\nC◢cos⁻¹((B²+C²-A²)÷(2BC→X◢cos⁻¹((A²+C²-B²)÷(2AC→Y◢180-X-Y◢ABsin(Ans)÷2",
+    "bytes": 99,
+    "example": "3-4-5 triangle     TYPE M=1, A=3, B=4, C=5\n                   GET  c=5, A=36.86989765°, B=53.13010235°, C=90°, area 6\na=5, b=7, C=60°    TYPE M=2, A=5, B=7, C=60\n                   GET  c=6.244997998, A=43.89788625°, B=76.10211375°, C=60°,\n                        area 15.15544457"
+  },
+  {
+    "id": "R",
+    "title": "Point and Line",
+    "mode": "COMP",
+    "category": "Coordinate",
+    "topics": [
+      "perpendicular distance",
+      "foot of perpendicular",
+      "reflection",
+      "point to line",
+      "image"
+    ],
+    "summary": "Find the distance from a point to a line, the foot of the perpendicular and the mirror image.",
+    "inputs": "Line coefficients A, B, C and the point (x, y).",
+    "outputs": "Perpendicular distance, foot of perpendicular and reflected point.",
+    "source": "?→A\n?→B\n?→C\n?→X\n?→Y\nA²+B²→M\n(AX+BY+C)÷M→D\nAbs(D)√(M)◢X-AD◢Y-BD◢X-2AD◢Y-2BD",
+    "bytes": 72,
+    "example": "TYPE  A=3, B=4, C=-25, X=0, Y=0\nGET   distance 5, foot (3,4), image (6,8)"
+  },
+  {
+    "id": "S",
+    "title": "Polygon Area",
+    "mode": "COMP",
+    "category": "Geometry",
+    "topics": [
+      "area",
+      "polygon",
+      "shoelace",
+      "triangle area",
+      "quadrilateral",
+      "coordinates"
+    ],
+    "summary": "Find the area of any polygon from its vertex coordinates with the shoelace formula.",
+    "inputs": "Vertices in order, then the first vertex again.",
+    "outputs": "The polygon area.",
+    "source": "ClrMemory\n?→A\n?→B\nA→X\nB→Y\nLbl 1\n?→C\n?→D\nXD-YC M+\nC→X\nD→Y\n(X≠A)+(Y≠B)⇒Goto 1\nAbs(M)÷2",
+    "bytes": 69,
+    "example": "TYPE  A=0, B=0, then C,D = 4,0 · 4,3 · 0,3 · 0,0\nGET   area 12"
+  },
+  {
+    "id": "T",
+    "title": "Binomial and Poisson",
+    "mode": "COMP",
+    "category": "Probability",
+    "topics": [
+      "binomial",
+      "poisson",
+      "cumulative probability",
+      "M1",
+      "distribution"
+    ],
+    "summary": "Get exact, at-least and at-most probabilities for binomial or Poisson models.",
+    "inputs": "Model, n and p (binomial) or λ (Poisson), and r.",
+    "outputs": "P(X=r), P(X≥r) and P(X≤r).",
+    "source": "ClrMemory\n?→Y\n?→A\nY=1⇒?→B\n?→C\nFor 0→X To C\nY=1⇒A nCr X B^(X)(1-B)^(A-X→D\nY=2⇒e^(-A)A^(X)÷X!→D\nD M+\nNext\nD◢1-M+D◢M",
+    "bytes": 93,
+    "example": "B(10, 0.3), r=3   TYPE Y=1, A=10, B=0.3, C=3\n                  GET  0.266827932, 0.6172172136, 0.6496107184\nPo(2), r=1        TYPE Y=2, A=2, C=1\n                  GET  0.2706705665, 0.8646647168, 0.4060058497"
+  },
+  {
+    "id": "U",
+    "title": "3D Vector Toolkit",
+    "mode": "COMP",
+    "category": "Vectors",
+    "topics": [
+      "vector",
+      "dot product",
+      "cross product",
+      "angle between vectors",
+      "3D",
+      "M2"
+    ],
+    "summary": "Dot product, angle, cross product and parallelogram area for two 3D vectors.",
+    "inputs": "Components of u and v.",
+    "outputs": "u·v, angle, |u×v| and the components of u×v.",
+    "source": "Deg\n?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\n√((A²+B²+C²)(D²+X²+Y²→M\nAD+BX+CY◢cos⁻¹(Ans÷M◢Msin(Ans)◢BY-CX◢CD-AY◢AX-BD",
+    "bytes": 91,
+    "example": "TYPE  A=1, B=2, C=3, D=4, X=5, Y=6\nGET   u·v=32, angle 12.93315449°, |u×v|=7.348469228, u×v=(-3,6,-3)"
+  },
+  {
+    "id": "V",
+    "title": "Normal Probability",
+    "mode": "COMP",
+    "category": "Statistics",
+    "topics": [
+      "normal distribution",
+      "z-score",
+      "standard score",
+      "normal probability",
+      "M1"
+    ],
+    "summary": "Standard score and normal-distribution probabilities without tables.",
+    "inputs": "Mean μ, standard deviation σ and value x.",
+    "outputs": "z, P(X<x) and P(X>x).",
+    "source": "?→A\n?→B\n?→C\n(C-A)÷B→X◢X→Y\nX→D\n1→C\nWhile Y\nC+2→C\nYX²÷C→Y\nD+Y→D\nWhileEnd\n.5+De^(-X²÷2)÷√(2π◢1-Ans",
+    "bytes": 83,
+    "example": "TYPE  A=0, B=1, C=1.96   → GET z=1.96, 0.9750021049, 0.02499789515\nTYPE  A=50, B=10, C=40   → GET z=-1, 0.1586552539, 0.8413447461"
   }
 ]);
 
@@ -312,12 +430,23 @@ export const PROGRAM_PACKS = Object.freeze([
   {
     "id": "coordinate",
     "name": "Coordinate geometry",
-    "description": "Points, circles, equations and trig.",
+    "description": "Points, circles, line–circle intersections and point–line distance.",
     "programIds": [
       "P3",
       "B",
-      "A",
-      "P4"
+      "E",
+      "R"
+    ]
+  },
+  {
+    "id": "trig-mensuration",
+    "name": "Trigonometry & mensuration",
+    "description": "Trig equations, triangles, polygon areas and triangle centres.",
+    "programIds": [
+      "P4",
+      "Q",
+      "S",
+      "M"
     ]
   },
   {
@@ -362,6 +491,28 @@ export const PROGRAM_PACKS = Object.freeze([
       "A",
       "P1",
       "J"
+    ]
+  },
+  {
+    "id": "m1",
+    "name": "M1 probability & statistics",
+    "description": "Binomial, Poisson, normal and without-replacement probabilities.",
+    "programIds": [
+      "T",
+      "V",
+      "I",
+      "D"
+    ]
+  },
+  {
+    "id": "m2",
+    "name": "M2 vectors & equations",
+    "description": "3D vectors, cubics, simultaneous equations and triangles.",
+    "programIds": [
+      "U",
+      "H",
+      "A",
+      "Q"
     ]
   }
 ]);

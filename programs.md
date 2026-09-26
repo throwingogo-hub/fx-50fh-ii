@@ -1,19 +1,33 @@
 # HKDSE Core programs for fx-50FH II
 
-These 16 programs are optional. They are available in the web calculator's
+These 22 programs are optional. They are available in the web calculator's
 **Program Studio → HKDSE Library**, but nothing installs automatically. A single
 program always asks for a destination slot, and an occupied slot or four-slot
 pack requires a second confirmation before anything is replaced.
 
-The complete P1–P4 Core pack uses **478 of 680 bytes**. It focuses on HKDSE
+The complete P1–P4 Core pack uses **349 of 680 bytes**. It focuses on HKDSE
 Mathematics Compulsory Part calculations that are slow or error-prone to repeat
 by hand. The calculator already has direct `nPr`, `nCr`, SD/REG statistics and
 built-in formula functions, so the pack does not duplicate them.
 
-Every heading shows the exact Program Studio byte count. The complete 16-program
-library is **2,207B**; seven recommended four-slot packs fit within the authentic
+Every heading shows the exact Program Studio byte count. The complete 22-program
+library is **2,007B**; ten recommended four-slot packs fit within the authentic
 680-byte shared memory. Any deliberately removed diagnostic output or tighter
 input restriction is stated in the relevant section below.
+
+### Compact by design
+
+The original 16 programs were rewritten from **2,207B to 1,500B** (32% smaller)
+without losing a feature, which is what makes room for the six new programs and
+the extra packs. The main techniques, useful for your own programs too:
+
+- `If … Then …` with the `IfEnd` omitted at the end of a program replaces
+  `Goto`/`Lbl` jumps.
+- The final answer is left on the display instead of being paused with `◢`.
+- `expr→X◢` stores and shows a value in one statement.
+- Closing brackets before `→`, `◢` or the end of a line are omitted.
+- Better formulas: one general-solution loop for P4, a perpendicular-foot method
+  for E, `Pol`/`Rec` to carry two coordinates, and REG statistics as extra memory.
 
 ## Install from the in-app Library
 
@@ -21,7 +35,7 @@ input restriction is stated in the relevant section below.
 2. Search by topic or choose a category.
 3. Select the destination P1–P4 slot, then press **Install**.
 4. If the slot already contains a program, confirm the replacement once more.
-5. For a complete setup, choose one of the seven memory-safe four-slot packs.
+5. For a complete setup, choose one of the ten memory-safe four-slot packs.
 
 Program Studio keeps one-step Undo after a Library, pack or backup install. Use
 **Export all** to download a versioned JSON backup before larger changes.
@@ -40,14 +54,15 @@ Program Studio keeps one-step Undo after a Library, pack or backup install. Use
 
 When the display shows `A?`, `B?`, `M?` or another variable prompt, enter the
 requested value and press **EXE**. Each answer pauses on screen; press **EXE**
-again to reveal the next answer. The calculator returns home after the last one.
+again to reveal the next answer. The last answer stays on the display when the
+program ends.
 
 For a negative input on the physical calculator, use the `(-)` key. In Program
 Studio source and the examples below, an ordinary minus sign is fine. Some `◢`
 pauses are followed immediately by the next statement because an extra line
 break would consume another program byte.
 
-## P1 — Quadratic X-Ray (80B)
+## P1 — Quadratic X-Ray (61B)
 
 Use P1 for a quadratic equation
 
@@ -71,10 +86,10 @@ The answers appear in this order:
 2. Vertex x-coordinate `h`
 3. Vertex y-coordinate `k`
 4. First real root
-5. Second real root
+5. Second real root (left on the display when the program ends)
 
 If `Δ < 0`, P1 stops after the vertex because there are no real roots. If
-`Δ = 0`, the repeated root is shown once.
+`Δ = 0`, both roots are equal, so the repeated root appears twice.
 
 ### Example
 
@@ -91,14 +106,11 @@ GET   Δ=1, h=2.5, k=-0.25, roots 3 and 2
 ?→A
 ?→B
 ?→C
-B²-4AC→D
-D◢-B÷2÷A◢-D÷4÷A◢D<0⇒Goto 9
-(√(D)-B)÷2÷A→C
-C◢D=0⇒Goto 9
--B÷A-C◢Lbl 9
+B²-4AC→D◢-B÷2÷A→X◢-D÷4÷A◢If D≥0
+Then X+√(D)÷2÷A◢2X-Ans
 ```
 
-## P2 — Sequence Engine (110B)
+## P2 — Sequence Engine (85B)
 
 P2 begins with `M?`. This selects the type of sequence.
 
@@ -108,7 +120,7 @@ P2 begins with `M?`. This selects the type of sequence.
 |---:|---|---|---|
 | `1` | Arithmetic progression | `A` first term, `B` common difference, `C=n` | `Tₙ`, then `Sₙ` |
 | `2` | Finite geometric progression | `A` first term, `B` common ratio, `C=n` | `Tₙ`, then `Sₙ` |
-| `3` | Infinite geometric progression | `A` first term, `B` common ratio | `S∞` |
+| `3` | Infinite geometric progression | `A` first term, `B` common ratio | `0` (the limit of `Tₙ`), then `S∞` |
 
 Use `M=3` only when `|B| < 1`. For `M=2`, use `B≠1`; a constant GP is
 quicker by hand: `Tₙ=A`, `Sₙ=AC`.
@@ -133,7 +145,7 @@ Infinite geometric progression with `a=6`, `r=0.5`:
 
 ```text
 TYPE  M=3, A=6, B=0.5
-GET   S∞=12
+GET   Tₙ→0, S∞=12
 ```
 
 ### Copy into P2
@@ -142,18 +154,16 @@ GET   S∞=12
 ?→M
 ?→A
 ?→B
-M=3⇒A÷(1-B)→X
-M=3⇒Goto 9
-?→C
+0→D
+M<3⇒?→C
 M=1⇒A+(C-1)B→D
-M=2⇒AB^(C-1)→D
-D◢M=1⇒C(A+D)÷2→X
-M=2⇒(A-BD)÷(1-B)→X
-Lbl 9
-X◢
+M=2⇒AB^(C-1→D
+D◢C(A+D)÷2→X
+M≠1⇒(A-BD)÷(1-B→X
+X
 ```
 
-## P3 — Coordinate Lab (104B)
+## P3 — Coordinate Lab (100B)
 
 P3 begins with `M?`. Choose two-point geometry or a circle equation.
 
@@ -167,15 +177,16 @@ Enter:
 | `A?`, `B?` | first point `(x₁,y₁)` |
 | `C?`, `D?` | second point `(x₂,y₂)` |
 
-Outputs: distance, midpoint x-coordinate, midpoint y-coordinate, then slope.
-A vertical line produces `Math ERROR` at the slope, after the first three useful
-answers have already appeared.
+Outputs: distance, midpoint x-coordinate, midpoint y-coordinate, slope `m`, then
+y-intercept `c`, so the line through the two points is `y = mx + c`. A vertical
+line produces `Math ERROR` at the slope, after the first three useful answers
+have already appeared.
 
 Example for `(0,0)` and `(3,4)`:
 
 ```text
 TYPE  M=1, A=0, B=0, C=3, D=4
-GET   distance 5, midpoint (1.5,2), slope 1.333333333
+GET   distance 5, midpoint (1.5,2), slope 1.333333333, intercept 0
 ```
 
 ### Mode 2 — circle equation
@@ -203,19 +214,21 @@ GET   centre (2,-3), radius 5
 ?→A
 ?→B
 ?→C
-M=2⇒Goto 2
-?→D
+If M=2
+Then -A÷2◢-B÷2◢√(A²+B²-4C)÷2
+Else ?→D
 C-A→X
 D-B→Y
-√(X²+Y²)◢(A+C)÷2◢(B+D)÷2◢Y÷X◢Goto 9
-Lbl 2
--A÷2◢-B÷2◢√(A²+B²-4C)÷2◢Lbl 9
+√(X²+Y²)◢(A+C)÷2◢(B+D)÷2◢Y÷X◢B-AAns
 ```
 
-## P4 — Trig 360 (184B)
+## P4 — Trig 360 (103B)
 
-P4 finds every distinct solution for `0° ≤ θ ≤ 360°`. It switches the
-calculator to degrees automatically.
+P4 finds every distinct solution for `0° ≤ θ ≤ 360°`, in increasing order. It
+switches the calculator to degrees automatically. Internally, every case is
+rewritten as `sin(θ − c) = sin β` and the general solution
+`θ = 180°n + (−1)ⁿβ + c` is scanned for `n = 0…3`, so one short loop replaces
+the old separate sine, cosine and tangent branches.
 
 ### Inputs
 
@@ -242,25 +255,15 @@ tan θ=-1   → TYPE M=3, D=-1   → GET 135°, 315°
 Deg
 ?→M
 ?→D
-M=1⇒Goto 1
-M=2⇒Goto 2
-tan^-1(D)→X
-X<0⇒X+180→X
-X◢X+180◢X≠0⇒Goto 9
-360◢Goto 9
-Lbl 1
-sin^-1(D)→X
-X<0⇒Goto 4
-X◢X=90⇒Goto 9
-180-X◢X≠0⇒Goto 9
-360◢Goto 9
-Lbl 4
-180-X◢X=-90⇒Goto 9
-360+X◢Goto 9
-Lbl 2
-cos^-1(D)→X
-X◢X=180⇒Goto 9
-360-X◢Lbl 9
+sin⁻¹(D(M<3→B
+tan⁻¹(D(M=3))-90(M=2→C
+-1E-99→X
+For 0→A To 3
+C+180A+B(-1)^(A→Y
+If (Y>X)(Y≤360
+Then Y→X◢IfEnd
+Next
+X
 ```
 
 ## Extra swap-in library
@@ -276,30 +279,34 @@ None duplicates an existing program or a one-button calculator feature:
 |---|---|---|
 | A | simultaneous 2×2 equations | the fx-50FH II has no equation-solver mode |
 | B | circle through three points | P3 starts from a completed general equation |
-| C | growth and decay unknowns | solves for final value, time, rate or starting value |
+| C | growth and decay unknowns | solves for final value, time or rate, and discounts back to a starting value |
 | D | combined population statistics | combines summary data without the original observations |
 | E | line–circle intersections | finds tangent/secant points when `k` appears in equation coefficients |
 | F | first sequence sum reaching a target | P2 requires `n` to be known already |
-| H | complete cubic equations | finds every distinct real root without needing a known factor |
+| H | complete cubic equations | finds every real root without needing a known factor |
 | I | hypergeometric probability ranges | evaluates exact, at-least and at-most cases in one run |
 | J | transformed quadratic roots | forms new equations without first finding the original roots |
 | K | tangents from a point to a circle | returns both points of contact and the tangent length |
 | L | annuities and reducing-balance loans | handles regular payments, not just one-off compound growth |
 | M | four centres of any triangle | returns G, I, H and O from three arbitrary non-collinear vertices |
+| Q–V | six newer programs | listed in **More swap-in programs** below |
 
 ### Suggested four-slot combinations
 
 | Focus | P1 | P2 | P3 | P4 | Total |
 |---|---|---|---|---|---:|
-| Original Core pack | Quadratic | Sequences | Coordinate | Trig | 478B |
-| Algebra and growth | Quadratic | Extra A | Sequences | Extra C | 352B |
-| Coordinate geometry | Coordinate | Extra B | Extra A | Trig | 469B |
-| Statistics and algebra | Sequences | Extra D | Extra A | Trig | 419B |
-| Advanced Section B / MCQ | Extra E | Extra F | Extra H | Extra J | 639B |
-| Paper 1 Section B power pack | Extra I | Extra J | Extra K | Extra L | 424B |
-| Centres & algebra | Extra M | Extra A | Quadratic | Extra J | 600B |
+| Original Core | Quadratic | Sequences | Coordinate | Trig | 349B |
+| Algebra & growth | Quadratic | Extra A | Sequences | Extra C | 270B |
+| Coordinate geometry | Coordinate | Extra B | Extra E | Extra R | 410B |
+| Trigonometry & mensuration | Trig | Extra Q | Extra S | Extra M | 488B |
+| Statistics & algebra | Sequences | Extra D | Extra A | Trig | 306B |
+| Advanced Section B / MCQ | Extra E | Extra F | Extra H | Extra J | 393B |
+| Paper 1 Section B | Extra I | Extra J | Extra K | Extra L | 309B |
+| Centres & algebra | Extra M | Extra A | Quadratic | Extra J | 402B |
+| M1 probability & statistics | Extra T | Extra V | Extra I | Extra D | 329B |
+| M2 vectors & equations | Extra U | Extra H | Extra A | Extra Q | 375B |
 
-## Extra A — Simultaneous 2×2 Solver (52B)
+## Extra A — Simultaneous 2×2 Solver (51B)
 
 Solves two linear equations written as
 
@@ -345,13 +352,15 @@ GET   x=3, y=1
 ?→X
 ?→Y
 AX-BD→M
-(CX-BY)÷M◢(AY-CD)÷M◢
+(CX-BY)÷M◢(AY-CD)÷M
 ```
 
-## Extra B — Circle Through Three Points (129B)
+## Extra B — Circle Through Three Points (114B)
 
 Finds the centre and radius of the unique circle through three supplied points.
 Unlike P3 mode 2, you do not need to derive the general circle equation first.
+The centre is found as the circumcentre `O = (P₁+P₂+P₃−H)/2`, using the short
+orthocentre formula, and `Pol`/`Rec` keep both coordinates without extra memory.
 
 ### Inputs
 
@@ -391,12 +400,13 @@ C-A→C
 D-B→D
 X-A→X
 Y-B→Y
-(C(X²+Y²)-X(C²+D²))÷2÷(CY-DX)→M
-((C²+D²)Y-(X²+Y²)D)÷2÷(CY-DX)→C
-A+C◢B+M◢√(C²+M²)◢
+(CX+DY)÷(CY-DX→M
+Pol((C+X-M(Y-D))÷2,(D+Y-M(C-X))÷2→M
+Rec(M,Y
+A+X◢B+Y◢M
 ```
 
-## Extra C — Growth and Decay Solver (110B)
+## Extra C — Growth and Decay Solver (73B)
 
 Uses the model
 
@@ -414,15 +424,17 @@ selects the unknown quantity.
 | `1` | final value | start | rate % | periods | final |
 | `2` | number of periods | start | rate % | final | periods |
 | `3` | rate | start | final | periods | rate % |
-| `4` | starting value | final | rate % | periods | start |
+
+To find a **starting value**, use `M=1` with the final value at `A?` and a
+**negative** number of periods at `C?`; this discounts backwards in time.
 
 ### Examples
 
 ```text
-TYPE  M=1, A=1000, B=5, C=3     → GET 1157.625
-TYPE  M=2, A=1000, B=10, C=1210 → GET 2 periods
-TYPE  M=3, A=1000, B=1210, C=2  → GET 10%
-TYPE  M=4, A=1210, B=10, C=2    → GET 1000
+TYPE  M=1, A=1000, B=5, C=3        → GET 1157.625
+TYPE  M=2, A=1000, B=10, C=1210    → GET 2 periods
+TYPE  M=3, A=1000, B=1210, C=2     → GET 10%
+TYPE  M=1, A=1157.625, B=5, C=-3   → GET start 1000
 ```
 
 ### Copy this program
@@ -432,14 +444,14 @@ TYPE  M=4, A=1210, B=10, C=2    → GET 1000
 ?→A
 ?→B
 ?→C
-M=1⇒A(1+B÷100)^(C)→X
-M=2⇒log(C÷A)÷log(1+B÷100)→X
-M=3⇒100((B÷A)^(1÷C)-1)→X
-M=4⇒A÷(1+B÷100)^(C)→X
-X◢
+1+B÷100→Y
+M=1⇒AY^(C→X
+M=2⇒log(Y,C÷A→X
+M=3⇒100(Cˣ√(B÷A)-1→X
+X
 ```
 
-## Extra D — Combined Population Statistics (73B)
+## Extra D — Combined Population Statistics (67B)
 
 Combines two groups when a question gives only each group's size, mean and
 population standard deviation. This is different from SD mode because the
@@ -481,7 +493,8 @@ GET   combined mean 12, combined SD 2.828427125
 ?→D
 ?→X
 ?→Y
-(AB+DX)÷(A+D)◢√((A(C²+B²)+D(Y²+X²))÷(A+D)-(Ans)²)◢
+A+D→M
+(AB+DX)÷M◢√((A(C²+B²)+D(Y²+X²))÷M-Ans²
 ```
 
 ## Advanced Section B / MCQ library
@@ -491,9 +504,9 @@ non-foundation-style questions found in Paper 2 Section B. They automate the
 arithmetic after you have formed the correct equation or model; they do not
 replace the working that Paper 1 requires.
 
-All four advanced programs occupy `639B`, leaving `41B` free for editing.
+All four advanced programs occupy `393B`, leaving `287B` free for editing.
 
-## Extra E — Line–Circle Intersections (211B)
+## Extra E — Line–Circle Intersections (124B)
 
 Finds the **numerical intersection point(s)** when `k` appears in a
 coefficient of the circle equation or the straight-line equation. Write the
@@ -536,7 +549,9 @@ cannot print general answers still containing an unresolved `k`.
 
 Each real intersection appears as an `x` value followed by its `y` value. A
 tangent produces one pair; a secant produces two pairs. If there is no real
-intersection, the calculator shows `Math ERROR`. Vertical lines are supported.
+intersection, the calculator shows `Math ERROR`. Vertical and horizontal lines
+need no special case: the program drops a perpendicular from the circle's centre
+to the line, then steps the half-chord length along the line in both directions.
 
 ### Examples
 
@@ -544,7 +559,7 @@ For `x²+y²+kx+y−4=0` and `x+ky=0`, take `k=1`:
 
 ```text
 TYPE  M=1, A=M, B=1, C=-4, D=1, X=M, Y=0
-GET   (√2,-√2), (-√2,√2)
+GET   (-√2,√2), (√2,-√2)
 ```
 
 At the physical `A?` and `X?` prompts, press `ALPHA` then `M+` to enter `M`.
@@ -568,29 +583,19 @@ GET   (1,(-1+√5)/2), (1,(-1−√5)/2)
 ?→D
 ?→X
 ?→Y
-X=0⇒Goto 1
-Y²-BXY+CX²→C
-AX²+2DY-BDX→B
-X²+D²→A
-B²-4AC→M
-(√(M)-B)÷(2A)→C
-C◢(-DC-Y)÷X◢
--B÷A-C→M
-M=C⇒Goto 9
-M◢(-Y-DM)÷X◢
-Goto 9
-Lbl 1
--Y÷D→X
-B²-4(X²+AX+C)→M
-(√(M)-B)÷2→C
-X◢C◢
--B-C→M
-M=C⇒Goto 9
-X◢M◢
-Lbl 9
+-A÷2→A
+-B÷2→B
+A²+B²-C→C
+D²+X²→M
+(AD+BX+Y)÷M→Y
+A-YD→A
+B-YX→B
+√(C÷M-Y²→C
+A-CX◢B+CD◢If C
+Then A+CX◢B-CD
 ```
 
-## Extra F — Sequence Target Solver (72B)
+## Extra F — Sequence Target Solver (62B)
 
 Finds the **smallest positive integer `n`** for which a partial sum reaches or
 exceeds a target. This is useful when a Section B question asks “after how many
@@ -611,7 +616,8 @@ terms/months…” rather than giving `n`.
 2. The corresponding sum `Sₙ`, useful for checking the inequality
 
 Use a sequence with increasing positive partial sums and a reachable target.
-Otherwise the search can end in `Time ERROR`.
+Otherwise the search can end in `Time ERROR`. The program starts with
+`ClrMemory`, which zeroes its counter and running sum in one command.
 
 ### Examples
 
@@ -632,23 +638,21 @@ GET   n=7, S₇=64.34375
 ### Copy this program
 
 ```text
+ClrMemory
 ?→M
 ?→A
 ?→B
 ?→C
-0→X
-0→Y
-A→D
 While Y<C
 X+1→X
-Y+D→Y
-M=1⇒D+B→D
-M=2⇒DB→D
+Y+A→Y
+M=1⇒A+B→A
+M=2⇒AB→A
 WhileEnd
-X◢Y◢
+X◢Y
 ```
 
-## Extra H — Complete Cubic Solver (273B)
+## Extra H — Complete Cubic Solver (134B)
 
 Solves a real cubic directly; unlike the previous Library program, it does not
 require you to know one root first. Write the equation as
@@ -670,10 +674,12 @@ Ax³ + Bx² + Cx + D = 0
 
 ### Outputs
 
-Every **distinct real root** is shown. The program uses Cardano's formula for
-one real root, a separate repeated-root branch when the discriminant is zero,
-and the trigonometric form for three real roots. Complex roots are intentionally
-not displayed because this is the real-number COMP version from the S5 list.
+Every real root is shown. When the cubic has three real roots, including
+repeated ones, the trigonometric form lists all three, so a double root appears
+twice and a triple root three times. Otherwise Cardano's formula gives the single
+real root. `Pol` turns the depressed cubic into an angle directly, so no extra
+branch is needed for the repeated-root case. Complex roots are intentionally not
+displayed because this is the real-number COMP version from the S5 list.
 
 ### Examples
 
@@ -689,110 +695,97 @@ GET   approximately -0.381966, -0.5, -2.618034
 x³+2x²+2x+1=0
 TYPE  A=1, B=2, C=2, M=1
 GET   -1
+
+x³−3x+2=0   (roots 1, 1, −2)
+TYPE  A=1, B=0, C=-3, M=2
+GET   1, -2, 1
 ```
 
 ### Copy this program
 
 ```text
+Deg
 ?→A
 ?→B
 ?→C
 ?→M
-2×B³÷(27×A³)-B×C÷(3×A²)+M÷A→D
-C÷A-B²÷(3×A²)→X
-B÷(3×A)→Y
-(D÷2)²+(X÷3)³→M
-M<0⇒Goto 1
-M=0⇒Goto 2
-∛((-D÷2+√(M)))+∛((-D÷2-√(M)))-Y◢
-Goto 9
-Lbl 2
-∛((-D÷2))→A
-2×A-Y◢
-A=0⇒Goto 9
--A-Y◢
-Goto 9
-Lbl 1
-Deg
-cos^-1((3×D÷(2×X))×√((-3÷X)))÷3→M
-2×√((-X÷3))→A
-A×cos(M)-Y◢
-A×cos(M - 120)-Y◢
-A×cos(M - 240)-Y◢
-Lbl 9
+B÷3÷A→B
+B²-C÷3÷A→X
+B³-(BC-M)÷2÷A→D
+D²-X³→M
+If M≤0
+Then Pol(-D,√(-M
+For 0→M To 2
+2∛(X)cos(Y÷3-120M)-B◢Next
+Else √(M→M
+∛(M-D)-∛(D+M)-B
 ```
 
 ## Paper 1 Section B power pack
 
-The next four programs are designed as one **424B alternative pack** for the
+The next four programs are designed as one **309B alternative pack** for the
 longer structured questions in Paper 1 Section B. They cover probability,
-algebra, coordinate geometry and financial modelling while leaving `256B` free.
+algebra, coordinate geometry and financial modelling while leaving `371B` free.
 
 The programs supply numerical results and checks. In Paper 1, still write the
 formula, substitution and reasoning required by the question; a calculator
 answer by itself does not earn the method marks.
 
-## Extra I — Without-Replacement Probability (130B)
+## Extra I — Without-Replacement Probability (86B)
 
 Uses the hypergeometric model for a population containing two types of item.
-It finds the probability of drawing exactly, at least or at most a specified
-number of type-A items when all items are drawn together **without replacement**.
+One run gives the probability of drawing **exactly**, **at least** and **at
+most** a specified number of type-A items when all items are drawn together
+**without replacement**; no mode selection is needed.
 
 ### Inputs
 
 | Prompt | Enter |
 |---|---|
-| `M?` | `1` for exactly, `2` for at least, or `3` for at most |
 | `A?` | number of type-A items in the population |
 | `B?` | number of other items in the population |
 | `C?` | total number of items drawn |
 | `D?` | required number of type-A items |
 
-### Output
+### Outputs
 
-The single output is the required probability. For `M=1`, enter a feasible
-value of `D`: `max(0,C-B) ≤ D ≤ min(A,C)`. Counts must be non-negative integers.
-This version uses the calculator's native `nCr` operation, avoiding the old
-factorial expansion and its `69!` limit.
+1. `P(X = D)`
+2. `P(X ≥ D)`
+3. `P(X ≤ D)` (left on the display)
+
+Enter a feasible value of `D`: `max(0,C-B) ≤ D ≤ min(A,C)`. Counts must be
+non-negative integers. The program uses the calculator's native `nCr`.
 
 ### Examples
 
 A box contains 5 red and 4 black balls, and 2 balls are drawn together:
 
 ```text
-TYPE  M=1, A=5, B=4, C=2, D=2  → GET P(exactly 2 red)=0.2777777778 = 5/18
-TYPE  M=2, A=5, B=4, C=2, D=1  → GET P(at least 1 red)=0.8333333333 = 5/6
-TYPE  M=3, A=5, B=4, C=2, D=1  → GET P(at most 1 red)=0.7222222222 = 13/18
+TYPE  A=5, B=4, C=2, D=2  → GET 0.2777777778, 0.2777777778, 1
+TYPE  A=5, B=4, C=2, D=1  → GET 0.5555555556, 0.8333333333, 0.7222222222
 ```
 
-For written working, show the combination expression. For example, the first
-answer is `5C2 / 9C2`; Extra I is the fast arithmetic check and range-summer.
+So `P(exactly 2 red)=5/18`, `P(at least 1 red)=5/6` and `P(at most 1
+red)=13/18`. For written working, show the combination expression. For example,
+the first answer is `5C2 / 9C2`; Extra I is the fast arithmetic check and
+range-summer.
 
 ### Copy this program
 
 ```text
-?→M
 ?→A
 ?→B
 ?→C
 ?→D
-0→X
-C-B>0⇒C-B→X
-C→Y
-A<C⇒A→Y
-M=1⇒D→X
-M=1⇒D→Y
-M=2⇒D>X⇒D→X
-M=3⇒D<Y⇒D→Y
+(A+B)nCr C→Y
 0→M
-While X≤Y
-A nCr X B nCr(C-X)÷(A+B)nCr C M+
-X+1→X
-WhileEnd
-M◢
+For (C-B)(C>B→X To D
+A nCr X B nCr(C-X)÷Y M+
+Next
+A nCr D B nCr(C-D)÷Y◢1-M+Ans◢M
 ```
 
-## Extra J — Transformed-Roots Builder (83B)
+## Extra J — Transformed-Roots Builder (73B)
 
 Start with a quadratic
 
@@ -826,7 +819,7 @@ WRITE z²-12z+35=0
 
 ### Mode 2 — roots `α²` and `β²`
 
-Enter `M=2` and the original coefficients `A`, `B`, `C`. The outputs are again
+Enter `M=2` (any value other than `1` also works) and the original coefficients `A`, `B`, `C`. The outputs are again
 `P`, then `Q`, in `z²+Pz+Q=0`.
 
 ```text
@@ -842,16 +835,15 @@ WRITE z²-13z+36=0
 ?→A
 ?→B
 ?→C
-M=2⇒Goto 2
-?→X
+If M=1
+Then ?→X
 ?→Y
-XB÷A-2Y◢X²C÷A-YAns-Y²◢Goto 9
-Lbl 2
-C÷A→X
-2X-(B÷A)²◢X²◢Lbl 9
+XB÷A-2Y◢X²C÷A-YAns-Y²
+Else C÷A→X
+2X-(B÷A)²◢X²
 ```
 
-## Extra K — Tangents from a Point to a Circle (104B)
+## Extra K — Tangents from a Point to a Circle (97B)
 
 For a circle with centre `(h,k)`, radius `r`, and a supplied point `(p,q)`,
 Extra K finds the tangent length and both points of contact. The supplied point
@@ -902,25 +894,33 @@ equations. Keep extra calculator digits until the final answer.
 D-A→D
 X-B→X
 D²+X²→M
-√((M)-C²)→Y
-Y◢C÷M→M
-A+M(CD-XY)◢B+M(CX+DY)◢A+M(CD+XY)◢B+M(CX-DY)◢
+√(M-C²→Y◢C÷M→M
+A+M(CD-XY)◢B+M(CX+DY)◢A+M(CD+XY)◢B+M(CX-DY
 ```
 
-## Extra L — Annuity and Loan Engine (107B)
+## Extra L — Annuity and Loan Engine (53B)
 
 Uses a constant percentage interest rate per payment period and payments made
 at the **end** of each period. Enter the rate per period, not automatically the
 annual rate: for a nominal annual rate of 6% compounded monthly, enter `B=0.5`.
 The interest rate must be non-zero.
 
-### Inputs and outputs
+One run answers both common questions, so there is no mode prompt:
 
-| `M` | Find | `A?` | `B?` | `C?` | `D?` | Output |
-|---:|---|---|---|---|---|---|
-| `1` | future savings value | starting balance | rate % per period | number of periods | regular deposit | future value |
-| `2` | regular loan payment | original loan | rate % per period | total payments | — | payment |
-| `3` | outstanding loan | original loan | rate % per period | payments already made | regular payment | balance |
+1. After `A?`, `B?` and `C?`, the program shows the **level payment** that
+   repays a loan of `A` in `C` periods.
+2. It then asks `D?` for a regular payment and shows the **balance** after
+   `C` periods. Enter deposits as positive values and loan repayments as
+   **negative** values. Enter `0` at `D?` if you only needed the payment.
+
+### Inputs
+
+| Prompt | Enter |
+|---|---|
+| `A?` | starting balance or original loan |
+| `B?` | interest rate % per period |
+| `C?` | number of periods |
+| `D?` | regular deposit (+) or repayment (−) |
 
 ### Examples
 
@@ -928,51 +928,46 @@ Start with `$1000`, then deposit `$100` at the end of each month for 12 months
 at 1% per month:
 
 ```text
-TYPE  M=1, A=1000, B=1, C=12, D=100
-GET   future value 2395.075331
+TYPE  A=1000, B=1, C=12   → GET 88.84878868 (payment, ignore)
+TYPE  D=100               → GET future value 2395.075331
 ```
 
 Repay a `$100000` loan over 240 monthly payments at 0.5% per month:
 
 ```text
-TYPE  M=2, A=100000, B=0.5, C=240
-GET   monthly payment 716.4310585
+TYPE  A=100000, B=0.5, C=240  → GET monthly payment 716.4310585
 ```
 
-After 12 payments of that amount:
+Outstanding balance after 12 payments of that amount:
 
 ```text
-TYPE  M=3, A=100000, B=0.5, C=12, D=716.4310585
-GET   outstanding balance 97330.20118
+TYPE  A=100000, B=0.5, C=12   → (first answer not needed)
+TYPE  D=-716.4310585          → GET outstanding balance 97330.20118
 ```
 
 ### Copy this program
 
 ```text
-?→M
 ?→A
 ?→B
-B÷100→B
 ?→C
-(1+B)^(C)→X
-M=2⇒AB÷(1-1÷X)→Y
-M=2⇒Goto 9
-?→D
-M=1⇒AX+D(X-1)÷B→Y
-M=3⇒AX-D(X-1)÷B→Y
-Lbl 9
-Y◢
+B%→B
+(1+B)^(C→X
+ABX÷(X-1)◢?→D
+AX+D(X-1)÷B
 ```
 
-## Extra M — Four Centres of Any Triangle (385B)
+## Extra M — Four Centres of Any Triangle (217B)
 
 Returns all four classical centres for **any non-collinear triangle**, replacing
 the old Library program that only accepted one special right-triangle layout.
 This is the general version represented in the supplied S5 program list.
 
-Set this program's run mode to `REG`; it uses the calculator's linear-statistics
-registers internally to preserve the three coordinate pairs. `ClrStat` runs at
-the start, so existing statistics data is cleared.
+Set this program's run mode to `REG`. It stores the first vertex as one REG data
+point, reads it back as `Σx` and `Σy`, and moves the triangle so that vertex
+sits at the origin. That frees memories for short formulas: `H` comes from a
+single dot-product ratio and `O = (3G − H)/2`. `ClrStat` runs at the start, so
+existing statistics data is cleared.
 
 ### Inputs
 
@@ -1022,22 +1017,301 @@ ClrStat
 A,B DT
 ?→C
 ?→D
-C,D DT
 ?→X
 ?→Y
-X,Y DT
-Σx÷3◢
-Σy÷3◢
-√((C-X)²+(D-Y)²)+√((X-A)²+(Y-B)²)+√((A-C)²+(B-D)²)→M
-(√((C-X)²+(D-Y)²)×A+√((X-A)²+(Y-B)²)×C+√((A-C)²+(B-D)²)×X)÷M◢
-(√((C-X)²+(D-Y)²)×B+√((X-A)²+(Y-B)²)×D+√((A-C)²+(B-D)²)×Y)÷M◢
-2×(A×(D-Y)+C×(Y-B)+X×(B-D))→M
-Pol(((A²+B²)×(D-Y)+(C²+D²)×(Y-B)+(X²+Y²)×(B-D))÷M,((A²+B²)×(X-C)+(C²+D²)×(A-X)+(X²+Y²)×(C-A))÷M)
-Rec(X,Y)
-Σx-2X◢
-Σy-2Y◢
-X◢
-Y◢
+C-A→C
+D-B→D
+X-A→X
+Y-B→Y
+Σx+(C+X)÷3◢Σy+(D+Y)÷3◢√(X²+Y²→A
+√(C²+D²→B
+A+B+√((C-X)²+(D-Y)²→M
+Σx+(AC+BX)÷M◢Σy+(AD+BY)÷M◢(CX+DY)÷(CY-DX→M
+Σx+M(Y-D◢Σy+M(C-X◢Σx+(C+X-M(Y-D))÷2◢Σy+(D+Y-M(C-X))÷2
+```
+
+## More swap-in programs
+
+These six programs were added after the programs above were compacted. They
+cover triangle solving, point–line geometry, polygon areas, and the Module 1 and
+Module 2 topics that are slowest to do by hand.
+
+| Extra | Adds | Why it is different |
+|---|---|---|
+| Q | triangle solver (SSS and SAS) | sides, all angles and area in one run |
+| R | point and line | perpendicular distance, foot and mirror image together |
+| S | polygon area | shoelace area for any number of vertices |
+| T | binomial and Poisson | exact and cumulative probabilities without long sums |
+| U | 3D vectors | dot, angle, cross product and area for Module 2 |
+| V | normal probability | `z` and both tail probabilities without tables |
+
+## Extra Q — Triangle Solver (99B)
+
+Solves a triangle with the cosine rule. Label the sides `a`, `b`, `c` opposite
+angles `A`, `B`, `C`. Degree mode is set automatically.
+
+### Inputs
+
+| `M` | Case | `A?` | `B?` | `C?` |
+|---:|---|---|---|---|
+| `1` | SSS | side `a` | side `b` | side `c` |
+| `2` | SAS | side `a` | side `b` | included angle `C` (degrees) |
+
+### Outputs
+
+1. Side `c` (the input again for SSS; the new side for SAS)
+2. Angle `A`
+3. Angle `B`
+4. Angle `C`
+5. Area `½ab sin C` (left on the display)
+
+Impossible side lengths produce `Math ERROR`.
+
+### Examples
+
+```text
+3-4-5 triangle     TYPE M=1, A=3, B=4, C=5
+                   GET  c=5, A=36.86989765°, B=53.13010235°, C=90°, area 6
+a=5, b=7, C=60°    TYPE M=2, A=5, B=7, C=60
+                   GET  c=6.244997998, A=43.89788625°, B=76.10211375°, C=60°,
+                        area 15.15544457
+```
+
+### Copy this program
+
+```text
+Deg
+?→M
+?→A
+?→B
+?→C
+M=2⇒√(A²+B²-2ABcos(C→C
+C◢cos⁻¹((B²+C²-A²)÷(2BC→X◢cos⁻¹((A²+C²-B²)÷(2AC→Y◢180-X-Y◢ABsin(Ans)÷2
+```
+
+## Extra R — Point and Line (72B)
+
+Write the straight line in general form
+
+```text
+Ax + By + C = 0
+```
+
+and supply a point `(x, y)`. A line `y = mx + c` becomes `A=m`, `B=-1`, `C=c`.
+
+### Inputs
+
+| Prompt | Enter |
+|---|---|
+| `A?`, `B?`, `C?` | line coefficients |
+| `X?`, `Y?` | the point |
+
+### Outputs
+
+1. Perpendicular distance from the point to the line
+2. Foot of the perpendicular: `x`, then `y`
+3. Reflection of the point in the line: `x`, then `y` (left on the display)
+
+### Example
+
+Point `(0,0)` and line `3x + 4y − 25 = 0`:
+
+```text
+TYPE  A=3, B=4, C=-25, X=0, Y=0
+GET   distance 5, foot (3,4), image (6,8)
+```
+
+### Copy this program
+
+```text
+?→A
+?→B
+?→C
+?→X
+?→Y
+A²+B²→M
+(AX+BY+C)÷M→D
+Abs(D)√(M)◢X-AD◢Y-BD◢X-2AD◢Y-2BD
+```
+
+## Extra S — Polygon Area (69B)
+
+Finds the area of a triangle, quadrilateral or any simple polygon from its
+vertex coordinates using the shoelace formula. There is no vertex limit.
+
+### Inputs
+
+1. Enter the first vertex at `A?` and `B?`.
+2. Enter each following vertex, in order around the polygon, at `C?` and `D?`.
+3. Finish by entering the **first vertex again** at `C?` and `D?`.
+
+Clockwise and anticlockwise orders both work.
+
+### Output
+
+The area (left on the display). `ClrMemory` runs first because the program
+accumulates in memory `M`.
+
+### Example
+
+Rectangle `(0,0)`, `(4,0)`, `(4,3)`, `(0,3)`:
+
+```text
+TYPE  A=0, B=0, then C,D = 4,0 · 4,3 · 0,3 · 0,0
+GET   area 12
+```
+
+### Copy this program
+
+```text
+ClrMemory
+?→A
+?→B
+A→X
+B→Y
+Lbl 1
+?→C
+?→D
+XD-YC M+
+C→X
+D→Y
+(X≠A)+(Y≠B)⇒Goto 1
+Abs(M)÷2
+```
+
+## Extra T — Binomial and Poisson (93B)
+
+For Mathematics Extended Part Module 1. One run gives exact and cumulative
+probabilities, so no table look-up or long sum is needed.
+
+### Inputs
+
+| Prompt | Enter |
+|---|---|
+| `Y?` | `1` for binomial `B(n,p)`, `2` for Poisson `Po(λ)` |
+| `A?` | `n` (binomial) or `λ` (Poisson) |
+| `B?` | `p` — asked only for the binomial model |
+| `C?` | the value `r` |
+
+### Outputs
+
+1. `P(X = r)`
+2. `P(X ≥ r)`
+3. `P(X ≤ r)` (left on the display)
+
+`ClrMemory` runs first because the program accumulates in memory `M`.
+
+### Examples
+
+```text
+B(10, 0.3), r=3   TYPE Y=1, A=10, B=0.3, C=3
+                  GET  0.266827932, 0.6172172136, 0.6496107184
+Po(2), r=1        TYPE Y=2, A=2, C=1
+                  GET  0.2706705665, 0.8646647168, 0.4060058497
+```
+
+### Copy this program
+
+```text
+ClrMemory
+?→Y
+?→A
+Y=1⇒?→B
+?→C
+For 0→X To C
+Y=1⇒A nCr X B^(X)(1-B)^(A-X→D
+Y=2⇒e^(-A)A^(X)÷X!→D
+D M+
+Next
+D◢1-M+D◢M
+```
+
+## Extra U — 3D Vector Toolkit (91B)
+
+For Mathematics Extended Part Module 2. Enter two vectors
+`u = (A, B, C)` and `v = (D, X, Y)`. Degrees are set automatically.
+
+### Inputs
+
+| Prompt | Enter |
+|---|---|
+| `A?`, `B?`, `C?` | components of `u` |
+| `D?`, `X?`, `Y?` | components of `v` |
+
+### Outputs
+
+1. Dot product `u·v`
+2. Angle between `u` and `v` in degrees
+3. `|u×v|`, the area of the parallelogram (halve it for a triangle)
+4. `u×v`: `i`, `j`, then `k` component (left on the display)
+
+### Example
+
+```text
+TYPE  A=1, B=2, C=3, D=4, X=5, Y=6
+GET   u·v=32, angle 12.93315449°, |u×v|=7.348469228, u×v=(-3,6,-3)
+```
+
+### Copy this program
+
+```text
+Deg
+?→A
+?→B
+?→C
+?→D
+?→X
+?→Y
+√((A²+B²+C²)(D²+X²+Y²→M
+AD+BX+CY◢cos⁻¹(Ans÷M◢Msin(Ans)◢BY-CX◢CD-AY◢AX-BD
+```
+
+## Extra V — Normal Probability (83B)
+
+Computes the standard score and the normal-distribution probabilities on either
+side of `x`, replacing a table look-up. The program sums the always-positive
+series `Φ(z) = ½ + φ(z)(z + z³/3 + z⁵/(3·5) + …)` until the next term is zero,
+so it stays accurate far into the tails.
+
+### Inputs
+
+| Prompt | Enter |
+|---|---|
+| `A?` | mean `μ` |
+| `B?` | standard deviation `σ` |
+| `C?` | the value `x` |
+
+### Outputs
+
+1. Standard score `z = (x − μ)/σ`
+2. `P(X < x)`
+3. `P(X > x)` (left on the display)
+
+For `P(a < X < b)`, run it for `b` and for `a`, then subtract the two `P(X < …)`
+answers.
+
+### Examples
+
+```text
+TYPE  A=0, B=1, C=1.96   → GET z=1.96, 0.9750021049, 0.02499789515
+TYPE  A=50, B=10, C=40   → GET z=-1, 0.1586552539, 0.8413447461
+```
+
+### Copy this program
+
+```text
+?→A
+?→B
+?→C
+(C-A)÷B→X◢X→Y
+X→D
+1→C
+While Y
+C+2→C
+YX²÷C→Y
+D+Y→D
+WhileEnd
+.5+De^(-X²÷2)÷√(2π◢1-Ans
 ```
 
 ## Syllabus basis

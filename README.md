@@ -6,8 +6,11 @@ scientific calculator that the HKEAA approves for the HKDSE.
 **[Open the calculator →](https://throwingogo-hub.github.io/fx-50fh-ii/)**
 
 Program Studio includes a searchable, memory-aware **HKDSE Program Library**:
-16 curated programs, seven recommended four-slot packs, protected installs,
-one-step undo and versioned export/import backup. The complete reference and
+22 byte-optimised programs, ten recommended four-slot packs, protected installs,
+one-step undo and versioned export/import backup. The original 16 programs were
+compacted from 2,207B to 1,500B (32% smaller) with no lost features, and six new
+programs cover triangle solving, point–line geometry, polygon areas, binomial and
+Poisson probability, 3D vectors and normal probability. The complete reference and
 manual-copy source remains in [programs.md](programs.md). A matching bilingual,
 print-ready edition is available as the
 [curated S5 Program Library PDF](output/pdf/fx-50fh-ii-s5-program-library.pdf).
@@ -59,7 +62,7 @@ Everything the keyboard is printed with is implemented:
   command insertion, byte and structure checks, direct run/edit controls, and
   automatic on-device recovery for all four slots—including active key-editor drafts.
   Its HKDSE Library searches by topic, previews inputs/outputs/examples, installs
-  a program into an explicitly selected slot, confirms replacements, loads seven
+  a program into an explicitly selected slot, confirms replacements, loads ten
   memory-safe packs, and supports one-step undo plus versioned backup/restore.
 - **Errors** — `Math`, `Syntax`, `Stack`, `Arg`, `Go`, `Nesting`, `Memory` and
   `Data Full`,
@@ -91,8 +94,8 @@ checkout can use any static-file server.
 
 ## Tests
 
-395 checks, including worked examples, operating limits, REPLAY/history
-navigation, Program Studio text/recovery/backup, all 16 catalog programs and
+448 checks, including worked examples, operating limits, REPLAY/history
+navigation, Program Studio text/recovery/backup, all 22 catalog programs and
 their documented branches, generated-guide parity, and exhaustive LCD menu-layout/glyph coverage derived from the user's guide, driven
 through the machine by key sequence rather than by calling the maths directly —
 so they exercise input, evaluation and formatting the way a person does.
@@ -104,8 +107,9 @@ npm test
 `programs.catalog.json` is the source of truth for the executable library.
 After changing it, run `npm run generate:programs`; `npm test` rejects stale
 `programs.md` or `js/program-catalog.generated.js` output. Run
-`npm run generate:pdf` in an environment with ReportLab and the macOS CJK fonts
-to rebuild the matching print edition.
+`npm run generate:pdf` in an environment with ReportLab to rebuild the matching
+print edition; it uses the macOS CJK fonts when present and WenQuanYi Zen Hei on
+Linux.
 
 ## Keyboard
 

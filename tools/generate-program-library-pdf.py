@@ -24,26 +24,40 @@ MONO_FONT = "ArialUnicode"
 META = {
     "P1": ("一元二次方程工具", "一次輸入係數，即時計算判別式、頂點及所有實根。", "A=a，B=b，C=c", "判別式、頂點 (h,k)、實根"),
     "P2": ("等差及等比數列", "處理等差、有限等比及無限等比數列的項及和。", "M=類型；A=首項；B=公差/公比；C=n", "指定項及部分和/無限和"),
-    "P3": ("坐標幾何及圓", "計算兩點距離、中點、斜率，或由一般式求圓心及半徑。", "M=1 兩點；M=2 圓的一般式係數", "距離、中點、斜率／圓心、半徑"),
+    "P3": ("坐標幾何及圓", "計算兩點距離、中點、斜率及截距，或由一般式求圓心及半徑。", "M=1 兩點；M=2 圓的一般式係數", "距離、中點、斜率、截距／圓心、半徑"),
     "P4": ("三角方程解", "求 0° 至 360° 內所有 sin、cos 或 tan 方程的解。", "M=1/2/3；D=已分離的三角函數值", "區間內所有不同角度"),
     "A": ("聯立二元一次方程", "輸入兩條直線方程的六個係數，求唯一交點。", "A,B,C 及 D,X,Y 為兩式係數", "x、y"),
-    "B": ("三點定圓", "由三個不共線點求圓心、半徑及一般式。", "A,B；C,D；X,Y 為三點坐標", "圓心、半徑、一般式係數"),
-    "C": ("增長與衰減", "在複式增長或衰減模型中求終值、時間、率或初值。", "M=未知量類型；其餘輸入已知數值", "所選未知量"),
+    "B": ("三點定圓", "由三個不共線點求圓心及半徑。", "A,B；C,D；X,Y 為三點坐標", "圓心、半徑"),
+    "C": ("增長與衰減", "在複式增長或衰減模型中求終值、時間或率；期數輸入負數可求初值。", "M=1/2/3；其餘輸入已知數值", "所選未知量"),
     "D": ("合併統計數據", "只有兩組人數、平均數及母體標準差時，合併兩組數據。", "A,B,C 及 D,X,Y 為兩組 n, μ, σ", "合併平均數及母體標準差"),
     "E": ("直線與圓的參數 k 交點", "當 k 出現在圓或直線的係數時，代入指定 k 值並求數值交點。", "M=k；圓 A,B,C；直線 D,X,Y；係數可含 M", "一或兩組 (x,y)；切線只輸出一組"),
     "F": ("數列目標項數", "求部分和首次達到指定目標時的最小正整數 n。", "M=AP/GP；A=首項；B=公差/公比；C=目標", "最小 n 及對應 Sₙ"),
-    "H": ("一元三次方程完整求根", "毋須先知道因式，直接求一元三次方程的所有不同實根。", "A,B,C,M 為 Ax³+Bx²+Cx+D=0 的係數", "一個、兩個或三個不同實根"),
-    "I": ("不放回抽樣概率", "以組合公式計算恰好、至少或至多指定數目的概率。", "M=1/2/3；A,B=兩類數量；C=抽取數；D=目標", "所需概率"),
+    "H": ("一元三次方程完整求根", "毋須先知道因式，直接求一元三次方程的所有實根。", "A,B,C,M 為 Ax³+Bx²+Cx+D=0 的係數", "一個或三個實根（重根會重複顯示）"),
+    "I": ("不放回抽樣概率", "一次過以組合公式計算恰好、至少及至多指定數目的概率。", "A,B=兩類數量；C=抽取數；D=目標", "P(=D)、P(≥D)、P(≤D)"),
     "J": ("變換根方程", "不先求原根，直接建立線性變換根或平方根的新二次方程。", "M=模式；A,B,C=原式；模式 1 再輸入 X,Y", "新首一二次方程的 P、Q"),
     "K": ("圓外一點的切線", "由圓心、半徑及圓外點求切線長及兩個切點。", "A,B=圓心；C=半徑；D,X=圓外點", "切線長及兩個切點"),
-    "L": ("年金與貸款", "處理期末供款的儲蓄終值、貸款供款及尚欠餘額。", "M=模式；A=本金；B=每期利率%；C=期數；D=供款", "所選金融數值"),
+    "L": ("年金與貸款", "先求貸款每期供款，再求期末供款後的儲蓄終值或尚欠餘額。", "A=本金；B=每期利率%；C=期數；D=供款（還款輸入負數）", "每期供款，然後結餘"),
     "M": ("任意三角形四心", "輸入任意三個不共線頂點，求形心、內心、垂心及外心。", "REG 模式；A,B；C,D；X,Y 為三點坐標", "G、I、H、O 四組坐標"),
+    "Q": ("解三角形", "以餘弦定理由三邊或兩邊及夾角求第三邊、三個角及面積。", "M=1 三邊 a,b,c；M=2 a,b 及夾角 C", "c、角 A、B、C、面積"),
+    "R": ("點與直線", "求點到直線 Ax+By+C=0 的垂直距離、垂足及對稱點。", "A,B,C=直線係數；X,Y=點", "距離、垂足、對稱點"),
+    "S": ("多邊形面積", "以鞋帶公式由頂點坐標求任意多邊形的面積。", "依次輸入各頂點，最後再輸入第一個頂點", "面積"),
+    "T": ("二項及泊松分佈", "（M1）計算二項或泊松分佈的恰好、至少及至多概率。", "Y=1 二項 (A=n, B=p)；Y=2 泊松 (A=λ)；C=r", "P(=r)、P(≥r)、P(≤r)"),
+    "U": ("三維向量", "（M2）計算數量積、夾角、向量積及平行四邊形面積。", "A,B,C=u；D,X,Y=v", "u·v、夾角、|u×v|、u×v"),
+    "V": ("正態分佈概率", "毋須查表，計算標準分及正態分佈兩側概率。", "A=μ；B=σ；C=x", "z、P(X<x)、P(X>x)"),
 }
 
 
 def register_fonts() -> None:
-    pdfmetrics.registerFont(TTFont(BODY_FONT, "/System/Library/Fonts/Supplemental/Arial Unicode.ttf"))
-    pdfmetrics.registerFont(TTFont(BODY_BOLD, "/System/Library/Fonts/STHeiti Medium.ttc", subfontIndex=0))
+    body = Path("/System/Library/Fonts/Supplemental/Arial Unicode.ttf")
+    bold = Path("/System/Library/Fonts/STHeiti Medium.ttc")
+    if body.exists() and bold.exists():
+        pdfmetrics.registerFont(TTFont(BODY_FONT, str(body)))
+        pdfmetrics.registerFont(TTFont(BODY_BOLD, str(bold), subfontIndex=0))
+        return
+    # Linux fallback: WenQuanYi Zen Hei covers both the Latin and CJK text.
+    fallback = "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc"
+    pdfmetrics.registerFont(TTFont(BODY_FONT, fallback, subfontIndex=0))
+    pdfmetrics.registerFont(TTFont(BODY_BOLD, fallback, subfontIndex=0))
 
 
 def wrap(text: str, font: str, size: float, width: float) -> list[str]:
@@ -100,7 +114,7 @@ def calculator_mark(c: canvas.Canvas, x: float, y: float, w: float, h: float) ->
             c.roundRect(kx, ky, key_w, key_h, 3, stroke=1, fill=0)
 
 
-def cover_page(c: canvas.Canvas, programs: list[dict]) -> None:
+def cover_page(c: canvas.Canvas, programs: list[dict], packs: list[dict]) -> None:
     c.setFillColor(colors.black)
     c.setFont("Helvetica-Bold", 43)
     c.drawCentredString(PAGE_W / 2, PAGE_H - 72, "CASIO fx-50FH II")
@@ -110,15 +124,17 @@ def cover_page(c: canvas.Canvas, programs: list[dict]) -> None:
     c.setFont(BODY_BOLD, 20)
     c.drawCentredString(PAGE_W / 2, PAGE_H - 370, "中五計算機程式 · 精選版")
     c.setFont(BODY_FONT, 9.5)
-    c.drawCentredString(PAGE_W / 2, PAGE_H - 393, "16 tested programs · 7 memory-safe packs · 680-byte aware")
+    c.drawCentredString(PAGE_W / 2, PAGE_H - 393, f"{len(programs)} tested programs · {len(packs)} memory-safe packs · 680-byte aware")
 
     start_y = PAGE_H - 432
     col_w = 255
+    rows = (len(programs) + 1) // 2
+    row_h = min(39, 340 / rows)
     for i, program in enumerate(programs):
-        col = i // 8
-        row = i % 8
+        col = i // rows
+        row = i % rows
         x = 52 + col * col_w
-        y = start_y - row * 39
+        y = start_y - row * row_h
         zh = META[program["id"]][0]
         c.setFont("Helvetica-Bold", 10.5)
         c.drawString(x, y, f"Program {i + 1:02d}")
@@ -129,7 +145,7 @@ def cover_page(c: canvas.Canvas, programs: list[dict]) -> None:
         c.drawString(x + 72, y - 13, program["title"])
         c.setFillColor(colors.black)
     c.setFont(BODY_FONT, 8)
-    c.drawCentredString(PAGE_W / 2, 47, "Built from the canonical tested web catalog · Revised 13 August 2026")
+    c.drawCentredString(PAGE_W / 2, 47, "Built from the canonical tested web catalog · Revised 26 September 2026")
     c.showPage()
 
 
@@ -265,7 +281,7 @@ def main() -> None:
     c.setTitle("CASIO fx-50FH II - Curated S5 Program Library")
     c.setAuthor("throwingogo-hub")
     c.setSubject("Tested HKDSE S5 calculator programs")
-    cover_page(c, programs)
+    cover_page(c, programs, catalog["packs"])
     reference_page(c, 2)
     for index, program in enumerate(programs, 1):
         program_page(c, index + 2, index, program)

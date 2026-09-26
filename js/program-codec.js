@@ -76,7 +76,8 @@ function singleToken(ch, mode, previous) {
   if (ch === 'i') return 'imag';
 
   if (ch === '-') {
-    const unary = !previous || [K.OPEN, K.SEP, K.INFIX, K.POW, K.PRE, K.PROG].includes(previous.k);
+    const unary = !previous || previous.id === 'EXP' ||
+      [K.OPEN, K.SEP, K.INFIX, K.POW, K.PRE, K.PROG, K.FN].includes(previous.k);
     return unary ? 'neg' : 'sub';
   }
 
@@ -109,7 +110,10 @@ export function parseProgramText(source, mode = 'COMP') {
       if (candidate.toLocaleLowerCase() !== entry.label.toLocaleLowerCase()) continue;
       const last = entry.label[entry.label.length - 1];
       const next = text[i + entry.label.length] || '';
-      if (/\p{L}|\p{N}/u.test(last) && /\p{L}|\p{N}/u.test(next)) continue;
+      if (/\p{L}|\p{N}/u.test(last) && /\p{L}|\p{Nd}/u.test(next)) continue;
+      // M+ and M- only close a statement; inside an expression "M-" is M minus.
+      if ((entry.id === 'pMplus' || entry.id === 'pMminus') &&
+          !/^[^\S\n]*(?:$|[\n:◢])/u.test(text.slice(i + entry.label.length))) continue;
       push(entry.id);
       i += entry.label.length;
       matched = true;

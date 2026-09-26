@@ -5,7 +5,7 @@
 import { Program, PROGRAM_MEMORY } from './program.js';
 import { bytesOf } from './tokens.js';
 import { formatProgramText, parseProgramText } from './program-codec.js';
-import { PROGRAMS, PROGRAM_PACKS, PROGRAM_BY_ID } from './program-catalog.generated.js?v=coefficient-k-v1';
+import { PROGRAMS, PROGRAM_PACKS, PROGRAM_BY_ID } from './program-catalog.generated.js?v=compact-library-v1';
 
 const STORAGE_KEY = 'fx50fhii.program-studio.v3';
 const LEGACY_STORAGE_KEY = 'fx50fhii.program-studio.v2';
@@ -27,7 +27,7 @@ const COMMANDS = [
 const CATEGORY_ACCENTS = {
   Algebra: '#b24f31', Sequences: '#5f6f9c', Coordinate: '#2f7663',
   Trigonometry: '#9a6830', Finance: '#7d5b86', Statistics: '#467b83',
-  Geometry: '#966142', Probability: '#526e3c', Variation: '#7b6041'
+  Geometry: '#966142', Probability: '#526e3c', Vectors: '#8a4f6a'
 };
 
 const clone = value => JSON.parse(JSON.stringify(value));
