@@ -6,8 +6,10 @@ scientific calculator that the HKEAA approves for the HKDSE.
 **[Open the calculator →](https://throwingogo-hub.github.io/fx-50fh-ii/)**
 
 Program Studio includes a searchable, memory-aware **HKDSE Program Library**:
-16 curated programs, seven recommended four-slot packs, protected installs,
-one-step undo and versioned export/import backup. The complete reference and
+16 curated programs, eight recommended four-slot packs, protected installs,
+one-step undo and versioned export/import backup. A fresh launch preloads the
+**Default** pack into P1–P4: simultaneous 2×2 equations, four triangle centres,
+the circle through three points, and tangents from a point to a circle. The complete reference and
 manual-copy source remains in [programs.md](programs.md). A matching bilingual,
 print-ready edition is available as the
 [curated S5 Program Library PDF](output/pdf/fx-50fh-ii-s5-program-library.pdf).
@@ -59,7 +61,7 @@ Everything the keyboard is printed with is implemented:
   command insertion, byte and structure checks, direct run/edit controls, and
   automatic on-device recovery for all four slots—including active key-editor drafts.
   Its HKDSE Library searches by topic, previews inputs/outputs/examples, installs
-  a program into an explicitly selected slot, confirms replacements, loads seven
+  a program into an explicitly selected slot, confirms replacements, loads eight
   memory-safe packs, and supports one-step undo plus versioned backup/restore.
 - **Errors** — `Math`, `Syntax`, `Stack`, `Arg`, `Go`, `Nesting`, `Memory` and
   `Data Full`,

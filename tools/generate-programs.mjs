@@ -28,6 +28,7 @@ const META = {
 };
 
 const PACKS = [
+  { id: 'default', name: 'Default', description: 'Preloaded on first launch: simultaneous equations, four centres, circle through three points and tangents to a circle.', programIds: ['A', 'M', 'B', 'K'] },
   { id: 'core', name: 'Original Core', description: 'The balanced everyday pack.', programIds: ['P1', 'P2', 'P3', 'P4'] },
   { id: 'algebra-growth', name: 'Algebra & growth', description: 'Quadratics, simultaneous equations, sequences and growth.', programIds: ['P1', 'A', 'P2', 'C'] },
   { id: 'coordinate', name: 'Coordinate geometry', description: 'Points, circles, equations and trig.', programIds: ['P3', 'B', 'A', 'P4'] },

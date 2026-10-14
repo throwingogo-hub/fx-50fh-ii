@@ -288,6 +288,17 @@ export const PROGRAMS = Object.freeze([
 
 export const PROGRAM_PACKS = Object.freeze([
   {
+    "id": "default",
+    "name": "Default",
+    "description": "Preloaded on first launch: simultaneous equations, four centres, circle through three points and tangents to a circle.",
+    "programIds": [
+      "A",
+      "M",
+      "B",
+      "K"
+    ]
+  },
+  {
     "id": "core",
     "name": "Original Core",
     "description": "The balanced everyday pack.",

@@ -1,7 +1,10 @@
 # HKDSE Core programs for fx-50FH II
 
-These 16 programs are optional. They are available in the web calculator's
-**Program Studio → HKDSE Library**, but nothing installs automatically. A single
+These 16 programs are available in the web calculator's
+**Program Studio → HKDSE Library**. On first launch, with no saved Program
+Studio state, the **Default** pack is preloaded into P1–P4: Extra A
+(simultaneous equations), Extra M (four centres), Extra B (circle through three
+points) and Extra K (tangents to a circle), using **670 of 680 bytes**. A single
 program always asks for a destination slot, and an occupied slot or four-slot
 pack requires a second confirmation before anything is replaced.
 
@@ -11,7 +14,7 @@ by hand. The calculator already has direct `nPr`, `nCr`, SD/REG statistics and
 built-in formula functions, so the pack does not duplicate them.
 
 Every heading shows the exact Program Studio byte count. The complete 16-program
-library is **2,207B**; seven recommended four-slot packs fit within the authentic
+library is **2,207B**; eight recommended four-slot packs fit within the authentic
 680-byte shared memory. Any deliberately removed diagnostic output or tighter
 input restriction is stated in the relevant section below.
 
@@ -21,7 +24,7 @@ input restriction is stated in the relevant section below.
 2. Search by topic or choose a category.
 3. Select the destination P1–P4 slot, then press **Install**.
 4. If the slot already contains a program, confirm the replacement once more.
-5. For a complete setup, choose one of the seven memory-safe four-slot packs.
+5. For a complete setup, choose one of the eight memory-safe four-slot packs.
 
 Program Studio keeps one-step Undo after a Library, pack or backup install. Use
 **Export all** to download a versioned JSON backup before larger changes.
@@ -291,6 +294,7 @@ None duplicates an existing program or a one-button calculator feature:
 
 | Focus | P1 | P2 | P3 | P4 | Total |
 |---|---|---|---|---|---:|
+| Default (preloaded) | Extra A | Extra M | Extra B | Extra K | 670B |
 | Original Core pack | Quadratic | Sequences | Coordinate | Trig | 478B |
 | Algebra and growth | Quadratic | Extra A | Sequences | Extra C | 352B |
 | Coordinate geometry | Coordinate | Extra B | Extra A | Trig | 469B |

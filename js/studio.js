@@ -5,7 +5,7 @@
 import { Program, PROGRAM_MEMORY } from './program.js';
 import { bytesOf } from './tokens.js';
 import { formatProgramText, parseProgramText } from './program-codec.js';
-import { PROGRAMS, PROGRAM_PACKS, PROGRAM_BY_ID } from './program-catalog.generated.js?v=coefficient-k-v1';
+import { PROGRAMS, PROGRAM_PACKS, PROGRAM_BY_ID } from './program-catalog.generated.js?v=default-pack-v1';
 
 const STORAGE_KEY = 'fx50fhii.program-studio.v3';
 const LEGACY_STORAGE_KEY = 'fx50fhii.program-studio.v2';
@@ -14,6 +14,7 @@ const BACKUP_FORMAT = 'fx-50fh-ii-program-backup';
 const BACKUP_VERSION = 1;
 const MODES = new Set(['COMP', 'CMPLX', 'BASE', 'SD', 'REG']);
 const SLOT_COUNT = 4;
+const DEFAULT_PACK = PROGRAM_PACKS.find(pack => pack.id === 'default');
 
 const COMMANDS = [
   ['Flow', [['If', 'If '], ['Then', 'Then '], ['Else', 'Else '], ['IfEnd', 'IfEnd']]],
@@ -155,10 +156,30 @@ export function setupProgramStudio(machine, onMachineChange) {
     return true;
   }
 
+  function loadDefaultPack() {
+    const entries = DEFAULT_PACK.programIds.map(id => PROGRAM_BY_ID.get(id));
+    const snapshot = {
+      version: 1,
+      slots: entries.map(program => ({ mode: program.mode, tokens: parseProgramText(program.source, program.mode).tokenIds }))
+    };
+    if (!machine.restoreProgramSnapshot(snapshot)) return;
+    drafts = entries.map(program => ({ mode: program.mode, source: program.source }));
+    selected = 0;
+  }
+
   function loadStorage() {
+    let raw = null;
     try {
-      const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
-      const saved = JSON.parse(raw || 'null');
+      raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
+    } catch {
+      // Blocked storage behaves like a first launch.
+    }
+    if (!raw) {
+      loadDefaultPack();
+      return;
+    }
+    try {
+      const saved = JSON.parse(raw);
       if (!saved || ![2, STORAGE_VERSION].includes(saved.version)) return;
       machine.restoreProgramSnapshot(saved.machine);
       selected = clampSlot(saved.selected);

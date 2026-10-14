@@ -729,6 +729,8 @@ for (let i = 0; i < CONSTANTS.length; i++) {
     pack.programIds.length === 4 && pack.programIds.every(id => PROGRAM_BY_ID.has(id))), true);
   check('all recommended packs fit the authentic 680-byte memory', PROGRAM_PACKS.every(pack => packBytes(pack) <= 680), true);
   check('Core pack remains 478 bytes', packBytes(PROGRAM_PACKS.find(pack => pack.id === 'core')), 478);
+  check('Default pack preloads A, M, B, K into P1–P4', PROGRAM_PACKS.find(pack => pack.id === 'default')?.programIds.join(','), 'A,M,B,K');
+  check('Default pack uses 670 of 680 bytes', packBytes(PROGRAM_PACKS.find(pack => pack.id === 'default')), 670);
   check('source-PDF programs all have improved catalog equivalents', ['P1', 'A', 'H', 'P3', 'E', 'B', 'M'].every(id => PROGRAM_BY_ID.has(id)), true);
   check('low-value bearings and variation extras were curated out', PROGRAM_BY_ID.has('G') || PROGRAM_BY_ID.has('N'), false);
   check('catalog search finds quadratic by topic', filterProgramCatalog('discriminant').map(program => program.id).join(','), 'P1');
