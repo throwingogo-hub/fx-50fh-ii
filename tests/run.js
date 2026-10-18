@@ -88,6 +88,26 @@ function runCatalogProgram(id, inputs) {
   return outputs;
 }
 
+
+/** Same as runCatalogProgram, but returns the answer shown when the program ends. */
+function catalogFinal(id, inputs) {
+  const spec = PROGRAM_BY_ID.get(id);
+  const parsed = parseProgramText(spec.source, spec.mode);
+  const machine = new Machine();
+  machine.mode = spec.mode;
+  const run = new Program(spec.mode, parsed.tokens).start(machine);
+  let inputIndex = 0;
+  let state = run.step();
+  let guard = 0;
+  while (!state.done && guard++ < 10000) {
+    if (state.kind === 'input') run.provide(inputs[inputIndex++]);
+    else if (state.kind === 'output') run.resume();
+    state = run.step();
+  }
+  if (guard >= 10000) throw new Error(id + ' did not finish');
+  return state.value ? state.value.re : null;
+}
+
 function runCatalogProgramWithKeys(id, inputSequences) {
   const spec = PROGRAM_BY_ID.get(id);
   const parsed = parseProgramText(spec.source, spec.mode);
@@ -822,10 +842,10 @@ for (let i = 0; i < CONSTANTS.length; i++) {
   // and the code fences must match regardless of the working copy.
   const guide = readFileSync(new URL('../programs.md', import.meta.url), 'utf8')
     .replace(/\r\n/g, '\n');
-  const starts = [...guide.matchAll(/^## (P[1-4]|Extra [A-N])[^\n]*\((\d+)B\)/gm)];
-  check('program guide exposes byte counts for all 16 curated programs', starts.length, 16);
-  check('canonical program catalog exposes all 16 curated programs', PROGRAMS.length, 16);
-  check('canonical program ids are unique', new Set(PROGRAMS.map(program => program.id)).size, 16);
+  const starts = [...guide.matchAll(/^## (P[1-7])[^\n]*\((\d+)B\)/gm)];
+  check('program guide exposes byte counts for all 7 S5 programs', starts.length, 7);
+  check('canonical program catalog exposes all 7 S5 programs', PROGRAMS.length, 7);
+  check('canonical program ids are unique', new Set(PROGRAMS.map(program => program.id)).size, 7);
   check('every catalog program has searchable metadata and an example', PROGRAMS.every(program =>
     program.title && program.category && program.summary && program.inputs && program.outputs && program.example && program.source), true);
   for (let i = 0; i < starts.length; i++) {
@@ -835,18 +855,17 @@ for (let i = 0; i < CONSTANTS.length; i++) {
     const parsed = parseProgramText(source, 'COMP');
     check(`${starts[i][1]} guide source parses`, parsed.errors.length, 0);
     check(`${starts[i][1]} guide byte label is exact`, parsed.bytes, Number(starts[i][2]));
-    const id = starts[i][1].startsWith('Extra ') ? starts[i][1].slice(6) : starts[i][1];
+    const id = starts[i][1];
     check(`${id} guide source matches the canonical catalog`, source, PROGRAM_BY_ID.get(id).source);
   }
   check('all recommended packs contain four real programs', PROGRAM_PACKS.every(pack =>
     pack.programIds.length === 4 && pack.programIds.every(id => PROGRAM_BY_ID.has(id))), true);
   check('all recommended packs fit the authentic 680-byte memory', PROGRAM_PACKS.every(pack => packBytes(pack) <= 680), true);
-  check('Core pack remains 478 bytes', packBytes(PROGRAM_PACKS.find(pack => pack.id === 'core')), 478);
-  check('source-PDF programs all have improved catalog equivalents', ['P1', 'A', 'H', 'P3', 'E', 'B', 'M'].every(id => PROGRAM_BY_ID.has(id)), true);
-  check('low-value bearings and variation extras were curated out', PROGRAM_BY_ID.has('G') || PROGRAM_BY_ID.has('N'), false);
+  check('Core pack is 316 bytes', packBytes(PROGRAM_PACKS.find(pack => pack.id === 'core')), 316);
+  check('the catalog is exactly the printed S5 set', PROGRAMS.map(program => program.id).join(','), 'P1,P2,P3,P4,P5,P6,P7');
   check('catalog search finds quadratic by topic', filterProgramCatalog('discriminant').map(program => program.id).join(','), 'P1');
-  check('catalog search finds the coefficient-k intersection solver', filterProgramCatalog('parameter k').map(program => program.id).join(','), 'E');
-  check('catalog category filter isolates finance programs', filterProgramCatalog('', 'Finance').map(program => program.id).join(','), 'C,L');
+  check('catalog search finds the line-circle solver', filterProgramCatalog('line circle').map(program => program.id).join(','), 'P5');
+  check('catalog category filter isolates coordinate programs', filterProgramCatalog('', 'Coordinate').map(program => program.id).join(','), 'P4,P5,P6');
 }
 {
   const drafts = [
@@ -874,58 +893,39 @@ for (let i = 0; i < CONSTANTS.length; i++) {
 }
 {
   const cases = [
-    ['P1 documented roots', 'P1', [1, -5, 6], [1, 2.5, -.25, 3, 2]],
-    ['P1 repeated root branch', 'P1', [1, -2, 1], [0, 1, 0, 1]],
-    ['P1 no-real-root branch', 'P1', [1, 0, 1], [-4, 0, 1]],
-    ['P2 arithmetic branch', 'P2', [1, 2, 3, 5], [14, 40]],
-    ['P2 finite geometric branch', 'P2', [2, 3, 2, 4], [24, 45]],
-    ['P2 infinite geometric branch', 'P2', [3, 6, .5], [12]],
-    ['P3 two-point branch', 'P3', [1, 0, 0, 3, 4], [5, 1.5, 2, 4 / 3]],
-    ['P3 circle branch', 'P3', [2, -4, 6, -12], [2, -3, 5]],
-    ['P4 sine branch', 'P4', [1, .5], [30, 150]],
-    ['P4 cosine boundary branch', 'P4', [2, 1], [0, 360]],
-    ['P4 negative tangent branch', 'P4', [3, -1], [135, 315]],
-    ['A simultaneous equations', 'A', [2, 1, 7, 1, -1, 2], [3, 1]],
-    ['B circle through three points', 'B', [0, 0, 4, 0, 0, 6], [2, 3, Math.sqrt(13)]],
-    ['C final-value branch', 'C', [1, 1000, 5, 3], [1157.625]],
-    ['C periods branch', 'C', [2, 1000, 10, 1210], [2]],
-    ['C rate branch', 'C', [3, 1000, 1210, 2], [10]],
-    ['C starting-value branch', 'C', [4, 1210, 10, 2], [1000]],
-    ['D combined populations', 'D', [2, 10, 2, 2, 14, 2], [12, Math.sqrt(8)]],
-    ['E k in both circle and line coefficients', 'E', [1, 1, 1, -4, 1, 1, 0], [
-      Math.sqrt(2), -Math.sqrt(2), -Math.sqrt(2), Math.sqrt(2)
-    ]],
-    ['E non-unit coefficient-k case', 'E', [2, 2, 1, -4, 1, 2, 0], [
-      (-3 + Math.sqrt(89)) / 5, (3 - Math.sqrt(89)) / 10,
-      (-3 - Math.sqrt(89)) / 5, (3 + Math.sqrt(89)) / 10
-    ]],
-    ['E vertical-line branch with k circle coefficient', 'E', [2, 2, 1, -4, 1, 0, -1], [
-      1, (-1 + Math.sqrt(5)) / 2, 1, (-1 - Math.sqrt(5)) / 2
-    ]],
-    ['E coefficient-k tangent branch', 'E', [2, 0, 0, -4, 0, 1, -2], [0, 2]],
-    ['F arithmetic target branch', 'F', [1, 3, 2, 100], [10, 120]],
-    ['F geometric target branch', 'F', [2, 2, 1.5, 50], [7, 64.34375]],
-    ['H cubic three-real-roots branch', 'H', [1, 6, 11, 6], [-1, -2, -3]],
-    ['H cubic one-real-root branch', 'H', [1, 2, 2, 1], [-1]],
-    ['H cubic repeated-root branch', 'H', [1, 0, -3, 2], [-2, 1]],
-    ['H cubic triple-root branch', 'H', [1, -3, 3, -1], [1]],
-    ['I exact probability branch', 'I', [1, 5, 4, 2, 2], [5 / 18]],
-    ['I at-least probability branch', 'I', [2, 5, 4, 2, 1], [5 / 6]],
-    ['I at-most probability branch', 'I', [3, 5, 4, 2, 1], [13 / 18]],
-    ['J affine roots branch', 'J', [1, 1, -5, 6, 2, 1], [-12, 35]],
-    ['J squared roots branch', 'J', [2, 1, -5, 6], [-13, 36]],
-    ['K external tangents', 'K', [0, 0, 5, 13, 0], [12, 25 / 13, 60 / 13, 25 / 13, -60 / 13]],
-    ['L future savings branch', 'L', [1, 1000, 1, 12, 100], [2395.07533145167]],
-    ['L loan payment branch', 'L', [2, 100000, .5, 240], [716.431058478335]],
-    ['L outstanding loan branch', 'L', [3, 100000, .5, 12, 716.4310585], [97330.2011848522]],
-    ['M general triangle centres', 'M', [0, 0, 24, 0, 12, 9], [12, 3, 12, 4, 12, 16, 12, -3.5]],
-    ['M right-triangle centres', 'M', [0, 0, 6, 0, 0, 6], [2, 2, 6 - 3 * Math.sqrt(2), 6 - 3 * Math.sqrt(2), 0, 0, 3, 3]]
+    ['P1 quadratic vertex and roots', 'P1', [1, 2, -15], [-1, -16, 3]],
+    ['P1 repeated-root quadratic', 'P1', [1, -2, 1], [1, 0, 1]],
+    ['P2 simultaneous equations', 'P2', [1, 1, 1, 2, -1, 5], [2]],
+    ['P3 cubic with three real roots', 'P3', [1, 6, 11, 6], [-1, -2, -3]],
+    ['P3 cubic with one real root', 'P3', [1, 2, 2, 1], [-1]],
+    ['P3 cubic with irrational roots', 'P3', [2, 7, 5, 1], [-0.381966011250119, -0.5, -2.6180339887499]],
+    ['P4 centre and radius', 'P4', [4, -8, 3], [-2, 4]],
+    ['P5 line and circle intersections', 'P5', [1, 7, 40, -2, -4, -20], [5, 5, -2, 6]],
+    ['P5 vertical line and circle', 'P5', [1, 0, 4, -6, -6, 8], [4, 6, 4, 0]],
+    ['P6 circle through three points', 'P6', [5, 2, 2, 3, 6, -5], [2, -2, 5, -4, 4]],
+    ['P7 triangle centres', 'P7', [0, 0, 24, 0, 12, 9], [12, 3, 12, 4, 12, 16, 12, -3.5]],
+    ['P7 right triangle at the origin', 'P7', [0, 0, 6, 0, 0, 6], [2, 2, 1.75735931288071, 1.75735931288071, 0, 0, 3, 3]]
   ];
-  for (const [name, id, inputs, outputs] of cases) nearMany(`program library: ${name}`, runCatalogProgram(id, inputs), outputs, 1e-8);
-  nearMany('program library: E accepts coefficient k through physical M-memory keys',
-    runCatalogProgramWithKeys('E', ['1', '#[MPLUS]', '1', '[NEG]4', '1', '#[MPLUS]', '0']),
-    [Math.sqrt(2), -Math.sqrt(2), -Math.sqrt(2), Math.sqrt(2)], 1e-8);
+  for (const [name, id, inputs, outputs] of cases) nearMany('program library: ' + name, runCatalogProgram(id, inputs), outputs, 1e-8);
+
+  // Five programs publish their last answer as the program ends rather than
+  // through an extra pause, exactly as the printed S5 listing does.
+  const finals = [
+    ['P1 ends on the second root', 'P1', [1, 2, -15], -5],
+    ['P2 ends on y', 'P2', [1, 1, 1, 2, -1, 5], -1],
+    ['P4 ends on the radius', 'P4', [4, -8, 3], Math.sqrt(17)],
+    ['P5 ends on y2', 'P5', [1, 7, 40, -2, -4, -20], 6],
+    ['P6 ends on the circle constant', 'P6', [5, 2, 2, 3, 6, -5], -17]
+  ];
+  for (const [name, id, inputs, want] of finals) nearMany('program library final display: ' + name, [catalogFinal(id, inputs)], [want], 1e-8);
+
+  let p1Error = '';
+  try { runCatalogProgram('P1', [1, 0, 1]); } catch (e) { p1Error = e.kind || e.message; }
+  check('P1 raises Math ERROR when the roots are not real', p1Error, 'Math');
+  nearMany('program library: P1 accepts a negative coefficient through the keyboard',
+    runCatalogProgramWithKeys('P1', ['1', '2', '[NEG]15']), [-1, -16, 3], 1e-8);
 }
+
 {
   const commandsRoundTrip = Object.entries(TOK)
     .filter(([, spec]) => spec.k === K.PROG)

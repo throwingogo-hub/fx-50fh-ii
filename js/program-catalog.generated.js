@@ -4,364 +4,191 @@
 export const PROGRAMS = Object.freeze([
   {
     "id": "P1",
-    "title": "Quadratic X-Ray",
-    "bytes": 80,
+    "title": "Quadratic: Vertex, Optimum and Roots",
     "mode": "COMP",
     "category": "Algebra",
     "topics": [
       "quadratic",
-      "discriminant",
       "vertex",
-      "roots"
+      "optimum",
+      "minimum",
+      "maximum",
+      "roots",
+      "discriminant"
     ],
-    "summary": "Diagnose a quadratic in one run: discriminant, vertex and every real root.",
-    "inputs": "Coefficients a, b and c.",
-    "outputs": "Discriminant, vertex coordinates and real roots.",
-    "example": "TYPE  A=1, B=-5, C=6\nGET   Δ=1, h=2.5, k=-0.25, roots 3 and 2",
-    "source": "?→A\n?→B\n?→C\nB²-4AC→D\nD◢-B÷2÷A◢-D÷4÷A◢D<0⇒Goto 9\n(√(D)-B)÷2÷A→C\nC◢D=0⇒Goto 9\n-B÷A-C◢Lbl 9"
+    "summary": "Read the vertex, the optimum value and both real roots of any quadratic in one run.",
+    "inputs": "a, b and c of ax² + bx + c = 0, in that order.",
+    "outputs": "Vertex x, the optimum value (vertex y), then the two real roots.",
+    "example": "Solve f(x) = x² + 2x − 15 and describe its graph.\n\nTYPE   1  EXE   2  EXE   (-)15  EXE\nGET    -1      vertex x-coordinate (h)\n       -16     minimum value (k)\n       3       first root\n       -5      second root\n\nNOTE   The second root appears when the program finishes; press EXE once\n       more if the display is still showing the first root. If Math ERROR\n       appears at the first root, b² - 4ac < 0 and the roots are not real.",
+    "source": "?→A\n?→B\n?→C\nB²-4AC→D\n-B÷(2A)◢\n-D÷(4A)◢\n(√(D)-B)÷(2A)◢\n-B÷A-Ans",
+    "bytes": 61
   },
   {
     "id": "P2",
-    "title": "Sequence Engine",
-    "bytes": 110,
-    "mode": "COMP",
-    "category": "Sequences",
-    "topics": [
-      "arithmetic sequence",
-      "geometric sequence",
-      "series"
-    ],
-    "summary": "Calculate terms and sums for arithmetic, finite geometric and infinite geometric sequences.",
-    "inputs": "Sequence type, first term, difference or ratio, and n when required.",
-    "outputs": "The requested term and sum.",
-    "example": "TYPE  M=1, A=2, B=3, C=5\nGET   T₅=14, S₅=40",
-    "source": "?→M\n?→A\n?→B\nM=3⇒A÷(1-B)→X\nM=3⇒Goto 9\n?→C\nM=1⇒A+(C-1)B→D\nM=2⇒AB^(C-1)→D\nD◢M=1⇒C(A+D)÷2→X\nM=2⇒(A-BD)÷(1-B)→X\nLbl 9\nX◢"
-  },
-  {
-    "id": "P3",
-    "title": "Coordinate Lab",
-    "bytes": 104,
-    "mode": "COMP",
-    "category": "Coordinate",
-    "topics": [
-      "distance",
-      "midpoint",
-      "slope",
-      "circle"
-    ],
-    "summary": "Handle two-point coordinate geometry or recover a circle from its general equation.",
-    "inputs": "A mode plus point coordinates or circle coefficients.",
-    "outputs": "Distance, midpoint, slope, or circle centre and radius.",
-    "example": "TYPE  M=1, A=0, B=0, C=3, D=4\nGET   distance 5, midpoint (1.5,2), slope 1.333333333",
-    "source": "?→M\n?→A\n?→B\n?→C\nM=2⇒Goto 2\n?→D\nC-A→X\nD-B→Y\n√(X²+Y²)◢(A+C)÷2◢(B+D)÷2◢Y÷X◢Goto 9\nLbl 2\n-A÷2◢-B÷2◢√(A²+B²-4C)÷2◢Lbl 9"
-  },
-  {
-    "id": "P4",
-    "title": "Trig 360",
-    "bytes": 184,
-    "mode": "COMP",
-    "category": "Trigonometry",
-    "topics": [
-      "trig equation",
-      "sine",
-      "cosine",
-      "tangent"
-    ],
-    "summary": "Return every solution from 0° to 360° after a trig equation has been isolated.",
-    "inputs": "Function selector and isolated sine, cosine or tangent value.",
-    "outputs": "All valid angles in the interval.",
-    "example": "2sin θ=1   → TYPE M=1, D=0.5  → GET 30°, 150°\ncos θ=1    → TYPE M=2, D=1    → GET 0°, 360°\ntan θ=-1   → TYPE M=3, D=-1   → GET 135°, 315°",
-    "source": "Deg\n?→M\n?→D\nM=1⇒Goto 1\nM=2⇒Goto 2\ntan^-1(D)→X\nX<0⇒X+180→X\nX◢X+180◢X≠0⇒Goto 9\n360◢Goto 9\nLbl 1\nsin^-1(D)→X\nX<0⇒Goto 4\nX◢X=90⇒Goto 9\n180-X◢X≠0⇒Goto 9\n360◢Goto 9\nLbl 4\n180-X◢X=-90⇒Goto 9\n360+X◢Goto 9\nLbl 2\ncos^-1(D)→X\nX◢X=180⇒Goto 9\n360-X◢Lbl 9"
-  },
-  {
-    "id": "A",
-    "title": "Simultaneous 2×2 Solver",
-    "bytes": 52,
+    "title": "Simultaneous Linear Equations in Two Unknowns",
     "mode": "COMP",
     "category": "Algebra",
     "topics": [
       "simultaneous equations",
-      "linear equations"
+      "linear equations",
+      "two unknowns",
+      "determinant"
     ],
-    "summary": "Solve a two-by-two system when the calculator has no equation-solver mode.",
-    "inputs": "The six coefficients from two linear equations.",
-    "outputs": "The unique x and y solution.",
-    "example": "TYPE  A=2, B=1, C=7, D=1, X=-1, Y=2\nGET   x=3, y=1",
-    "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\nAX-BD→M\n(CX-BY)÷M◢(AY-CD)÷M◢"
+    "summary": "Solve two linear equations in x and y without rearranging either of them.",
+    "inputs": "A, B, C of Ax + By = C, then D, X, Y of Dx + Xy = Y.",
+    "outputs": "x, then y.",
+    "example": "Solve  x + y = 1  and  2x - y = 5.\n\nTYPE   1  EXE   1  EXE   1  EXE   2  EXE   (-)1  EXE   5  EXE\nGET    2      x\n       -1     y\n\nNOTE   The six values are read as A, B, C, D, X, Y. Put the constant of each\n       equation on the right-hand side before you start. If the determinant\n       XA - BD is zero the lines are parallel or identical, and Math ERROR is shown.",
+    "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\n(XC-BY)÷(XA-BD)→M◢\nC÷B-AM÷B",
+    "bytes": 51
   },
   {
-    "id": "B",
-    "title": "Circle Through Three Points",
-    "bytes": 129,
-    "mode": "COMP",
-    "category": "Coordinate",
-    "topics": [
-      "circle",
-      "three points",
-      "circumcircle"
-    ],
-    "summary": "Build the general equation of the circle through three supplied points.",
-    "inputs": "Coordinates of three non-collinear points.",
-    "outputs": "Circle coefficients, centre and radius.",
-    "example": "TYPE  A=0, B=0, C=4, D=0, X=0, Y=6\nGET   centre (2,3), radius 3.605551275",
-    "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\nC-A→C\nD-B→D\nX-A→X\nY-B→Y\n(C(X²+Y²)-X(C²+D²))÷2÷(CY-DX)→M\n((C²+D²)Y-(X²+Y²)D)÷2÷(CY-DX)→C\nA+C◢B+M◢√(C²+M²)◢"
-  },
-  {
-    "id": "C",
-    "title": "Growth and Decay Solver",
-    "bytes": 110,
-    "mode": "COMP",
-    "category": "Finance",
-    "topics": [
-      "growth",
-      "decay",
-      "exponential",
-      "compound"
-    ],
-    "summary": "Solve for the missing value in exponential growth or decay models.",
-    "inputs": "Mode plus the known starting value, final value, rate and time.",
-    "outputs": "The selected unknown quantity.",
-    "example": "TYPE  M=1, A=1000, B=5, C=3     → GET 1157.625\nTYPE  M=2, A=1000, B=10, C=1210 → GET 2 periods\nTYPE  M=3, A=1000, B=1210, C=2  → GET 10%\nTYPE  M=4, A=1210, B=10, C=2    → GET 1000",
-    "source": "?→M\n?→A\n?→B\n?→C\nM=1⇒A(1+B÷100)^(C)→X\nM=2⇒log(C÷A)÷log(1+B÷100)→X\nM=3⇒100((B÷A)^(1÷C)-1)→X\nM=4⇒A÷(1+B÷100)^(C)→X\nX◢"
-  },
-  {
-    "id": "D",
-    "title": "Combined Population Statistics",
-    "bytes": 73,
-    "mode": "COMP",
-    "category": "Statistics",
-    "topics": [
-      "combined mean",
-      "standard deviation",
-      "population"
-    ],
-    "summary": "Combine two populations from summary statistics without the original observations.",
-    "inputs": "Both population sizes, means and population standard deviations.",
-    "outputs": "Combined mean and combined population standard deviation.",
-    "example": "TYPE  A=2, B=10, C=2, D=2, X=14, Y=2\nGET   combined mean 12, combined SD 2.828427125",
-    "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\n(AB+DX)÷(A+D)◢√((A(C²+B²)+D(Y²+X²))÷(A+D)-(Ans)²)◢"
-  },
-  {
-    "id": "E",
-    "title": "Line–Circle Intersections",
-    "bytes": 211,
-    "mode": "COMP",
-    "category": "Coordinate",
-    "topics": [
-      "line circle",
-      "intersection",
-      "tangent",
-      "secant",
-      "parameter k",
-      "coefficient containing k",
-      "vertical line"
-    ],
-    "summary": "Find the numerical intersection points when k appears in a circle or straight-line coefficient.",
-    "inputs": "First enter k at M, then coefficients of x²+y²+Ax+By+C=0 and Dx+Xy+Y=0; any coefficient may be a number or an expression in M.",
-    "outputs": "One or two numerical (x,y) intersection pairs; a tangent produces one pair.",
-    "example": "For x²+y²+kx+y−4=0 and x+ky=0, TYPE M=1, A=M, B=1, C=-4, D=1, X=M, Y=0\nGET   (√2,-√2), (-√2,√2)",
-    "source": "?→M\n?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\nX=0⇒Goto 1\nY²-BXY+CX²→C\nAX²+2DY-BDX→B\nX²+D²→A\nB²-4AC→M\n(√(M)-B)÷(2A)→C\nC◢(-DC-Y)÷X◢\n-B÷A-C→M\nM=C⇒Goto 9\nM◢(-Y-DM)÷X◢\nGoto 9\nLbl 1\n-Y÷D→X\nB²-4(X²+AX+C)→M\n(√(M)-B)÷2→C\nX◢C◢\n-B-C→M\nM=C⇒Goto 9\nX◢M◢\nLbl 9"
-  },
-  {
-    "id": "F",
-    "title": "Sequence Target Solver",
-    "bytes": 72,
-    "mode": "COMP",
-    "category": "Sequences",
-    "topics": [
-      "sequence target",
-      "minimum n",
-      "series"
-    ],
-    "summary": "Find the first term count whose arithmetic or geometric sum reaches a target.",
-    "inputs": "Sequence type, sequence values and target sum.",
-    "outputs": "The first qualifying n and its sum.",
-    "example": "TYPE  M=1, A=3, B=2, C=100\nGET   n=10, S₁₀=120",
-    "source": "?→M\n?→A\n?→B\n?→C\n0→X\n0→Y\nA→D\nWhile Y<C\nX+1→X\nY+D→Y\nM=1⇒D+B→D\nM=2⇒DB→D\nWhileEnd\nX◢Y◢"
-  },
-  {
-    "id": "H",
-    "title": "Complete Cubic Solver",
-    "bytes": 273,
+    "id": "P3",
+    "title": "Cubic Equations",
     "mode": "COMP",
     "category": "Algebra",
     "topics": [
       "cubic",
       "cubic equation",
       "cardano",
-      "three real roots"
+      "three real roots",
+      "factor theorem"
     ],
-    "summary": "Solve a cubic directly and return every distinct real root without requiring a known factor.",
-    "inputs": "All four coefficients of Ax³+Bx²+Cx+D=0.",
-    "outputs": "One, two or three distinct real roots.",
-    "example": "TYPE  A=1, B=6, C=11, M=6\nGET   roots -1, -2, -3",
-    "source": "?→A\n?→B\n?→C\n?→M\n2×B³÷(27×A³)-B×C÷(3×A²)+M÷A→D\nC÷A-B²÷(3×A²)→X\nB÷(3×A)→Y\n(D÷2)²+(X÷3)³→M\nM<0⇒Goto 1\nM=0⇒Goto 2\n∛((-D÷2+√(M)))+∛((-D÷2-√(M)))-Y◢\nGoto 9\nLbl 2\n∛((-D÷2))→A\n2×A-Y◢\nA=0⇒Goto 9\n-A-Y◢\nGoto 9\nLbl 1\nDeg\ncos^-1((3×D÷(2×X))×√((-3÷X)))÷3→M\n2×√((-X÷3))→A\nA×cos(M)-Y◢\nA×cos(M - 120)-Y◢\nA×cos(M - 240)-Y◢\nLbl 9"
+    "summary": "Return every real root of a cubic without guessing a factor first.",
+    "inputs": "a, b, c and d of ax³ + bx² + cx + d = 0.",
+    "outputs": "The distinct real roots, one pause each.",
+    "example": "Factorise x³ + 6x² + 11x + 6 = 0.\n\nTYPE   1  EXE   6  EXE   11  EXE   6  EXE\nGET    -1, -2, -3   the three roots\n\n       so  x³ + 6x² + 11x + 6 = (x + 1)(x + 2)(x + 3).\n\nNOTE   Three pauses means three distinct real roots. One pause means one real\n       root and a complex conjugate pair, which this program does not print.\n       A repeated root is printed once. Example: 2, 7, 5, 1 gives -0.5, -0.382 and -2.62.",
+    "source": "?→A\n?→B\n?→C\n?→M\n2×B³÷(27×A³)-B×C÷(3×A²)+M÷A→D\nC÷A-B²÷(3×A²)→X\nB÷(3×A)→Y\n(D÷2)²+(X÷3)³→M\nM<0⇒Goto 1\nM=0⇒Goto 2\n∛((-D÷2+√(M)))+∛((-D÷2-√(M)))-Y◢\nGoto 9\nLbl 2\n∛((-D÷2))→A\n2×A-Y◢\nA=0⇒Goto 9\n-A-Y◢\nGoto 9\nLbl 1\nDeg\ncos⁻¹((3×D÷(2×X))×√((-3÷X)))÷3→M\n2×√((-X÷3))→A\nA×cos(M)-Y◢\nA×cos(M - 120)-Y◢\nA×cos(M - 240)-Y◢\nLbl 9",
+    "bytes": 273
   },
   {
-    "id": "I",
-    "title": "Without-Replacement Probability",
-    "bytes": 130,
-    "mode": "COMP",
-    "category": "Probability",
-    "topics": [
-      "hypergeometric",
-      "without replacement",
-      "nCr"
-    ],
-    "summary": "Evaluate exact, at-least or at-most probabilities without replacement.",
-    "inputs": "Probability mode, population counts, draw count and target count.",
-    "outputs": "The requested hypergeometric probability.",
-    "example": "TYPE  M=1, A=5, B=4, C=2, D=2  → GET P(exactly 2 red)=0.2777777778 = 5/18\nTYPE  M=2, A=5, B=4, C=2, D=1  → GET P(at least 1 red)=0.8333333333 = 5/6\nTYPE  M=3, A=5, B=4, C=2, D=1  → GET P(at most 1 red)=0.7222222222 = 13/18",
-    "source": "?→M\n?→A\n?→B\n?→C\n?→D\n0→X\nC-B>0⇒C-B→X\nC→Y\nA<C⇒A→Y\nM=1⇒D→X\nM=1⇒D→Y\nM=2⇒D>X⇒D→X\nM=3⇒D<Y⇒D→Y\n0→M\nWhile X≤Y\nA nCr X B nCr(C-X)÷(A+B)nCr C M+\nX+1→X\nWhileEnd\nM◢"
-  },
-  {
-    "id": "J",
-    "title": "Transformed-Roots Builder",
-    "bytes": 83,
-    "mode": "COMP",
-    "category": "Algebra",
-    "topics": [
-      "transformed roots",
-      "quadratic",
-      "vieta"
-    ],
-    "summary": "Construct a new quadratic after applying a transformation to the original roots.",
-    "inputs": "Original quadratic coefficients plus transformation mode and constants.",
-    "outputs": "Coefficients of the transformed-root equation.",
-    "example": "TYPE  M=1, A=1, B=-5, C=6, X=2, Y=1\nGET   P=-12, Q=35\nWRITE z²-12z+35=0",
-    "source": "?→M\n?→A\n?→B\n?→C\nM=2⇒Goto 2\n?→X\n?→Y\nXB÷A-2Y◢X²C÷A-YAns-Y²◢Goto 9\nLbl 2\nC÷A→X\n2X-(B÷A)²◢X²◢Lbl 9"
-  },
-  {
-    "id": "K",
-    "title": "Tangents from a Point to a Circle",
-    "bytes": 104,
+    "id": "P4",
+    "title": "Centre and Radius of a Circle",
     "mode": "COMP",
     "category": "Coordinate",
     "topics": [
-      "circle tangent",
-      "point of contact",
-      "tangent length"
+      "circle",
+      "centre",
+      "radius",
+      "completing the square"
     ],
-    "summary": "Find both tangent points and the tangent length from an external point to a circle.",
-    "inputs": "Circle data and the external point.",
-    "outputs": "Two contact points and tangent length.",
-    "example": "TYPE  A=0, B=0, C=5, D=13, X=0\nGET   tangent length 12\n      contact points (1.923076923,4.615384615)\n                     (1.923076923,-4.615384615)",
-    "source": "?→A\n?→B\n?→C\n?→D\n?→X\nD-A→D\nX-B→X\nD²+X²→M\n√((M)-C²)→Y\nY◢C÷M→M\nA+M(CD-XY)◢B+M(CX+DY)◢A+M(CD+XY)◢B+M(CX-DY)◢"
+    "summary": "Complete the square instantly for x² + y² + Cx + By + A = 0.",
+    "inputs": "C, B and A of x² + y² + Cx + By + A = 0.",
+    "outputs": "Centre x, centre y, then the radius.",
+    "example": "Find the centre and radius of x² + y² + 4x - 8y + 3 = 0.\n\nTYPE   4  EXE   (-)8  EXE   3  EXE\nGET    -2           x-coordinate of the centre\n       4            y-coordinate of the centre\n       4.123105626  radius = √17\n\nNOTE   The radius appears when the program finishes. Math ERROR at that step\n       means x² + y² + Cx + By + A = 0 is not a real circle.",
+    "source": "?→A\n?→B\n?→C\n-A÷2→X◢\n-B÷2→Y◢\n√(X²+Y²-C)",
+    "bytes": 38
   },
   {
-    "id": "L",
-    "title": "Annuity and Loan Engine",
-    "bytes": 107,
+    "id": "P5",
+    "title": "Intersection Points of a Straight Line and a Circle",
     "mode": "COMP",
-    "category": "Finance",
+    "category": "Coordinate",
     "topics": [
-      "annuity",
-      "loan",
-      "payment",
-      "compound interest"
+      "line circle",
+      "intersection",
+      "substitution",
+      "quadratic"
     ],
-    "summary": "Calculate savings annuities and reducing-balance loan quantities.",
-    "inputs": "Mode, payment, rate, term and known balance values.",
-    "outputs": "The selected annuity or loan result.",
-    "example": "TYPE  M=1, A=1000, B=1, C=12, D=100\nGET   future value 2395.075331",
-    "source": "?→M\n?→A\n?→B\nB÷100→B\n?→C\n(1+B)^(C)→X\nM=2⇒AB÷(1-1÷X)→Y\nM=2⇒Goto 9\n?→D\nM=1⇒AX+D(X-1)÷B→Y\nM=3⇒AX-D(X-1)÷B→Y\nLbl 9\nY◢"
+    "summary": "Substitute the line into the circle and print both intersection points.",
+    "inputs": "D, X, Y of the line Dx + Xy = Y, then C, B, A of x² + y² + Cx + By + A = 0.",
+    "outputs": "x1, y1, x2, y2.",
+    "example": "Where does x + 7y = 40 meet x² + y² - 2x - 4y - 20 = 0?\n\nTYPE   1  EXE   7  EXE   40  EXE   (-)2  EXE   (-)4  EXE   (-)20  EXE\nGET    5, 5      first intersection point\n       -2, 6     second intersection point\n\n       A vertical line also works: x = 4 and x² + y² - 6x - 6y + 8 = 0\n       (TYPE 1, 0, 4, -6, -6, 8) gives (4, 6) and (4, 0).\n\nNOTE   Input order is the line first, then the circle. A line that misses the\n       circle gives Math ERROR because the discriminant is negative.",
+    "source": "?→D\n?→X\n?→Y\n?→C\n?→B\n?→A\nX=0⇒Goto 1\nY²+CDY+AD²→A\n-2XY-CDX+BD²→B\nD²+X²→M\n(-B-√(B²-4AM))÷(2M)→C\n(Y-CX)÷D◢\nC◢\n(-B+√(B²-4AM))÷(2M)→C\n(Y-CX)÷D◢\nC◢\nGoto 2\nLbl 1\nY÷D→X◢\nC²-4(X²+BX+A)→M\n(-C+√(M))÷2◢\nX◢\n(-C-√(M))÷2◢\nLbl 2",
+    "bytes": 201
   },
   {
-    "id": "M",
-    "title": "Four Centres of Any Triangle",
-    "bytes": 385,
+    "id": "P6",
+    "title": "Centre, Radius and Equation from Three Given Points",
+    "mode": "COMP",
+    "category": "Coordinate",
+    "topics": [
+      "circle",
+      "three points",
+      "circumcircle",
+      "equation"
+    ],
+    "summary": "Build the circle through three points and print its equation in general form.",
+    "inputs": "x1, y1, x2, y2, x3, y3.",
+    "outputs": "Centre x, centre y, radius, then -2h, -2k and h² + k² - r² for the equation.",
+    "example": "Find the circle through (5, 2), (2, 3) and (6, -5).\n\nTYPE   5  EXE   2  EXE   2  EXE   3  EXE   6  EXE   (-)5  EXE\nGET    2, -2        centre (h, k)\n       5            radius\n       -4, 4, -17   the equation x² + y² - 4x + 4y - 17 = 0\n\nNOTE   Enter the six coordinates in point order. Collinear points give\n       Math ERROR because no circle passes through them.",
+    "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\nC-A→C\nD-B→D\nX-A→X\nY-B→Y\n(C(X²+Y²)-X(C²+D²))÷2÷(CY-DX)→M\n((C²+D²)Y-(X²+Y²)D)÷2÷(CY-DX)→C\nA+C→X\nB+M→Y\nX◢Y◢\n√((X-A)²+(Y-B)²)→M◢\n-2X◢-2Y◢\nX²+Y²-M²",
+    "bytes": 166
+  },
+  {
+    "id": "P7",
+    "title": "Centres of a Triangle",
     "mode": "REG",
     "category": "Geometry",
     "topics": [
       "centroid",
-      "circumcentre",
       "incentre",
-      "orthocentre"
+      "orthocentre",
+      "circumcentre",
+      "triangle centres"
     ],
-    "summary": "Return the centroid, incentre, orthocentre and circumcentre for any non-collinear triangle.",
-    "inputs": "Coordinates of all three vertices.",
-    "outputs": "Coordinates of G, I, H and O.",
-    "example": "TYPE  A=0, B=0, C=24, D=0, X=12, Y=9\nGET   G=(12,3), I=(12,4), H=(12,16), O=(12,-3.5)",
-    "source": "ClrStat\n?→A\n?→B\nA,B DT\n?→C\n?→D\nC,D DT\n?→X\n?→Y\nX,Y DT\nΣx÷3◢\nΣy÷3◢\n√((C-X)²+(D-Y)²)+√((X-A)²+(Y-B)²)+√((A-C)²+(B-D)²)→M\n(√((C-X)²+(D-Y)²)×A+√((X-A)²+(Y-B)²)×C+√((A-C)²+(B-D)²)×X)÷M◢\n(√((C-X)²+(D-Y)²)×B+√((X-A)²+(Y-B)²)×D+√((A-C)²+(B-D)²)×Y)÷M◢\n2×(A×(D-Y)+C×(Y-B)+X×(B-D))→M\nPol(((A²+B²)×(D-Y)+(C²+D²)×(Y-B)+(X²+Y²)×(B-D))÷M,((A²+B²)×(X-C)+(C²+D²)×(A-X)+(X²+Y²)×(C-A))÷M)\nRec(X,Y)\nΣx-2X◢\nΣy-2Y◢\nX◢\nY◢"
+    "summary": "All four triangle centres from the three vertex coordinates.",
+    "inputs": "x1, y1, x2, y2, x3, y3.",
+    "outputs": "Centroid, incentre, orthocentre, then circumcentre.",
+    "example": "Take the triangle with vertices O(0, 0), A(24, 0) and B(12, 9).\n\nTYPE   0  EXE   0  EXE   24  EXE   0  EXE   12  EXE   9  EXE\nGET    12, 3      centroid G\n       12, 4      incentre I\n       12, 16     orthocentre H\n       12, -3.5   circumcentre O\n\nNOTE   This program runs in REG mode and reads the vertices in input order.\n       If Math ERROR appears, enter the origin first, then the other two\n       vertices: 0, 0, 6, 0, 0, 6 gives G(2, 2), I(1.757, 1.757), H(0, 0), O(3, 3).",
+    "source": "ClrStat\n?→A\n?→B\nA,B DT\n?→C\n?→D\nC,D DT\n?→X\n?→Y\nX,Y DT\nΣx÷3◢\nΣy÷3◢\n√((C-X)²+(D-Y)²)+√((X-A)²+(Y-B)²)+√((A-C)²+(B-D)²)→M\n(√((C-X)²+(D-Y)²)×A+√((X-A)²+(Y-B)²)×C+√((A-C)²+(B-D)²)×X)÷M◢\n(√((C-X)²+(D-Y)²)×B+√((X-A)²+(Y-B)²)×D+√((A-C)²+(B-D)²)×Y)÷M◢\n2×(A×(D-Y)+C×(Y-B)+X×(B-D))→M\nPol(((A²+B²)×(D-Y)+(C²+D²)×(Y-B)+(X²+Y²)×(B-D))÷M,((A²+B²)×(X-C)+(C²+D²)×(A-X)+(X²+Y²)×(C-A))÷M)\nRec(X,Y)\nΣx-2X◢\nΣy-2Y◢\nX◢\nY◢",
+    "bytes": 385
   }
 ]);
 
 export const PROGRAM_PACKS = Object.freeze([
   {
     "id": "core",
-    "name": "Original Core",
-    "description": "The balanced everyday pack.",
+    "name": "Core four",
+    "description": "Quadratic, simultaneous equations, circle centre and circle from three points.",
+    "programIds": [
+      "P1",
+      "P2",
+      "P4",
+      "P6"
+    ]
+  },
+  {
+    "id": "algebra",
+    "name": "Algebra",
+    "description": "Quadratic, simultaneous equations, the complete cubic solver and circle centre.",
     "programIds": [
       "P1",
       "P2",
       "P3",
       "P4"
-    ]
-  },
-  {
-    "id": "algebra-growth",
-    "name": "Algebra & growth",
-    "description": "Quadratics, simultaneous equations, sequences and growth.",
-    "programIds": [
-      "P1",
-      "A",
-      "P2",
-      "C"
     ]
   },
   {
     "id": "coordinate",
     "name": "Coordinate geometry",
-    "description": "Points, circles, equations and trig.",
+    "description": "Cubic, circle centre, line-circle intersections and circle from three points.",
     "programIds": [
       "P3",
-      "B",
-      "A",
-      "P4"
+      "P4",
+      "P5",
+      "P6"
     ]
   },
   {
-    "id": "statistics-algebra",
-    "name": "Statistics & algebra",
-    "description": "Sequences, combined statistics, systems and trig.",
+    "id": "centres",
+    "name": "Centres",
+    "description": "Quadratic, circle centre, circle from three points and all four triangle centres.",
     "programIds": [
-      "P2",
-      "D",
-      "A",
-      "P4"
-    ]
-  },
-  {
-    "id": "advanced",
-    "name": "Advanced Section B / MCQ",
-    "description": "Coefficient-k intersections, sequence targets, complete cubics and transformed roots.",
-    "programIds": [
-      "E",
-      "F",
-      "H",
-      "J"
-    ]
-  },
-  {
-    "id": "paper1",
-    "name": "Paper 1 Section B",
-    "description": "Probability, transformed roots, tangents and finance.",
-    "programIds": [
-      "I",
-      "J",
-      "K",
-      "L"
-    ]
-  },
-  {
-    "id": "centres-algebra",
-    "name": "Centres & algebra",
-    "description": "General triangle centres with high-value algebra tools.",
-    "programIds": [
-      "M",
-      "A",
       "P1",
-      "J"
+      "P4",
+      "P6",
+      "P7"
+    ]
+  },
+  {
+    "id": "exam",
+    "name": "Exam mix",
+    "description": "Quadratic, simultaneous equations, line-circle intersections and circle from three points.",
+    "programIds": [
+      "P1",
+      "P2",
+      "P5",
+      "P6"
     ]
   }
 ]);

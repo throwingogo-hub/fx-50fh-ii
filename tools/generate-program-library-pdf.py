@@ -22,28 +22,37 @@ BODY_BOLD = "STHeitiMedium"
 MONO_FONT = "ArialUnicode"
 
 META = {
-    "P1": ("一元二次方程工具", "一次輸入係數，即時計算判別式、頂點及所有實根。", "A=a，B=b，C=c", "判別式、頂點 (h,k)、實根"),
-    "P2": ("等差及等比數列", "處理等差、有限等比及無限等比數列的項及和。", "M=類型；A=首項；B=公差/公比；C=n", "指定項及部分和/無限和"),
-    "P3": ("坐標幾何及圓", "計算兩點距離、中點、斜率，或由一般式求圓心及半徑。", "M=1 兩點；M=2 圓的一般式係數", "距離、中點、斜率／圓心、半徑"),
-    "P4": ("三角方程解", "求 0° 至 360° 內所有 sin、cos 或 tan 方程的解。", "M=1/2/3；D=已分離的三角函數值", "區間內所有不同角度"),
-    "A": ("聯立二元一次方程", "輸入兩條直線方程的六個係數，求唯一交點。", "A,B,C 及 D,X,Y 為兩式係數", "x、y"),
-    "B": ("三點定圓", "由三個不共線點求圓心、半徑及一般式。", "A,B；C,D；X,Y 為三點坐標", "圓心、半徑、一般式係數"),
-    "C": ("增長與衰減", "在複式增長或衰減模型中求終值、時間、率或初值。", "M=未知量類型；其餘輸入已知數值", "所選未知量"),
-    "D": ("合併統計數據", "只有兩組人數、平均數及母體標準差時，合併兩組數據。", "A,B,C 及 D,X,Y 為兩組 n, μ, σ", "合併平均數及母體標準差"),
-    "E": ("直線與圓的參數 k 交點", "當 k 出現在圓或直線的係數時，代入指定 k 值並求數值交點。", "M=k；圓 A,B,C；直線 D,X,Y；係數可含 M", "一或兩組 (x,y)；切線只輸出一組"),
-    "F": ("數列目標項數", "求部分和首次達到指定目標時的最小正整數 n。", "M=AP/GP；A=首項；B=公差/公比；C=目標", "最小 n 及對應 Sₙ"),
-    "H": ("一元三次方程完整求根", "毋須先知道因式，直接求一元三次方程的所有不同實根。", "A,B,C,M 為 Ax³+Bx²+Cx+D=0 的係數", "一個、兩個或三個不同實根"),
-    "I": ("不放回抽樣概率", "以組合公式計算恰好、至少或至多指定數目的概率。", "M=1/2/3；A,B=兩類數量；C=抽取數；D=目標", "所需概率"),
-    "J": ("變換根方程", "不先求原根，直接建立線性變換根或平方根的新二次方程。", "M=模式；A,B,C=原式；模式 1 再輸入 X,Y", "新首一二次方程的 P、Q"),
-    "K": ("圓外一點的切線", "由圓心、半徑及圓外點求切線長及兩個切點。", "A,B=圓心；C=半徑；D,X=圓外點", "切線長及兩個切點"),
-    "L": ("年金與貸款", "處理期末供款的儲蓄終值、貸款供款及尚欠餘額。", "M=模式；A=本金；B=每期利率%；C=期數；D=供款", "所選金融數值"),
-    "M": ("任意三角形四心", "輸入任意三個不共線頂點，求形心、內心、垂心及外心。", "REG 模式；A,B；C,D；X,Y 為三點坐標", "G、I、H、O 四組坐標"),
+    "P1": ("一元二次方程：頂點與極值", "輸入 a、b、c，即時求出頂點、極值及兩個實根。", "A=a，B=b，C=c", "頂點 x、極值、兩個實根"),
+    "P2": ("聯立二元一次方程", "輸入兩條直線方程的六個係數，即時求出交點。", "A,B,C 及 D,X,Y（Ax+By=C、Dx+Xy=Y）", "x、y"),
+    "P3": ("一元三次方程", "毋須先猜因式，直接求一元三次方程的所有實根。", "A,B,C,M 為 Ax³+Bx²+Cx+M=0 的係數", "所有不同實根"),
+    "P4": ("圓心及半徑", "由圓的一般式係數，即時求出圓心及半徑。", "A,B,C 為 x²+y²+Cx+By+A=0 的係數", "圓心坐標、半徑"),
+    "P5": ("直線與圓的交點", "把直線代入圓方程，求出兩個交點坐標。", "直線 D,X,Y；圓 C,B,A", "x₁, y₁, x₂, y₂"),
+    "P6": ("三點定圓", "由三個不共線點求圓心、半徑及圓方程。", "六個坐標 x₁,y₁,x₂,y₂,x₃,y₃", "圓心、半徑、一般式三個係數"),
+    "P7": ("三角形四心", "輸入三個頂點坐標，求形心、內心、垂心及外心。", "REG 模式；三個頂點坐標", "G、I、H、O 四組坐標"),
 }
 
 
 def register_fonts() -> None:
-    pdfmetrics.registerFont(TTFont(BODY_FONT, "/System/Library/Fonts/Supplemental/Arial Unicode.ttf"))
-    pdfmetrics.registerFont(TTFont(BODY_BOLD, "/System/Library/Fonts/STHeiti Medium.ttc", subfontIndex=0))
+    """Register a CJK-capable pair. macOS and Windows paths are both tried."""
+    candidates = [
+        ("/System/Library/Fonts/Supplemental/Arial Unicode.ttf", None),
+        ("C:/Windows/Fonts/arialuni.ttf", None),
+        ("C:/Windows/Fonts/msyh.ttc", 0),
+        ("/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc", 0),
+    ]
+    bold_candidates = [
+        ("/System/Library/Fonts/STHeiti Medium.ttc", 0),
+        ("C:/Windows/Fonts/msyhbd.ttc", 0),
+        ("/usr/share/fonts/truetype/noto/NotoSansCJK-Bold.ttc", 0),
+    ]
+    body = next(((p, i) for p, i in candidates if Path(p).exists()), None)
+    bold = next(((p, i) for p, i in bold_candidates if Path(p).exists()), body)
+    if body is None:
+        raise SystemExit("no CJK-capable font found; install one or edit register_fonts()")
+    pdfmetrics.registerFont(TTFont(BODY_FONT, body[0], subfontIndex=body[1]) if body[1] is not None
+                            else TTFont(BODY_FONT, body[0]))
+    pdfmetrics.registerFont(TTFont(BODY_BOLD, bold[0], subfontIndex=bold[1]) if bold[1] is not None
+                            else TTFont(BODY_BOLD, bold[0]))
 
 
 def wrap(text: str, font: str, size: float, width: float) -> list[str]:
@@ -92,11 +101,11 @@ def calculator_mark(c: canvas.Canvas, x: float, y: float, w: float, h: float) ->
     c.setFont("Helvetica-Bold", 14)
     c.drawCentredString(x + w / 2, y + h - 45, "PROGRAM")
     key_w = (w - 40) / 5
-    key_h = 19
-    for row in range(7):
+    key_h = 16
+    for row in range(6):
         for col in range(5):
             kx = x + 12 + col * (key_w + 4)
-            ky = y + 13 + row * (key_h + 5)
+            ky = y + 12 + row * (key_h + 4)
             c.roundRect(kx, ky, key_w, key_h, 3, stroke=1, fill=0)
 
 
@@ -110,7 +119,7 @@ def cover_page(c: canvas.Canvas, programs: list[dict]) -> None:
     c.setFont(BODY_BOLD, 20)
     c.drawCentredString(PAGE_W / 2, PAGE_H - 370, "中五計算機程式 · 精選版")
     c.setFont(BODY_FONT, 9.5)
-    c.drawCentredString(PAGE_W / 2, PAGE_H - 393, "16 tested programs · 7 memory-safe packs · 680-byte aware")
+    c.drawCentredString(PAGE_W / 2, PAGE_H - 393, "7 tested programs · 5 memory-safe packs · 680-byte aware")
 
     start_y = PAGE_H - 432
     col_w = 255
@@ -129,7 +138,7 @@ def cover_page(c: canvas.Canvas, programs: list[dict]) -> None:
         c.drawString(x + 72, y - 13, program["title"])
         c.setFillColor(colors.black)
     c.setFont(BODY_FONT, 8)
-    c.drawCentredString(PAGE_W / 2, 47, "Built from the canonical tested web catalog · Revised 13 August 2026")
+    c.drawCentredString(PAGE_W / 2, 47, "Built from the canonical tested web catalog · Revised 18 October 2026")
     c.showPage()
 
 
@@ -221,10 +230,10 @@ def program_page(c: canvas.Canvas, page_no: int, number: int, program: dict) -> 
 
     code_lines: list[str] = []
     for raw in program["source"].splitlines():
-        pieces = wrap(raw, MONO_FONT, 6.45, PAGE_W - 116)
+        pieces = wrap(raw, MONO_FONT, 7.3, PAGE_W - 116)
         code_lines.extend(pieces or [""])
-    code_leading = 7.7
-    code_h = max(104, min(258, len(code_lines) * code_leading + 32))
+    code_leading = 8.7
+    code_h = max(104, min(330, len(code_lines) * code_leading + 32))
     code_top = PAGE_H - 276
     code_bottom = code_top - code_h
     c.setFont("Helvetica-Bold", 11)
@@ -233,17 +242,17 @@ def program_page(c: canvas.Canvas, page_no: int, number: int, program: dict) -> 
     c.setStrokeColor(colors.HexColor("#777777"))
     c.roundRect(44, code_bottom, PAGE_W - 88, code_h - 10, 5, stroke=1, fill=1)
     c.setFillColor(colors.black)
-    draw_lines(c, code_lines, 56, code_top - 17, MONO_FONT, 6.45, code_leading)
+    draw_lines(c, code_lines, 56, code_top - 17, MONO_FONT, 7.3, code_leading)
 
     example_top = code_bottom - 22
     c.setFont(BODY_BOLD, 12)
     c.drawString(44, example_top, "示範 Example")
     example_lines = wrap(program["example"], BODY_FONT, 8.5, PAGE_W - 110)
-    example_box_h = min(112, max(52, len(example_lines) * 11 + 18))
+    example_box_h = min(205, max(52, len(example_lines) * 11 + 18))
     c.setFillColor(colors.HexColor("#F5F5F5"))
     c.roundRect(44, example_top - example_box_h - 9, PAGE_W - 88, example_box_h, 5, stroke=0, fill=1)
     c.setFillColor(colors.black)
-    draw_lines(c, example_lines, 56, example_top - 27, BODY_FONT, 8.5, 11, 8)
+    draw_lines(c, example_lines, 56, example_top - 27, BODY_FONT, 8.5, 11, 18)
 
     note_y = max(49, example_top - example_box_h - 31)
     c.setFont(BODY_FONT, 7.4)
