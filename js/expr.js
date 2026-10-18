@@ -56,6 +56,33 @@ function cpow(a, b) {
   return cexp(cmul(b, clog(a)));
 }
 
+// An integer power is repeated multiplication, as the unit performs it: the
+// result stays exact, so i^3 is -i and (1+i)^2 is 2i rather than the tiny
+// trigonometric residue a polar evaluation would leave behind.
+function cintpow(a, n) {
+  let k = Math.abs(n);
+  let r = C(1), base = a;
+  while (k > 0) {
+    if (k % 2 === 1) r = cmul(r, base);
+    base = cmul(base, base);
+    k = Math.floor(k / 2);
+  }
+  if (n < 0) {
+    if (r.re === 0 && r.im === 0) err('Math');
+    r = cdiv(C(1), r);
+  }
+  return r;
+}
+
+// A result that has drifted onto the axes by less than the unit's 15-digit
+// working resolution is put back on them, so 2∠90 is 2i and not 1.2e-16+2i.
+function snapAxis(z) {
+  const scale = Math.max(Math.abs(z.re), Math.abs(z.im));
+  if (scale === 0) return z;
+  const tol = scale * 1e-14;
+  return C(Math.abs(z.re) < tol ? 0 : z.re, Math.abs(z.im) < tol ? 0 : z.im);
+}
+
 // ---------------------------------------------------------------------------
 // Angle handling
 const ANG = { Deg: Math.PI / 180, Rad: 1, Gra: Math.PI / 200 };
@@ -520,6 +547,8 @@ function binary(f, node, ctx, E, real) {
     if (!isReal(b)) err('Math');
     if (isReal(a)) {
       if (a.re < 0 && !Number.isInteger(b.re)) {
+        // CMPLX mode returns the principal value, so (-1)^0.5 is i.
+        if (ctx.mode === 'CMPLX') return rz(cpow(a, b));
         const inv = 1 / b.re;
         if (Math.abs(inv - Math.round(inv)) > 1e-9 || Math.round(inv) % 2 === 0) err('Math');
         return C(r15(-Math.pow(-a.re, b.re)));
@@ -528,6 +557,7 @@ function binary(f, node, ctx, E, real) {
       if (!isFinite(v)) err('Math');
       return C(r15(v));
     }
+    if (Number.isInteger(b.re) && Math.abs(b.re) <= 1e9) return rz(cintpow(a, b.re));
     return rz(cpow(a, b));
   }
   if (f === 'xroot') {
@@ -552,7 +582,14 @@ function binary(f, node, ctx, E, real) {
   if (f === 'angle') {
     if (ctx.mode !== 'CMPLX') err('Syntax');
     const r = real(node.a), th = toRad(real(node.b), ctx.angle);
-    return rz(C(r * Math.cos(th), r * Math.sin(th)));
+    // Right angles land exactly on an axis, as they do on the unit.
+    const q = th / (Math.PI / 2);
+    if (Math.abs(q - Math.round(q)) < 1e-12) {
+      const k = ((Math.round(q) % 4) + 4) % 4;
+      const c = [1, 0, -1, 0][k], s = [0, 1, 0, -1][k];
+      return rz(C(r * c, r * s));
+    }
+    return rz(snapAxis(C(r * Math.cos(th), r * Math.sin(th))));
   }
   if (['eq', 'ne', 'gt', 'lt', 'ge', 'le'].includes(f)) {
     const a = real(node.a), b = real(node.b);
@@ -644,9 +681,15 @@ function callFn(f, args, ctx, E, real) {
     }
     case 'sqrt': {
       const z = one();
-      if (isReal(z)) { if (z.re < 0) err('Math'); return C(r15(Math.sqrt(z.re))); }
-      err('Math');
-      return null;
+      if (!isReal(z)) {
+        // The guide (E-19) admits sqrt( in CMPLX mode but not a complex argument.
+        err('Math');
+      }
+      if (z.re < 0) {
+        if (ctx.mode !== 'CMPLX') err('Math');
+        return C(0, r15(Math.sqrt(-z.re)));
+      }
+      return C(r15(Math.sqrt(z.re)));
     }
     case 'cbrt': return C(r15(Math.cbrt(oneR())));
     case 'Abs': { const z = one(); return C(r15(cabs(z))); }

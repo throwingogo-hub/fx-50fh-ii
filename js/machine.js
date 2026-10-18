@@ -223,7 +223,11 @@ export class Machine {
         if (!alpha && !shift && this.screen === 'result') return this.toggleDms();
         break;
       case 'ENG':
-        if (!alpha) return this.engShift(shift ? -1 : 1);
+        // The guide states that CMPLX does not support engineering notation.
+        if (!alpha) {
+          if (this.mode !== 'CMPLX') this.engShift(shift ? -1 : 1);
+          return;
+        }
         break;
       case 'MPLUS':
         if (this.mode === 'SD' || this.mode === 'REG') {
@@ -463,6 +467,8 @@ export class Machine {
     this.tokens = h.tokens.map((t) => Object.assign({}, t));
     this.cursor = this.tokens.length;
     this.result = h.result;
+    // A replayed complex result starts again from its real part.
+    this.result.part = 0;
     this.screen = 'result';
   }
 
@@ -556,6 +562,8 @@ export class Machine {
   // result presentation toggles
   toggleFraction() {
     if (!this.result) return;
+    // Fractions and sexagesimals are real-value formats.
+    if (this.mode === 'CMPLX' && !isReal(this.result.z)) return;
     if (this.result.view === 'frac') { this.result.view = 'normal'; return; }
     this.result.improper = this.setup.frac === 'd/c';
     if (formatFraction(this.result.z.re, this.result.improper)) this.result.view = 'frac';
@@ -563,6 +571,7 @@ export class Machine {
 
   toggleImproper() {
     if (this.screen !== 'result' || !this.result) return;
+    if (this.mode === 'CMPLX' && !isReal(this.result.z)) return;
     const next = this.result.view === 'frac' ? !this.result.improper : this.setup.frac !== 'd/c';
     if (formatFraction(this.result.z.re, next)) {
       this.result.view = 'frac';
@@ -572,6 +581,7 @@ export class Machine {
 
   toggleDms() {
     if (this.screen !== 'result' || !this.result) return;
+    if (this.mode === 'CMPLX' && !isReal(this.result.z)) return;
     this.result.view = this.result.view === 'dms' ? 'normal' : 'dms';
   }
 
@@ -579,6 +589,7 @@ export class Machine {
   // press only normalises, unless the value is already a valid engineering
   // form (mantissa 1 to 999 at exponent 0), in which case it shifts at once.
   engShift(dir) {
+    if (this.mode === 'CMPLX') return;
     if (this.screen !== 'result' || !this.result) return;
     const x = this.result.z.re;
     if (x === 0) return;
@@ -591,9 +602,18 @@ export class Machine {
     this.result.engExp -= 3 * dir;
   }
 
+  // Re⇔Im only has meaning while a complex result is displayed; the guide
+  // turns R⇔I on for exactly those results.
   toggleReIm() {
-    if (!this.result) return;
+    if (this.screen !== 'result' || !this.result) return;
+    if (isReal(this.result.z)) return;
     this.result.part = this.result.part ? 0 : 1;
+  }
+
+  /** True when a complex result is being shown in its r∠θ form. */
+  polarResult(res) {
+    return res.forceFormat === 'polar' ||
+      (this.setup.cplx === 'r∠θ' && res.forceFormat !== 'rect');
   }
 
   convertResult() {
@@ -664,6 +684,7 @@ export class Machine {
     this.formula = null;
     this.statBrowse = null;
     if (m === this.mode && m !== 'REG') { this.clearEntry(); return; }
+    if (this.mode === 'CMPLX' && m !== 'CMPLX') this.ans = C(this.ans.re);
     this.mode = m;
     this.stat.clear();
     this.fvars = {};
@@ -1444,8 +1465,11 @@ export class Machine {
     ind.add({ Deg: 'D', Rad: 'R', Gra: 'G' }[this.setup.angle]);
     if (this.setup.disp === 'Fix') ind.add('FIX');
     if (this.setup.disp === 'Sci') ind.add('SCI');
-    if (this.mode === 'CMPLX' && this.result && !isReal(this.result.z)) ind.add('R⇔I');
-    if (this.mode === 'CMPLX' && this.result && this.result.part === 1) ind.add('i');
+    if (this.mode === 'CMPLX' && this.result && !isReal(this.result.z)) {
+      ind.add('R⇔I');
+      // The imaginary part carries the i symbol; a polar θ carries the ∠ symbol.
+      if (this.result.part === 1) ind.add(this.polarResult(this.result) ? '∠' : 'i');
+    }
 
     const lowInputMemory = this.screen === 'input' && INPUT_BYTES - bytesOf(this.tokens) <= 8;
     const base = {
@@ -1650,9 +1674,7 @@ export class Machine {
     let x = z.re;
     let left = '';
     if (this.mode === 'CMPLX' && !isReal(z)) {
-      const polar = (res.forceFormat === 'polar') ||
-        (this.setup.cplx === 'r∠θ' && res.forceFormat !== 'rect');
-      if (polar) {
+      if (this.polarResult(res)) {
         const r = Math.hypot(z.re, z.im);
         const th = Math.atan2(z.im, z.re) /
           { Deg: Math.PI / 180, Rad: 1, Gra: Math.PI / 200 }[this.setup.angle];

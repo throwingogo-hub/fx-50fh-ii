@@ -478,6 +478,116 @@ t('Abs(2+2i)', '[MODE]2@)2+2#[ENG])=', '2.828427125');
 t('arg(2+2i)', '[MODE]2@(2+2#[ENG])=', '45');
 t('1+1i in polar', '[MODE]2@[MODE][RIGHT][RIGHT][RIGHT]2' + '1+1#[ENG]=', '1.414213562');
 
+// The CMPLX chapter of the guide, plus the places where a complex value has to
+// stay exact: sqrt of a negative real, integer powers of i, and right angles.
+function complexParts(m) {
+  const real = shown(m);
+  send(m, '@[EXE]');
+  return [real, shown(m)];
+}
+{
+  const m = new Machine();
+  send(m, '[MODE]2[SQRT]0-1)=');
+  check('sqrt(-1) shows the real part 0', shown(m), '0');
+  check('sqrt(-1) lights R⇔I', m.view().indicators.has('R⇔I'), true);
+  check('sqrt(-1) does not light i on the real part', m.view().indicators.has('i'), false);
+  send(m, '@[EXE]');
+  check('sqrt(-1) imaginary part is 1', shown(m), '1');
+  check('sqrt(-1) lights i on the imaginary part', m.view().indicators.has('i'), true);
+}
+{
+  const m = new Machine();
+  send(m, '[MODE]2[SQRT]0-4)=');
+  check('sqrt(-4) is 2i', complexParts(m).join(','), '0,2');
+}
+t('sqrt(-2) keeps ten digits', '[MODE]2[SQRT]0-2)=@[EXE]', '1.414213562');
+te('sqrt of a complex argument is not supported', '[MODE]2[SQRT]3+4#[ENG])=', 'Math ERROR');
+te('sqrt(-1) stays a Math ERROR outside CMPLX', '[MODE]1[SQRT]0-1)=', 'Math ERROR');
+{
+  const m = new Machine();
+  send(m, '[MODE]2#[ENG][POW]3)=');
+  check('i^3 is -i, real part', complexParts(m).join(','), '0,-1');
+}
+{
+  const m = new Machine();
+  send(m, '[MODE]2(1+#[ENG])[POW]2)=');
+  check('(1+i)^2 is 2i without residue', complexParts(m).join(','), '0,2');
+}
+{
+  const m = new Machine();
+  send(m, '[MODE]2(1+#[ENG])[POW]3)=');
+  check('(1+i)^3 is -2+2i', complexParts(m).join(','), '-2,2');
+}
+{
+  const m = new Machine();
+  send(m, '[MODE]2#[ENG][SQR]=');
+  check('i^2 is the real -1', shown(m), '-1');
+  check('a real result does not light R⇔I', m.view().indicators.has('R⇔I'), false);
+  send(m, '@[EXE]');
+  check('Re⇔Im does nothing to a real result', shown(m), '-1');
+}
+{
+  const m = new Machine();
+  send(m, '[MODE]25@[NEG]90=');
+  check('5∠90 is 5i', complexParts(m).join(','), '0,5');
+}
+{
+  const m = new Machine();
+  send(m, '[MODE]25@[NEG]180=');
+  check('5∠180 collapses to the real -5', shown(m), '-5');
+  check('a collapsed angle clears R⇔I', m.view().indicators.has('R⇔I'), false);
+}
+{
+  const m = new Machine();
+  send(m, '[MODE]25@[NEG]30=');
+  check('5∠30 real part', shown(m), '4.330127019');
+  send(m, '@[EXE]');
+  check('5∠30 imaginary part', shown(m), '2.5');
+}
+t('(-1)^0.5 is i in CMPLX', '[MODE]2(0-1)[POW]0.5)=@[EXE]', '1');
+te('(-1)^0.5 stays a Math ERROR outside CMPLX', '[MODE]1(0-1)[POW]0.5)=', 'Math ERROR');
+{
+  // Polar display: r first, then θ with the ∠ symbol rather than i.
+  const m = new Machine();
+  send(m, '[MODE]2@[MODE][RIGHT][RIGHT][RIGHT]2' + '1+1#[ENG]=@[EXE]');
+  check('polar θ shows 45', shown(m), '45');
+  check('polar θ lights ∠', m.view().indicators.has('∠'), true);
+  check('polar θ does not light i', m.view().indicators.has('i'), false);
+  send(m, '@[SUB]=');
+  check('▶a+bi overrides the polar default', shown(m), '1');
+  send(m, '@[EXE]');
+  check('▶a+bi puts the i symbol back', m.view().indicators.has('i'), true);
+}
+{
+  // ENG is not available in CMPLX mode (guide p. E-25).
+  const m = new Machine();
+  send(m, '[MODE]21' + '234=');
+  send(m, '[ENG]');
+  check('ENG leaves a CMPLX result alone', shown(m), '1234');
+}
+{
+  // The imaginary part of Ans is cleared on leaving CMPLX (guide p. E-15).
+  const m = new Machine();
+  send(m, '[MODE]21+2#[ENG]=');
+  send(m, '[MODE]1' + '[ANS]=');
+  check('Ans loses its imaginary part outside CMPLX', shown(m), '1');
+}
+{
+  const m = new Machine();
+  send(m, '[MODE]21+2#[ENG]=@[SUB]=');
+  check('▶a+bi keeps both parts in Ans', complexParts(m).join(','), '1,2');
+}
+{
+  // A replayed complex result starts again from its real part.
+  const m = new Machine();
+  send(m, '[MODE]21+2#[ENG]=@[EXE]');
+  send(m, '[AC][UP]');
+  check('history replay starts at the real part', shown(m), '1');
+  check('history replay keeps R⇔I', m.view().indicators.has('R⇔I'), true);
+  send(m, '@[EXE]');
+  check('history replay can show the imaginary part', shown(m), '2');
+}
+
 // ---- statistics -------------------------------------------------------------
 {
   const m = new Machine();
@@ -708,7 +818,10 @@ for (let i = 0; i < CONSTANTS.length; i++) {
     '5,nCr,2,:,5,nPr,2');
 }
 {
-  const guide = readFileSync(new URL('../programs.md', import.meta.url), 'utf8');
+  // Normalise the checklist to LF: a Windows checkout converts line endings,
+  // and the code fences must match regardless of the working copy.
+  const guide = readFileSync(new URL('../programs.md', import.meta.url), 'utf8')
+    .replace(/\r\n/g, '\n');
   const starts = [...guide.matchAll(/^## (P[1-4]|Extra [A-N])[^\n]*\((\d+)B\)/gm)];
   check('program guide exposes byte counts for all 16 curated programs', starts.length, 16);
   check('canonical program catalog exposes all 16 curated programs', PROGRAMS.length, 16);

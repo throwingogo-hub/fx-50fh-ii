@@ -42,6 +42,17 @@ Everything the keyboard is printed with is implemented:
   `nCr`, `Rnd(`, `Pol(` and `Rec(` — with `Pol`/`Rec` writing their second
   result into `Y`, as they do on the unit.
 - **Percent** in all six of the guide's forms, including `Ans − Ans × 20%`.
+- **Complex numbers** — `i`, `a+bi` and `r∠θ` entry and display, `Conjg`,
+  `Abs`, `arg`, `▶a+bi` and `▶r∠θ`, with the `R⇔I` symbol lit on every
+  complex result and `Re⇔Im` (`SHIFT EXE`) toggling between the real part and
+  the imaginary part `i` — or, in polar format, between `r` and `θ` under the
+  `∠` symbol. Complex results keep Casio's precision: an integer power is
+  repeated multiplication, so `i³` is `-i` and `(1+i)²` is `2i` with no
+  trigonometric residue, right angles such as `5∠90` land exactly on an axis,
+  and `√(-4)` is `2i`. As the guide requires, `√(`, `^(` and `∛(` work in
+  CMPLX but refuse a complex argument, `sin`/`cos`/`tan`, `log`/`ln`, `x!`,
+  `nPr` and `nCr` refuse complex arguments, `ENG` is unavailable in CMPLX,
+  and the imaginary part of `Ans` is dropped on leaving the mode.
 - **Display settings** — `Fix`, `Sci`, `Norm1`/`Norm2`, `ENG` and `←ENG`,
   angle unit, fraction format, complex format, statistical frequency.
 - **Memory** — `Ans`, independent memory `M`, and variables `A B C D X Y`.
@@ -91,7 +102,8 @@ checkout can use any static-file server.
 
 ## Tests
 
-395 checks, including worked examples, operating limits, REPLAY/history
+428 checks, including the guide's CMPLX chapter and complex-number edge
+cases, worked examples, operating limits, REPLAY/history
 navigation, Program Studio text/recovery/backup, all 16 catalog programs and
 their documented branches, generated-guide parity, and exhaustive LCD menu-layout/glyph coverage derived from the user's guide, driven
 through the machine by key sequence rather than by calling the maths directly —

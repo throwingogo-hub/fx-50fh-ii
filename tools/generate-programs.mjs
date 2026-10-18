@@ -4,6 +4,8 @@ import { pathToFileURL } from 'node:url';
 
 const root = resolve(process.cwd());
 const { parseProgramText } = await import(pathToFileURL(resolve(root, 'js/program-codec.js')));
+// The checkout may use CRLF on Windows; every comparison and render is LF.
+const read = (path) => readFileSync(path, 'utf8').replace(/\r\n/g, '\n');
 const guidePath = resolve(root, 'programs.md');
 const catalogPath = resolve(root, 'programs.catalog.json');
 const runtimePath = resolve(root, 'js/program-catalog.generated.js');
@@ -55,7 +57,7 @@ function getExample(body) {
 }
 
 function bootstrap() {
-  const guide = readFileSync(guidePath, 'utf8');
+  const guide = read(guidePath);
   const starts = [...guide.matchAll(/^## (P[1-4]|Extra [A-N]) — (.+?) \((\d+)B\)$/gm)];
   if (starts.length !== 16) throw new Error(`expected 16 curated program sections, found ${starts.length}`);
   const prefix = guide.slice(0, starts[0].index);
@@ -90,7 +92,7 @@ function bootstrap() {
 }
 
 function loadCatalog() {
-  const catalog = JSON.parse(readFileSync(catalogPath, 'utf8'));
+  const catalog = JSON.parse(read(catalogPath));
   if (catalog.version !== 1 || catalog.programs?.length !== 16) throw new Error('invalid program catalog');
   const ids = new Set();
   for (const program of catalog.programs) {
@@ -128,7 +130,7 @@ function generate(checkOnly = false) {
   const catalog = loadCatalog();
   const outputs = [[guidePath, renderGuide(catalog)], [runtimePath, renderRuntime(catalog)]];
   if (checkOnly) {
-    const stale = outputs.filter(([path, next]) => readFileSync(path, 'utf8') !== next).map(([path]) => path);
+    const stale = outputs.filter(([path, next]) => read(path) !== next).map(([path]) => path);
     if (stale.length) throw new Error(`generated files are stale: ${stale.join(', ')}`);
     return;
   }
