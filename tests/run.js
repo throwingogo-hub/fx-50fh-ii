@@ -350,6 +350,17 @@ check('every hotspot stays inside the fitted shell', KEYS.every((key) =>
 // ---- basic arithmetic -------------------------------------------------------
 t('2×(5+4)−2×(−3)', '2*(5+4)-2*[NEG]3=', '24');
 t('2.5+1−2', '2.5+1-2=', '1.5');
+t('leading minus is a negative sign', '-5=', '-5');
+t('minus after an operator is a negative sign', '2+-3=', '-1');
+t('minus after an open parenthesis is a negative sign', '2*(-3)=', '-6');
+t('minus after a comma is a negative sign', '@[ADD]3,-4)=', '5');
+{
+  const m = new Machine();
+  m.setStudioProgram(0, 'CMPLX', parseProgramText(PROGRAM_BY_ID.get('P8').source, 'CMPLX').tokenIds);
+  m.runProgram(0);
+  send(m, '-1=');
+  check('a program prompt accepts a minus-key negative', m.vars.A, -1);
+}
 t('7×8−4×5', '7*8-4*5=', '36');
 t('(2+3)×(4−1 with open paren', '(2+3)*(4-1=', '15');
 t('sin 30', '[SIN]30)=', '0.5');

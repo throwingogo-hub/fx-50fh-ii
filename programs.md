@@ -38,8 +38,9 @@ When the display shows A?, B? or another variable prompt, type the requested
 value and press **EXE**. Each answer pauses on screen; press **EXE** again for the
 next one. The last value appears as the program ends.
 
-For a negative input on the physical calculator use the (-) key; an ordinary
-minus sign is fine in Program Studio and in the examples below.
+For a negative input on the physical calculator use the (-) key. On the web
+keypad the ordinary - key works as a negative sign too, both at a program
+prompt and on the calculation line.
 ## P1 — Quadratic: Vertex, Optimum and Roots (61B)
 
 **Use it to** Read the vertex, the optimum value and both real roots of any quadratic in one run.

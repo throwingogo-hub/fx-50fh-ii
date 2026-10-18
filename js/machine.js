@@ -366,10 +366,20 @@ export class Machine {
     return tok(map[base][h - 1]);
   }
 
+  // A minus typed where a value belongs is a negative sign, so "-5", "2+-3"
+  // and "2*(-3)" work straight from the keypad; between two values it stays
+  // subtraction. The display prints the same minus either way.
+  signedToken(t, prev) {
+    if (t.f !== 'sub') return t;
+    if (!prev || [K.OPEN, K.SEP, K.INFIX, K.POW, K.PRE, K.PROG].includes(prev.k)) return tok('neg');
+    return t;
+  }
+
   insertToken(t) {
     // While the program editor is open every token goes into the program.
     if (this.prog && this.prog.stage === 'edit') return this.progInsert(t);
     if (this.screen === 'result') this.startFromResult(t);
+    t = this.signedToken(t, this.tokens[this.cursor - 1]);
     // The input area is a fixed 99 bytes. Once full, further key operations are
     // ignored; Stack ERROR belongs to evaluation-stack overflow, not typing.
     if (bytesOf(this.tokens) + (t.b || 1) > INPUT_BYTES) return;
@@ -1326,6 +1336,7 @@ export class Machine {
 
   progInsert(t) {
     const p = this.prog;
+    t = this.signedToken(t, p.tokens[p.cursor - 1]);
     if (PROGRAM_MEMORY - this.programBytes() - (t.b || 1) < 0) { this.raise('Memory'); return; }
     p.tokens.splice(p.cursor, 0, t);
     p.cursor++;
@@ -1473,7 +1484,8 @@ export class Machine {
       }
       if (id === 'DEL') { if (st.edit) st.edit.pop(); return; }
       st.edit = st.edit || [];
-      const t = this.tokenFor(id, shift, alpha);
+      let t = this.tokenFor(id, shift, alpha);
+      if (t) t = this.signedToken(t, st.edit[st.edit.length - 1]);
       if (t && bytesOf(st.edit) + (t.b || 1) <= INPUT_BYTES) st.edit.push(t);
       return;
     }
