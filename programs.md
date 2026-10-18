@@ -1,13 +1,13 @@
 # S5 CASIO fx-50FH program set
 
-These are the seven programs from the S5 program list, plus a complex-number
-variant of Program 2. They are available in the web calculator's
+These are the seven programs from the S5 program list, plus complex-number
+variant of Programs 2 and 5. They are available in the web calculator's
 **Program Studio → HKDSE Library**. Nothing installs automatically: a single
 program always asks for a destination slot, and an occupied slot or a pack
 needs a second confirmation before anything is replaced.
 
-Every heading shows the exact Program Studio byte count. The eight programs total
-**1226B**, more than the shared **680-byte** program memory, so install the ones
+Every heading shows the exact Program Studio byte count. The nine programs total
+**1427B**, more than the shared **680-byte** program memory, so install the ones
 you need or one of the ready-made packs.
 
 ## Install from the in-app Library
@@ -384,5 +384,60 @@ NOTE   Run the program in CMPLX mode — i is ALPHA ENG. Every coefficient may
 ?→Y
 (XC-BY)÷(XA-BD)→M◢
 C÷B-AM÷B
+```
+
+## P9 — Intersections of a Line and a Circle (Complex) (201B)
+
+**Use it to** Find where a line meets a circle, even when they do not meet in the real plane — the answers come back as a complex conjugate pair.
+
+**Input.** D, X, Y of the line Dx + Xy = Y, then C, B, A of x² + y² + Cx + By + A = 0.
+
+**Output.** x1, y1, x2, y2. Complex answers show the real part first and the imaginary part after SHIFT EXE.
+
+### Example
+
+```text
+Where does x + y = 10 meet x² + y² = 25?
+
+TYPE   1  EXE   1  EXE   10  EXE   0  EXE   0  EXE   (-)25  EXE
+GET    5 + 3.535533906i   x1
+       5 - 3.535533906i   y1
+       5 - 3.535533906i   x2
+       5 + 3.535533906i   y2
+
+NOTE   The line misses the circle, so the intersections are a complex
+       conjugate pair. Each answer shows its real part first; SHIFT EXE
+       shows the imaginary part. A line that does meet the circle prints
+       real numbers exactly as the real line-circle program does:
+       1, 7, 40, -2, -4, -20 gives (5, 5) and (-2, 6).
+```
+
+### Copy
+
+```text
+?→D
+?→X
+?→Y
+?→C
+?→B
+?→A
+X=0⇒Goto 1
+Y²+CDY+AD²→A
+-2XY-CDX+BD²→B
+D²+X²→M
+(-B-√(B²-4AM))÷(2M)→C
+(Y-CX)÷D◢
+C◢
+(-B+√(B²-4AM))÷(2M)→C
+(Y-CX)÷D◢
+C◢
+Goto 2
+Lbl 1
+Y÷D→X◢
+C²-4(X²+BX+A)→M
+(-C+√(M))÷2◢
+X◢
+(-C-√(M))÷2◢
+Lbl 2
 ```
 

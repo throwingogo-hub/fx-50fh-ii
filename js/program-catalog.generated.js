@@ -150,6 +150,25 @@ export const PROGRAMS = Object.freeze([
     "example": "Solve  (1 + i)x + y = 2  and  x − y = i.\n\nTYPE   1+i  EXE   1  EXE   2  EXE   1  EXE   (-)1  EXE   i  EXE\nGET    1      x — a real number, so Re⇔Im shows 0\n       1      y, real part\n       -1     y, imaginary part (press SHIFT EXE)\n\nNOTE   Run the program in CMPLX mode — i is ALPHA ENG. Every coefficient may\n       be real or complex, and either answer may be complex. At a paused\n       answer, SHIFT EXE turns the display over to the imaginary part.\n       A zero determinant XA - BD gives Math ERROR.",
     "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\n(XC-BY)÷(XA-BD)→M◢\nC÷B-AM÷B",
     "bytes": 51
+  },
+  {
+    "id": "P9",
+    "title": "Intersections of a Line and a Circle (Complex)",
+    "mode": "CMPLX",
+    "category": "Coordinate",
+    "topics": [
+      "line circle",
+      "intersection",
+      "complex",
+      "conjugate",
+      "no real intersection"
+    ],
+    "summary": "The same line-and-circle solver as P5, but a line that misses the circle returns the complex conjugate intersections.",
+    "inputs": "D, X, Y of the line Dx + Xy = Y, then C, B, A of x² + y² + Cx + By + A = 0.",
+    "outputs": "x1, y1, x2, y2; complex answers show the real part first and Re-Im for the imaginary part.",
+    "example": "Where does x + y = 10 meet x² + y² = 25?\n\nTYPE   1  EXE   1  EXE   10  EXE   0  EXE   0  EXE   (-)25  EXE\nGET    5 + 3.535533906i   x1\n       5 - 3.535533906i   y1\n       5 - 3.535533906i   x2\n       5 + 3.535533906i   y2\n\nNOTE   The line misses the circle, so the intersections are a complex\n       conjugate pair. Each answer shows its real part first; SHIFT EXE\n       shows the imaginary part. A line that does meet the circle prints\n       real numbers exactly as the real line-circle program does:\n       1, 7, 40, -2, -4, -20 gives (5, 5) and (-2, 6).",
+    "source": "?→D\n?→X\n?→Y\n?→C\n?→B\n?→A\nX=0⇒Goto 1\nY²+CDY+AD²→A\n-2XY-CDX+BD²→B\nD²+X²→M\n(-B-√(B²-4AM))÷(2M)→C\n(Y-CX)÷D◢\nC◢\n(-B+√(B²-4AM))÷(2M)→C\n(Y-CX)÷D◢\nC◢\nGoto 2\nLbl 1\nY÷D→X◢\nC²-4(X²+BX+A)→M\n(-C+√(M))÷2◢\nX◢\n(-C-√(M))÷2◢\nLbl 2",
+    "bytes": 201
   }
 ]);
 
@@ -212,11 +231,11 @@ export const PROGRAM_PACKS = Object.freeze([
   {
     "id": "complex",
     "name": "Complex",
-    "description": "Complex simultaneous equations with the real solver, the cubic and line-circle intersections.",
+    "description": "Complex simultaneous equations and complex line-circle intersections, with the real solvers beside them.",
     "programIds": [
-      "P2",
-      "P3",
       "P5",
+      "P9",
+      "P2",
       "P8"
     ]
   }

@@ -89,6 +89,25 @@ function runCatalogProgram(id, inputs) {
 }
 
 
+/** Run a catalog program and keep both parts of every answer. */
+function runComplexProgram(id, inputs) {
+  const spec = PROGRAM_BY_ID.get(id);
+  const parsed = parseProgramText(spec.source, spec.mode);
+  const machine = new Machine();
+  machine.mode = spec.mode;
+  const run = new Program(spec.mode, parsed.tokens).start(machine);
+  const out = [];
+  let inputIndex = 0;
+  let state = run.step();
+  let guard = 0;
+  while (!state.done && guard++ < 10000) {
+    if (state.kind === 'input') run.provide(inputs[inputIndex++]);
+    else if (state.kind === 'output') { out.push([state.value.re, state.value.im]); run.resume(); }
+    state = run.step();
+  }
+  if (state.value) out.push([state.value.re, state.value.im]);
+  return out;
+}
 /** Same as runCatalogProgram, but returns the answer shown when the program ends. */
 function catalogFinal(id, inputs) {
   const spec = PROGRAM_BY_ID.get(id);
@@ -868,10 +887,10 @@ for (let i = 0; i < CONSTANTS.length; i++) {
   // and the code fences must match regardless of the working copy.
   const guide = readFileSync(new URL('../programs.md', import.meta.url), 'utf8')
     .replace(/\r\n/g, '\n');
-  const starts = [...guide.matchAll(/^## (P[1-8])[^\n]*\((\d+)B\)/gm)];
-  check('program guide exposes byte counts for all 8 library programs', starts.length, 8);
-  check('canonical program catalog exposes all 8 library programs', PROGRAMS.length, 8);
-  check('canonical program ids are unique', new Set(PROGRAMS.map(program => program.id)).size, 8);
+  const starts = [...guide.matchAll(/^## (P[1-9])[^\n]*\((\d+)B\)/gm)];
+  check('program guide exposes byte counts for all 9 library programs', starts.length, 9);
+  check('canonical program catalog exposes all 9 library programs', PROGRAMS.length, 9);
+  check('canonical program ids are unique', new Set(PROGRAMS.map(program => program.id)).size, 9);
   check('every catalog program has searchable metadata and an example', PROGRAMS.every(program =>
     program.title && program.category && program.summary && program.inputs && program.outputs && program.example && program.source), true);
   for (let i = 0; i < starts.length; i++) {
@@ -888,10 +907,10 @@ for (let i = 0; i < CONSTANTS.length; i++) {
     pack.programIds.length === 4 && pack.programIds.every(id => PROGRAM_BY_ID.has(id))), true);
   check('all recommended packs fit the authentic 680-byte memory', PROGRAM_PACKS.every(pack => packBytes(pack) <= 680), true);
   check('Core pack is 316 bytes', packBytes(PROGRAM_PACKS.find(pack => pack.id === 'core')), 316);
-  check('the catalog is the printed S5 set plus the complex solver', PROGRAMS.map(program => program.id).join(','), 'P1,P2,P3,P4,P5,P6,P7,P8');
+  check('the catalog is the printed S5 set plus the two complex solvers', PROGRAMS.map(program => program.id).join(','), 'P1,P2,P3,P4,P5,P6,P7,P8,P9');
   check('catalog search finds quadratic by topic', filterProgramCatalog('discriminant').map(program => program.id).join(','), 'P1');
-  check('catalog search finds the line-circle solver', filterProgramCatalog('line circle').map(program => program.id).join(','), 'P5');
-  check('catalog category filter isolates coordinate programs', filterProgramCatalog('', 'Coordinate').map(program => program.id).join(','), 'P4,P5,P6');
+  check('catalog search finds the line-circle solvers', filterProgramCatalog('line circle').map(program => program.id).join(','), 'P5,P9');
+  check('catalog category filter isolates coordinate programs', filterProgramCatalog('', 'Coordinate').map(program => program.id).join(','), 'P4,P5,P6,P9');
 }
 {
   const drafts = [
@@ -944,6 +963,20 @@ for (let i = 0; i < CONSTANTS.length; i++) {
     ['P6 ends on the circle constant', 'P6', [5, 2, 2, 3, 6, -5], -17]
   ];
   for (const [name, id, inputs, want] of finals) nearMany('program library final display: ' + name, [catalogFinal(id, inputs)], [want], 1e-8);
+
+  {
+    const cases = [
+      ['P9 real intersections', 'P9', [1, 7, 40, -2, -4, -20], [[5, 0], [5, 0], [-2, 0], [6, 0]]],
+      ['P9 complex conjugate intersections', 'P9', [1, 1, 10, 0, 0, -25],
+        [[5, 3.535533906], [5, -3.535533906], [5, -3.535533906], [5, 3.535533906]]]
+    ];
+    for (const [name, id, inputs, want] of cases) {
+      const got = runComplexProgram(id, inputs);
+      const ok = got.length >= want.length && want.every(([re, im], i) =>
+        Math.abs(got[i][0] - re) < 1e-6 && Math.abs(got[i][1] - im) < 1e-6);
+      check('program library: ' + name, ok, true);
+    }
+  }
 
   let p1Error = '';
   try { runCatalogProgram('P1', [1, 0, 1]); } catch (e) { p1Error = e.kind || e.message; }

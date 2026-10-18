@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "prefix": "# S5 CASIO fx-50FH program set\n\nThese are the seven programs from the S5 program list, plus a complex-number\nvariant of Program 2. They are available in the web calculator's\n**Program Studio → HKDSE Library**. Nothing installs automatically: a single\nprogram always asks for a destination slot, and an occupied slot or a pack\nneeds a second confirmation before anything is replaced.\n\nEvery heading shows the exact Program Studio byte count. The eight programs total\n**1226B**, more than the shared **680-byte** program memory, so install the ones\nyou need or one of the ready-made packs.\n\n## Install from the in-app Library\n\n1. Open Program Studio and choose **HKDSE Library**.\n2. Search by topic or choose a category.\n3. Select the destination P1-P4 slot, then press **Install**.\n4. If the slot already contains a program, confirm the replacement once more.\n5. For a complete setup, choose one of the memory-safe four-slot packs.\n\nProgram Studio keeps one-step Undo after a Library, pack or backup install. Use\n**Export all** to download a versioned JSON backup before larger changes.\n\n## Install manually\n\n1. Open Program Studio's **Editor** and select P1, P2, P3 or P4.\n2. Set **Run mode** to the mode printed beside that program (COMP for six of\n   the programs, CMPLX for P8 and REG for P7).\n3. Copy the entire matching code block below and paste it into **source**.\n4. Wait for **Structure OK**; the slot is saved automatically on this device.\n\n## Run a program\n\n- In Program Studio, select its slot and press **Run on calculator**; or\n- On the calculator home screen, press **Prog**, then 1, 2, 3 or 4.\n\nWhen the display shows A?, B? or another variable prompt, type the requested\nvalue and press **EXE**. Each answer pauses on screen; press **EXE** again for the\nnext one. The last value appears as the program ends.\n\nFor a negative input on the physical calculator use the (-) key. On the web\nkeypad the ordinary - key works as a negative sign too, both at a program\nprompt and on the calculation line.\n",
+  "prefix": "# S5 CASIO fx-50FH program set\n\nThese are the seven programs from the S5 program list, plus complex-number\nvariant of Programs 2 and 5. They are available in the web calculator's\n**Program Studio → HKDSE Library**. Nothing installs automatically: a single\nprogram always asks for a destination slot, and an occupied slot or a pack\nneeds a second confirmation before anything is replaced.\n\nEvery heading shows the exact Program Studio byte count. The nine programs total\n**1427B**, more than the shared **680-byte** program memory, so install the ones\nyou need or one of the ready-made packs.\n\n## Install from the in-app Library\n\n1. Open Program Studio and choose **HKDSE Library**.\n2. Search by topic or choose a category.\n3. Select the destination P1-P4 slot, then press **Install**.\n4. If the slot already contains a program, confirm the replacement once more.\n5. For a complete setup, choose one of the memory-safe four-slot packs.\n\nProgram Studio keeps one-step Undo after a Library, pack or backup install. Use\n**Export all** to download a versioned JSON backup before larger changes.\n\n## Install manually\n\n1. Open Program Studio's **Editor** and select P1, P2, P3 or P4.\n2. Set **Run mode** to the mode printed beside that program (COMP for six of\n   the programs, CMPLX for P8 and REG for P7).\n3. Copy the entire matching code block below and paste it into **source**.\n4. Wait for **Structure OK**; the slot is saved automatically on this device.\n\n## Run a program\n\n- In Program Studio, select its slot and press **Run on calculator**; or\n- On the calculator home screen, press **Prog**, then 1, 2, 3 or 4.\n\nWhen the display shows A?, B? or another variable prompt, type the requested\nvalue and press **EXE**. Each answer pauses on screen; press **EXE** again for the\nnext one. The last value appears as the program ends.\n\nFor a negative input on the physical calculator use the (-) key. On the web\nkeypad the ordinary - key works as a negative sign too, both at a program\nprompt and on the calculation line.\n",
   "packs": [
     {
       "id": "core",
@@ -60,11 +60,11 @@
     {
       "id": "complex",
       "name": "Complex",
-      "description": "Complex simultaneous equations with the real solver, the cubic and line-circle intersections.",
+      "description": "Complex simultaneous equations and complex line-circle intersections, with the real solvers beside them.",
       "programIds": [
-        "P2",
-        "P3",
         "P5",
+        "P9",
+        "P2",
         "P8"
       ]
     }
@@ -250,6 +250,29 @@
       "copyHeading": "Copy",
       "after": "\n\n",
       "guideBody": "**Use it to** Solve two simultaneous equations whose coefficients, or whose answers, are complex.\n\n**Input.** A, B, C of Ax + By = C then D, X, Y of Dx + Xy = Y; each value may be typed as a+bi.\n\n**Output.** x, then y. A complex answer shows its real part first; SHIFT EXE shows the imaginary part.\n\n### Example\n\n```text\nSolve  (1 + i)x + y = 2  and  x − y = i.\n\nTYPE   1+i  EXE   1  EXE   2  EXE   1  EXE   (-)1  EXE   i  EXE\nGET    1      x — a real number, so Re⇔Im shows 0\n       1      y, real part\n       -1     y, imaginary part (press SHIFT EXE)\n\nNOTE   Run the program in CMPLX mode — i is ALPHA ENG. Every coefficient may\n       be real or complex, and either answer may be complex. At a paused\n       answer, SHIFT EXE turns the display over to the imaginary part.\n       A zero determinant XA - BD gives Math ERROR.\n```"
+    },
+    {
+      "id": "P9",
+      "label": "P9",
+      "title": "Intersections of a Line and a Circle (Complex)",
+      "mode": "CMPLX",
+      "category": "Coordinate",
+      "topics": [
+        "line circle",
+        "intersection",
+        "complex",
+        "conjugate",
+        "no real intersection"
+      ],
+      "summary": "The same line-and-circle solver as P5, but a line that misses the circle returns the complex conjugate intersections.",
+      "inputs": "D, X, Y of the line Dx + Xy = Y, then C, B, A of x² + y² + Cx + By + A = 0.",
+      "outputs": "x1, y1, x2, y2; complex answers show the real part first and Re-Im for the imaginary part.",
+      "example": "Where does x + y = 10 meet x² + y² = 25?\n\nTYPE   1  EXE   1  EXE   10  EXE   0  EXE   0  EXE   (-)25  EXE\nGET    5 + 3.535533906i   x1\n       5 - 3.535533906i   y1\n       5 - 3.535533906i   x2\n       5 + 3.535533906i   y2\n\nNOTE   The line misses the circle, so the intersections are a complex\n       conjugate pair. Each answer shows its real part first; SHIFT EXE\n       shows the imaginary part. A line that does meet the circle prints\n       real numbers exactly as the real line-circle program does:\n       1, 7, 40, -2, -4, -20 gives (5, 5) and (-2, 6).",
+      "source": "?→D\n?→X\n?→Y\n?→C\n?→B\n?→A\nX=0⇒Goto 1\nY²+CDY+AD²→A\n-2XY-CDX+BD²→B\nD²+X²→M\n(-B-√(B²-4AM))÷(2M)→C\n(Y-CX)÷D◢\nC◢\n(-B+√(B²-4AM))÷(2M)→C\n(Y-CX)÷D◢\nC◢\nGoto 2\nLbl 1\nY÷D→X◢\nC²-4(X²+BX+A)→M\n(-C+√(M))÷2◢\nX◢\n(-C-√(M))÷2◢\nLbl 2",
+      "bytes": 201,
+      "copyHeading": "Copy",
+      "after": "\n\n",
+      "guideBody": "**Use it to** Find where a line meets a circle, even when they do not meet in the real plane — the answers come back as a complex conjugate pair.\n\n**Input.** D, X, Y of the line Dx + Xy = Y, then C, B, A of x² + y² + Cx + By + A = 0.\n\n**Output.** x1, y1, x2, y2. Complex answers show the real part first and the imaginary part after SHIFT EXE.\n\n### Example\n\n```text\nWhere does x + y = 10 meet x² + y² = 25?\n\nTYPE   1  EXE   1  EXE   10  EXE   0  EXE   0  EXE   (-)25  EXE\nGET    5 + 3.535533906i   x1\n       5 - 3.535533906i   y1\n       5 - 3.535533906i   x2\n       5 + 3.535533906i   y2\n\nNOTE   The line misses the circle, so the intersections are a complex\n       conjugate pair. Each answer shows its real part first; SHIFT EXE\n       shows the imaginary part. A line that does meet the circle prints\n       real numbers exactly as the real line-circle program does:\n       1, 7, 40, -2, -4, -20 gives (5, 5) and (-2, 6).\n```"
     }
   ]
 }
