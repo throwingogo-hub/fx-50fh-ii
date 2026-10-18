@@ -1,12 +1,13 @@
 # S5 CASIO fx-50FH program set
 
-These are the seven programs from the S5 program list, available in the web
-calculator's **Program Studio → HKDSE Library**. Nothing installs automatically:
-a single program always asks for a destination slot, and an occupied slot or a
-pack needs a second confirmation before anything is replaced.
+These are the seven programs from the S5 program list, plus a complex-number
+variant of Program 2. They are available in the web calculator's
+**Program Studio → HKDSE Library**. Nothing installs automatically: a single
+program always asks for a destination slot, and an occupied slot or a pack
+needs a second confirmation before anything is replaced.
 
-Every heading shows the exact Program Studio byte count. The seven programs total
-**1175B**, more than the shared **680-byte** program memory, so install the ones
+Every heading shows the exact Program Studio byte count. The eight programs total
+**1226B**, more than the shared **680-byte** program memory, so install the ones
 you need or one of the ready-made packs.
 
 ## Install from the in-app Library
@@ -24,7 +25,7 @@ Program Studio keeps one-step Undo after a Library, pack or backup install. Use
 
 1. Open Program Studio's **Editor** and select P1, P2, P3 or P4.
 2. Set **Run mode** to the mode printed beside that program (COMP for six of
-   the programs, REG for P7).
+   the programs, CMPLX for P8 and REG for P7).
 3. Copy the entire matching code block below and paste it into **source**.
 4. Wait for **Structure OK**; the slot is saved automatically on this device.
 
@@ -345,5 +346,42 @@ Rec(X,Y)
 Σy-2Y◢
 X◢
 Y◢
+```
+
+## P8 — Simultaneous Equations (Complex) (51B)
+
+**Use it to** Solve two simultaneous equations whose coefficients, or whose answers, are complex.
+
+**Input.** A, B, C of Ax + By = C then D, X, Y of Dx + Xy = Y; each value may be typed as a+bi.
+
+**Output.** x, then y. A complex answer shows its real part first; SHIFT EXE shows the imaginary part.
+
+### Example
+
+```text
+Solve  (1 + i)x + y = 2  and  x − y = i.
+
+TYPE   1+i  EXE   1  EXE   2  EXE   1  EXE   (-)1  EXE   i  EXE
+GET    1      x — a real number, so Re⇔Im shows 0
+       1      y, real part
+       -1     y, imaginary part (press SHIFT EXE)
+
+NOTE   Run the program in CMPLX mode — i is ALPHA ENG. Every coefficient may
+       be real or complex, and either answer may be complex. At a paused
+       answer, SHIFT EXE turns the display over to the imaginary part.
+       A zero determinant XA - BD gives Math ERROR.
+```
+
+### Copy
+
+```text
+?→A
+?→B
+?→C
+?→D
+?→X
+?→Y
+(XC-BY)÷(XA-BD)→M◢
+C÷B-AM÷B
 ```
 

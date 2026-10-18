@@ -182,7 +182,7 @@ check('every hotspot stays inside the fitted shell', KEYS.every((key) =>
   check('Program Studio exposes versioned backup controls',
     html.includes('data-studio-action="export-backup"') && html.includes('data-studio-action="import-backup"'), true);
   check('mobile column layout cancels the desktop Studio flex basis',
-    /@media \(max-width: 820px\)[\s\S]*?#studio \{ flex: none; margin-top: 0; \}/.test(css), true);
+    /@media \(max-width: 820px\)[\s\S]*?#studio \{ flex: none; margin-top: 0; width: 100%; max-width: 720px; \}/.test(css), true);
 }
 
 // ---- shared LCD menu layout ------------------------------------------------
@@ -842,10 +842,10 @@ for (let i = 0; i < CONSTANTS.length; i++) {
   // and the code fences must match regardless of the working copy.
   const guide = readFileSync(new URL('../programs.md', import.meta.url), 'utf8')
     .replace(/\r\n/g, '\n');
-  const starts = [...guide.matchAll(/^## (P[1-7])[^\n]*\((\d+)B\)/gm)];
-  check('program guide exposes byte counts for all 7 S5 programs', starts.length, 7);
-  check('canonical program catalog exposes all 7 S5 programs', PROGRAMS.length, 7);
-  check('canonical program ids are unique', new Set(PROGRAMS.map(program => program.id)).size, 7);
+  const starts = [...guide.matchAll(/^## (P[1-8])[^\n]*\((\d+)B\)/gm)];
+  check('program guide exposes byte counts for all 8 library programs', starts.length, 8);
+  check('canonical program catalog exposes all 8 library programs', PROGRAMS.length, 8);
+  check('canonical program ids are unique', new Set(PROGRAMS.map(program => program.id)).size, 8);
   check('every catalog program has searchable metadata and an example', PROGRAMS.every(program =>
     program.title && program.category && program.summary && program.inputs && program.outputs && program.example && program.source), true);
   for (let i = 0; i < starts.length; i++) {
@@ -862,7 +862,7 @@ for (let i = 0; i < CONSTANTS.length; i++) {
     pack.programIds.length === 4 && pack.programIds.every(id => PROGRAM_BY_ID.has(id))), true);
   check('all recommended packs fit the authentic 680-byte memory', PROGRAM_PACKS.every(pack => packBytes(pack) <= 680), true);
   check('Core pack is 316 bytes', packBytes(PROGRAM_PACKS.find(pack => pack.id === 'core')), 316);
-  check('the catalog is exactly the printed S5 set', PROGRAMS.map(program => program.id).join(','), 'P1,P2,P3,P4,P5,P6,P7');
+  check('the catalog is the printed S5 set plus the complex solver', PROGRAMS.map(program => program.id).join(','), 'P1,P2,P3,P4,P5,P6,P7,P8');
   check('catalog search finds quadratic by topic', filterProgramCatalog('discriminant').map(program => program.id).join(','), 'P1');
   check('catalog search finds the line-circle solver', filterProgramCatalog('line circle').map(program => program.id).join(','), 'P5');
   check('catalog category filter isolates coordinate programs', filterProgramCatalog('', 'Coordinate').map(program => program.id).join(','), 'P4,P5,P6');
@@ -924,6 +924,39 @@ for (let i = 0; i < CONSTANTS.length; i++) {
   check('P1 raises Math ERROR when the roots are not real', p1Error, 'Math');
   nearMany('program library: P1 accepts a negative coefficient through the keyboard',
     runCatalogProgramWithKeys('P1', ['1', '2', '[NEG]15']), [-1, -16, 3], 1e-8);
+}
+{
+  // The complex solver accepts a+bi at every prompt and returns complex roots.
+  const spec = PROGRAM_BY_ID.get('P8');
+  const parsed = parseProgramText(spec.source, spec.mode);
+  const machine = new Machine();
+  machine.setStudioProgram(0, 'CMPLX', parsed.tokenIds);
+  machine.runProgram(0);
+  const feed = (text) => send(machine, text + '=');
+  feed('1+#' + '[ENG]');   // A = 1+i
+  feed('1');               // B
+  feed('2');               // C
+  feed('1');               // D
+  feed('[NEG]1');          // X
+  feed('#' + '[ENG]');     // Y = i
+  check('P8 pauses on x', machine.view().line2, '1');
+  send(machine, '=');
+  check('P8 finishes on the real part of y', machine.view().line2, '1');
+  check('P8 flags a complex answer', machine.view().indicators.has('R⇔I'), true);
+  send(machine, '@[EXE]');
+  check('P8 shows the imaginary part of y', machine.view().line2, '-1');
+  check('P8 lights the i indicator', machine.view().indicators.has('i'), true);
+  check('P8 keeps complex variables in memory', typeof machine.vars.A === 'object' && machine.vars.A.im === 1, true);
+}
+{
+  // STO and RCL carry a complex value through variable memory.
+  const machine = new Machine();
+  send(machine, '[MODE]2' + '1+2#[ENG]=@[RCL][NEG]');
+  check('STO keeps the imaginary part', typeof machine.vars.A, 'object');
+  send(machine, '@[RCL][NEG]');
+  check('RCL shows the real part', machine.view().line2, '1');
+  send(machine, '@[EXE]');
+  check('RCL shows the imaginary part', machine.view().line2, '2');
 }
 
 {

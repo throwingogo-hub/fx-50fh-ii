@@ -450,7 +450,11 @@ export function setupProgramStudio(machine, onMachineChange) {
       slots.className = 'pack-slots';
       pack.programIds.forEach((id, slot) => {
         const tag = document.createElement('span');
-        tag.textContent = `${slotName(slot)} · ${id}`;
+        const slotLabel = document.createElement('b');
+        slotLabel.textContent = slotName(slot);
+        const programLabel = document.createElement('i');
+        programLabel.textContent = id;
+        tag.append(slotLabel, programLabel);
         slots.appendChild(tag);
       });
       const footer = document.createElement('footer');

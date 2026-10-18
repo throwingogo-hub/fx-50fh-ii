@@ -4,7 +4,7 @@
 // resumable state machine so that "?" input prompts and "◢" output pauses can
 // hand control back to the keyboard between steps.
 
-import { parse, evaluate, CalcError, C, r15 } from './expr.js';
+import { parse, evaluate, CalcError, C, r15, asZ, asNum, storeZ } from './expr.js';
 import { K, textOf, bytesOf } from './tokens.js';
 
 export const PROGRAM_MEMORY = 680;
@@ -124,8 +124,8 @@ export class Run {
 
   provide(value) {
     if (!this.waiting || this.waiting.kind !== 'input') err('Syntax');
-    this.m.vars[this.waiting.varName] = r15(value);
-    this.last = C(r15(value));
+    this.m.vars[this.waiting.varName] = storeZ(asZ(value));
+    this.last = asZ(this.m.vars[this.waiting.varName]);
     this.waiting = null;
     this.pc++;
   }
@@ -243,8 +243,8 @@ export class Run {
       const target = toks[arrow + 1];
       if (!target || !target.v) err('Syntax');
       const v = this.evalTokens(toks.slice(0, arrow));
-      this.m.vars[target.v] = r15(v.re);
-      this.last = C(this.m.vars[target.v]);
+      this.m.vars[target.v] = storeZ(v);
+      this.last = asZ(this.m.vars[target.v]);
       this.m.ans = this.last;
       const rest = toks.slice(arrow + 2);
       if (rest.length) return this.exec({ toks: rest, pause: false });
@@ -255,7 +255,7 @@ export class Run {
     const tail = toks[toks.length - 1];
     if (tail && (tail.c === 'M+' || tail.c === 'M-')) {
       const v = this.evalTokens(toks.slice(0, -1));
-      const next = this.m.vars.M + (tail.c === 'M+' ? 1 : -1) * v.re;
+      const next = asNum(this.m.vars.M) + (tail.c === 'M+' ? 1 : -1) * v.re;
       if (!Number.isFinite(next) || Math.abs(next) >= 1e100) err('Math');
       this.m.vars.M = r15(next);
       this.last = v;
@@ -309,7 +309,7 @@ export class Run {
     while (this.loops.length && this.loops[this.loops.length - 1].body !== startIdx) this.loops.pop();
     const f = this.loops[this.loops.length - 1];
     if (!f) err('Syntax');
-    const v = this.m.vars[f.varName] + f.step;
+    const v = asNum(this.m.vars[f.varName]) + f.step;
     this.m.vars[f.varName] = r15(v);
     if ((f.step > 0 && v <= f.to) || (f.step < 0 && v >= f.to)) {
       this.pc = f.body;

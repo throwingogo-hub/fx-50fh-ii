@@ -6,8 +6,9 @@ scientific calculator that the HKEAA approves for the HKDSE.
 **[Open the calculator →](https://throwingogo-hub.github.io/fx-50fh-ii/)**
 
 Program Studio includes a searchable, memory-aware **HKDSE Program Library**:
-the seven programs from the printed S5 list, five four-slot packs, protected
-installs, one-step undo and versioned export/import backup. The complete reference and
+the seven programs from the printed S5 list plus a complex-number simultaneous
+solver, six four-slot packs, protected installs, one-step undo and versioned
+export/import backup. The complete reference and
 manual-copy source remains in [programs.md](programs.md). A matching bilingual,
 print-ready edition is available as the
 [curated S5 Program Library PDF](output/pdf/fx-50fh-ii-s5-program-library.pdf).
@@ -52,7 +53,10 @@ Everything the keyboard is printed with is implemented:
   and `√(-4)` is `2i`. As the guide requires, `√(`, `^(` and `∛(` work in
   CMPLX but refuse a complex argument, `sin`/`cos`/`tan`, `log`/`ln`, `x!`,
   `nPr` and `nCr` refuse complex arguments, `ENG` is unavailable in CMPLX,
-  and the imaginary part of `Ans` is dropped on leaving the mode.
+  and the imaginary part of `Ans` is dropped on leaving the mode. Program
+  variables hold complex values too, so a CMPLX program can prompt for `a+bi`
+  and print a complex answer, with `SHIFT EXE` turning a paused answer over to
+  its imaginary part.
 - **Display settings** — `Fix`, `Sci`, `Norm1`/`Norm2`, `ENG` and `←ENG`,
   angle unit, fraction format, complex format, statistical frequency.
 - **Memory** — `Ans`, independent memory `M`, and variables `A B C D X Y`.
@@ -70,7 +74,7 @@ Everything the keyboard is printed with is implemented:
   command insertion, byte and structure checks, direct run/edit controls, and
   automatic on-device recovery for all four slots—including active key-editor drafts.
   Its HKDSE Library searches by topic, previews inputs/outputs/examples, installs
-  a program into an explicitly selected slot, confirms replacements, loads five
+  a program into an explicitly selected slot, confirms replacements, loads six
   memory-safe packs, and supports one-step undo plus versioned backup/restore.
 - **Errors** — `Math`, `Syntax`, `Stack`, `Arg`, `Go`, `Nesting`, `Memory` and
   `Data Full`,
@@ -102,7 +106,7 @@ checkout can use any static-file server.
 
 ## Tests
 
-379 checks, including the guide's CMPLX chapter and complex-number edge
+391 checks, including the guide's CMPLX chapter and complex-number edge
 cases, worked examples, operating limits, REPLAY/history
 navigation, Program Studio text/recovery/backup, all seven S5 programs and
 their documented examples, generated-guide parity, and exhaustive LCD menu-layout/glyph coverage derived from the user's guide, driven

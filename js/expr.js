@@ -30,6 +30,12 @@ export function r15(x) {
 }
 const rz = (z) => C(r15(z.re), r15(z.im));
 
+// Variables hold a plain number while they are real and a C pair once they are
+// complex, so real programs keep their exact integer arithmetic.
+export const asZ = (v) => (typeof v === 'number' ? C(v) : v);
+export const asNum = (v) => (typeof v === 'number' ? v : v.re);
+export const storeZ = (z) => (Math.abs(z.im) < 1e-300 ? r15(z.re) : C(r15(z.re), r15(z.im)));
+
 const cadd = (a, b) => C(a.re + b.re, a.im + b.im);
 const csub = (a, b) => C(a.re - b.re, a.im - b.im);
 const cmul = (a, b) => C(a.re * b.re - a.im * b.im, a.re * b.im + a.im * b.re);
@@ -488,7 +494,7 @@ function valueOf(t, ctx) {
     if (ctx.mode !== 'CMPLX') err('Syntax');
     return C(0, 1);
   }
-  if (t.v) return C(ctx.vars[t.v] || 0);
+  if (t.v) return asZ(ctx.vars[t.v] || 0);
   if (t.sci) return C(ctx.sci(t.sci));
   if (t.fv) return C(ctx.fvars ? (ctx.fvars[t.fv] || 0) : 0);
   if (t.stat) return C(ctx.stat(t.stat));

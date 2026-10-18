@@ -2,7 +2,7 @@
 // calculation history, statistics entry, built-in formulas and program mode.
 
 import { tok, bytesOf, textOf, K, registerConstants } from './tokens.js';
-import { parse, evaluate, CalcError, C, isReal, r15 } from './expr.js';
+import { parse, evaluate, CalcError, C, isReal, r15, asZ, asNum, storeZ } from './expr.js';
 import { formatReal, formatEng, formatFraction, formatDms, formatBase } from './format.js';
 import { CONSTANTS, CONST_BY_KEY, CONST_PAGES } from './consts.js';
 import { FORMULAS, formulaTitle } from './formulas.js';
@@ -527,20 +527,20 @@ export class Machine {
 
   storeTo(v) {
     let value;
-    if (this.screen === 'result' && this.result) value = this.result.z.re;
+    if (this.screen === 'result' && this.result) value = this.result.z;
     else if (this.tokens.length) {
-      value = evaluate(parse(this.tokens, this.ctx()), this.ctx()).re;
-    } else value = this.ans.re;
-    this.vars[v] = r15(value);
-    this.ans = C(this.vars[v]);
-    this.result = { z: C(this.vars[v]), view: 'normal', engShift: 0, part: 0 };
+      value = evaluate(parse(this.tokens, this.ctx()), this.ctx());
+    } else value = this.ans;
+    this.vars[v] = storeZ(value);
+    this.ans = asZ(this.vars[v]);
+    this.result = { z: this.ans, view: 'normal', engShift: 0, part: 0 };
     this.screen = 'result';
   }
 
   recallFrom(v) {
-    const value = this.vars[v] || 0;
-    this.ans = C(value);
-    this.result = { z: C(value), view: 'normal', engShift: 0, part: 0 };
+    const value = asZ(this.vars[v] || 0);
+    this.ans = value;
+    this.result = { z: value, view: 'normal', engShift: 0, part: 0 };
     this.tokens = [];
     this.cursor = 0;
     this.screen = 'result';
@@ -551,7 +551,7 @@ export class Machine {
     if (this.screen === 'result' && this.result) value = this.result.z.re;
     else if (this.tokens.length) value = evaluate(parse(this.tokens, this.ctx()), this.ctx()).re;
     else value = this.ans.re;
-    const next = this.vars.M + sign * value;
+    const next = asNum(this.vars.M) + sign * value;
     if (!Number.isFinite(next) || Math.abs(next) >= 1e100) throw new CalcError('Math');
     this.vars.M = r15(next);
     this.result = { z: C(value), view: 'normal', engShift: 0, part: 0 };
@@ -1397,7 +1397,7 @@ export class Machine {
     const savedMode = this.mode;
     this.mode = prog.mode;
     const run = prog.start(this);
-    this.prog = { stage: 'running', slot, run, savedMode };
+    this.prog = { stage: 'running', slot, run, savedMode, mode: prog.mode };
     this.stepProgram();
   }
 
@@ -1415,7 +1415,10 @@ export class Machine {
       throw e;
     }
     if (out.done) {
-      this.mode = p.savedMode;
+      // A CMPLX program that ends on a complex answer stays in CMPLX so the
+      // answer keeps its R⇔I / Re⇔Im behaviour.
+      const keepCmplx = p.mode === 'CMPLX' && out.value && !isReal(out.value);
+      this.mode = keepCmplx ? 'CMPLX' : p.savedMode;
       this.prog = null;
       this.result = out.value ? { z: out.value, view: 'normal', engShift: 0, part: 0 } : this.result;
       this.screen = this.result ? 'result' : 'input';
@@ -1432,8 +1435,8 @@ export class Machine {
     if (st.kind === 'input') {
       if (id === 'EXE') {
         const v = st.edit && st.edit.length
-          ? evaluate(parse(st.edit, this.ctx()), this.ctx()).re
-          : (this.vars[st.varName] || 0);
+          ? evaluate(parse(st.edit, this.ctx()), this.ctx())
+          : asZ(this.vars[st.varName] || 0);
         p.run.provide(v);
         return this.stepProgram();
       }
@@ -1444,6 +1447,12 @@ export class Machine {
       return;
     }
     if (st.kind === 'output') {
+      // A complex answer can be turned over to its imaginary part while the
+      // program waits for EXE, just as a finished result can.
+      if (shift && this.mode === 'CMPLX' && st.value && !isReal(st.value)) {
+        st.part = st.part ? 0 : 1;
+        return;
+      }
       if (id === 'EXE') { p.run.resume(); return this.stepProgram(); }
     }
   }
@@ -1455,7 +1464,7 @@ export class Machine {
     const ind = new Set();
     if (this.shift) ind.add('S');
     if (this.alpha) ind.add('A');
-    if (this.vars.M) ind.add('M');
+    if (asNum(this.vars.M)) ind.add('M');
     if (this.pending === 'sto') ind.add('STO');
     if (this.pending === 'rcl') ind.add('RCL');
     if (this.mode === 'SD') ind.add('SD');
@@ -1469,6 +1478,11 @@ export class Machine {
       ind.add('R⇔I');
       // The imaginary part carries the i symbol; a polar θ carries the ∠ symbol.
       if (this.result.part === 1) ind.add(this.polarResult(this.result) ? '∠' : 'i');
+    }
+    if (this.mode === 'CMPLX' && this.screen === 'prog' && this.prog?.state?.kind === 'output'
+        && this.prog.state.value && !isReal(this.prog.state.value)) {
+      ind.add('R⇔I');
+      if (this.prog.state.part === 1) ind.add('i');
     }
 
     const lowInputMemory = this.screen === 'input' && INPUT_BYTES - bytesOf(this.tokens) <= 8;
@@ -1649,11 +1663,11 @@ export class Machine {
       if (st.kind === 'input') {
         return {
           line1: st.varName + '?',
-          line2: st.edit && st.edit.length ? textOf(st.edit) : this.fmtPlain(this.vars[st.varName] || 0)
+          line2: st.edit && st.edit.length ? textOf(st.edit) : this.fmtPlain(asNum(this.vars[st.varName] || 0))
         };
       }
       if (st.kind === 'output') {
-        const l2 = this.line2For({ z: st.value, view: 'normal', engShift: 0, part: 0 });
+        const l2 = this.line2For({ z: st.value, view: 'normal', engShift: 0, part: st.part || 0 });
         return { line1: st.text || '', line2: l2.main, exp: l2.exp, pause: true };
       }
     }

@@ -132,6 +132,24 @@ export const PROGRAMS = Object.freeze([
     "example": "Take the triangle with vertices O(0, 0), A(24, 0) and B(12, 9).\n\nTYPE   0  EXE   0  EXE   24  EXE   0  EXE   12  EXE   9  EXE\nGET    12, 3      centroid G\n       12, 4      incentre I\n       12, 16     orthocentre H\n       12, -3.5   circumcentre O\n\nNOTE   This program runs in REG mode and reads the vertices in input order.\n       If Math ERROR appears, enter the origin first, then the other two\n       vertices: 0, 0, 6, 0, 0, 6 gives G(2, 2), I(1.757, 1.757), H(0, 0), O(3, 3).",
     "source": "ClrStat\n?→A\n?→B\nA,B DT\n?→C\n?→D\nC,D DT\n?→X\n?→Y\nX,Y DT\nΣx÷3◢\nΣy÷3◢\n√((C-X)²+(D-Y)²)+√((X-A)²+(Y-B)²)+√((A-C)²+(B-D)²)→M\n(√((C-X)²+(D-Y)²)×A+√((X-A)²+(Y-B)²)×C+√((A-C)²+(B-D)²)×X)÷M◢\n(√((C-X)²+(D-Y)²)×B+√((X-A)²+(Y-B)²)×D+√((A-C)²+(B-D)²)×Y)÷M◢\n2×(A×(D-Y)+C×(Y-B)+X×(B-D))→M\nPol(((A²+B²)×(D-Y)+(C²+D²)×(Y-B)+(X²+Y²)×(B-D))÷M,((A²+B²)×(X-C)+(C²+D²)×(A-X)+(X²+Y²)×(C-A))÷M)\nRec(X,Y)\nΣx-2X◢\nΣy-2Y◢\nX◢\nY◢",
     "bytes": 385
+  },
+  {
+    "id": "P8",
+    "title": "Simultaneous Equations (Complex)",
+    "mode": "CMPLX",
+    "category": "Algebra",
+    "topics": [
+      "simultaneous equations",
+      "complex",
+      "imaginary",
+      "two unknowns"
+    ],
+    "summary": "Solve a 2x2 system whose coefficients, or whose answers, are complex.",
+    "inputs": "A, B, C of Ax + By = C then D, X, Y of Dx + Xy = Y; each may be a+bi.",
+    "outputs": "x, then y; complex answers show the real part first and Re-Im for the imaginary part.",
+    "example": "Solve  (1 + i)x + y = 2  and  x − y = i.\n\nTYPE   1+i  EXE   1  EXE   2  EXE   1  EXE   (-)1  EXE   i  EXE\nGET    1      x — a real number, so Re⇔Im shows 0\n       1      y, real part\n       -1     y, imaginary part (press SHIFT EXE)\n\nNOTE   Run the program in CMPLX mode — i is ALPHA ENG. Every coefficient may\n       be real or complex, and either answer may be complex. At a paused\n       answer, SHIFT EXE turns the display over to the imaginary part.\n       A zero determinant XA - BD gives Math ERROR.",
+    "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\n(XC-BY)÷(XA-BD)→M◢\nC÷B-AM÷B",
+    "bytes": 51
   }
 ]);
 
@@ -189,6 +207,17 @@ export const PROGRAM_PACKS = Object.freeze([
       "P2",
       "P5",
       "P6"
+    ]
+  },
+  {
+    "id": "complex",
+    "name": "Complex",
+    "description": "Complex simultaneous equations with the real solver, the cubic and line-circle intersections.",
+    "programIds": [
+      "P2",
+      "P3",
+      "P5",
+      "P8"
     ]
   }
 ]);

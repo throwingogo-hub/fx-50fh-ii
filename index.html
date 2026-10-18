@@ -27,17 +27,20 @@
 
     <section id="studio" hidden aria-labelledby="studio-title">
       <header class="studio-head">
-        <div>
+        <div class="studio-head-copy">
           <p class="studio-kicker">PROGRAM WORKBENCH · 680 BYTE MEMORY</p>
           <h1 id="studio-title">Program Studio</h1>
-          <p class="studio-intro">Write normally. Every change is saved on this device.</p>
+          <p class="studio-intro">Write normally or install from the library. Every change is saved on this device.</p>
         </div>
-        <span id="studio-save-state" class="save-state" role="status">saved</span>
+        <div class="studio-head-meta">
+          <span id="studio-save-state" class="save-state" role="status">saved</span>
+          <span class="studio-badge">680 B shared · 4 slots</span>
+        </div>
       </header>
 
       <div id="studio-view-tabs" class="studio-view-tabs" role="tablist" aria-label="Program Studio views">
         <button id="editor-tab" type="button" role="tab" aria-selected="true" aria-controls="studio-editor-view" tabindex="0">Editor</button>
-        <button id="library-tab" type="button" role="tab" aria-selected="false" aria-controls="program-library-view" tabindex="-1">HKDSE Library <span>7</span></button>
+        <button id="library-tab" type="button" role="tab" aria-selected="false" aria-controls="program-library-view" tabindex="-1">Library <span>8</span></button>
       </div>
 
       <div id="studio-editor-view" role="tabpanel" aria-labelledby="editor-tab">
@@ -103,7 +106,7 @@
       <section id="program-library-view" class="program-library" role="tabpanel" aria-labelledby="library-tab" hidden>
         <header class="library-head">
           <div>
-            <p class="library-eyebrow">7 S5 PROGRAMS · 5 FOUR-SLOT PACKS</p>
+            <p class="library-eyebrow">8 PROGRAMS · 6 FOUR-SLOT PACKS</p>
             <h2>HKDSE Program Library</h2>
             <p>Choose deliberately. Nothing installs or replaces a slot until you confirm it.</p>
             <a class="library-pdf-link" href="output/pdf/fx-50fh-ii-s5-program-library.pdf" download>Download curated PDF</a>
@@ -137,7 +140,7 @@
 
         <div class="library-results-heading">
           <h2>Swap-in programs</h2>
-          <output id="library-result-count">7 programs</output>
+          <output id="library-result-count">8 programs</output>
         </div>
         <div id="program-library-grid" class="program-library-grid"></div>
         <p id="library-empty" class="library-empty" hidden>No matching program. Try a broader topic.</p>
@@ -172,7 +175,7 @@
       <li><b>Program Studio</b> → write or paste normal program text, insert
         commands, see shared byte usage, and run or continue editing with the calculator keys.
         All four slots and active drafts are autosaved on this device. The <b>HKDSE Library</b>
-        provides the seven S5 programs and five four-slot packs with overwrite confirmation,
+        provides the seven S5 programs plus a complex solver, and six four-slot packs, with overwrite confirmation,
         Undo, and versioned export/import backup.</li>
       <li>In BASE mode: x² = DEC, ^ = HEX, log = BIN, ln = OCT, and x⁻¹ opens
         the LOGIC menu.</li>
