@@ -169,6 +169,25 @@ export const PROGRAMS = Object.freeze([
     "example": "Where does x + y = 10 meet x² + y² = 25?\n\nTYPE   1  EXE   1  EXE   10  EXE   0  EXE   0  EXE   (-)25  EXE\nGET    5 + 3.535533906i   x1\n       5 - 3.535533906i   y1\n       5 - 3.535533906i   x2\n       5 + 3.535533906i   y2\n\nNOTE   The line misses the circle, so the intersections are a complex\n       conjugate pair. Each answer shows its real part first; SHIFT EXE\n       shows the imaginary part. A line that does meet the circle prints\n       real numbers exactly as the real line-circle program does:\n       1, 7, 40, -2, -4, -20 gives (5, 5) and (-2, 6).",
     "source": "?→D\n?→X\n?→Y\n?→C\n?→B\n?→A\nX=0⇒Goto 1\nY²+CDY+AD²→A\n-2XY-CDX+BD²→B\nD²+X²→M\n(-B-√(B²-4AM))÷(2M)→C\n(Y-CX)÷D◢\nC◢\n(-B+√(B²-4AM))÷(2M)→C\n(Y-CX)÷D◢\nC◢\nGoto 2\nLbl 1\nY÷D→X◢\nC²-4(X²+BX+A)→M\n(-C+√(M))÷2◢\nX◢\n(-C-√(M))÷2◢\nLbl 2",
     "bytes": 201
+  },
+  {
+    "id": "P10",
+    "title": "Simultaneous Equations (Quadratic, Complex)",
+    "mode": "CMPLX",
+    "category": "Algebra",
+    "topics": [
+      "quadratic simultaneous",
+      "parabola",
+      "line and curve",
+      "complex",
+      "intersection"
+    ],
+    "summary": "Solve a line and a curve, or two curves, that are quadratic in x, with complex intersection points when they do not meet.",
+    "inputs": "A, B, C of y = Ax² + Bx + C, then D, X, Y of y = Dx² + Xx + Y (D = 0 for a straight line).",
+    "outputs": "x1, y1, x2, y2; complex answers show the real part first and Re-Im for the imaginary part.",
+    "example": "Where do y = x² + 2x + 3 and y = x meet?\n\nTYPE   1  EXE   2  EXE   3  EXE   0  EXE   1  EXE   0  EXE\nGET    -0.5 - 1.658312395i   x1\n       -0.5 - 1.658312395i   y1\n       -0.5 + 1.658312395i   x2\n       -0.5 + 1.658312395i   y2\n\nNOTE   The line misses the parabola, so the intersection points are a complex\n       conjugate pair; SHIFT EXE shows each imaginary part. A line that does\n       meet the curve gives real answers: y = x² and y = 2x + 3\n       (1, 0, 0, 0, 2, 3) gives (-1, 1) and (3, 9).\n       Set D = 0 for a straight line. A must differ from D.",
+    "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\nA-D→D\nB-X→X\nC-Y→M\n(-X-√(X²-4DM))÷(2D)→Y\nY◢\nA Y²+B Y+C◢\n(-X+√(X²-4DM))÷(2D)→Y\nY◢\nA Y²+B Y+C◢",
+    "bytes": 111
   }
 ]);
 
@@ -231,12 +250,12 @@ export const PROGRAM_PACKS = Object.freeze([
   {
     "id": "complex",
     "name": "Complex",
-    "description": "Complex simultaneous equations and complex line-circle intersections, with the real solvers beside them.",
+    "description": "The three complex solvers - simultaneous, line-circle and quadratic - beside the real linear solver.",
     "programIds": [
-      "P5",
+      "P8",
       "P9",
-      "P2",
-      "P8"
+      "P10",
+      "P2"
     ]
   }
 ]);

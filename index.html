@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>CASIO fx-50FH II — web</title>
 <meta name="description" content="A 1:1 working web recreation of the CASIO fx-50FH II (H.K.E.A.A. approved) programmable scientific calculator: all six modes, 23 built-in formulas, 40 scientific constants, base-n, statistics and the BASIC-like program mode.">
-<link rel="stylesheet" href="css/style.css?v=studio-v6">
+<link rel="stylesheet" href="css/style.css?v=studio-v7">
 </head>
 <body>
 
@@ -46,7 +46,7 @@
 
       <div id="studio-view-tabs" class="studio-view-tabs" role="tablist" aria-label="Program Studio views">
         <button id="editor-tab" type="button" role="tab" aria-selected="true" aria-controls="studio-editor-view" tabindex="0">Editor</button>
-        <button id="library-tab" type="button" role="tab" aria-selected="false" aria-controls="program-library-view" tabindex="-1">Library <span>9</span></button>
+        <button id="library-tab" type="button" role="tab" aria-selected="false" aria-controls="program-library-view" tabindex="-1">Library <span>10</span></button>
       </div>
 
       <div id="studio-editor-view" role="tabpanel" aria-labelledby="editor-tab">
@@ -112,7 +112,7 @@
       <section id="program-library-view" class="program-library" role="tabpanel" aria-labelledby="library-tab" hidden>
         <header class="library-head">
           <div>
-            <p class="library-eyebrow">9 PROGRAMS · 6 FOUR-SLOT PACKS</p>
+            <p class="library-eyebrow">10 PROGRAMS · 6 FOUR-SLOT PACKS</p>
             <h2>HKDSE Program Library</h2>
             <p>Choose deliberately. Nothing installs or replaces a slot until you confirm it.</p>
             <a class="library-pdf-link" href="output/pdf/fx-50fh-ii-s5-program-library.pdf" download>Download curated PDF</a>
@@ -146,7 +146,7 @@
 
         <div class="library-results-heading">
           <h2>Swap-in programs</h2>
-          <output id="library-result-count">9 programs</output>
+          <output id="library-result-count">10 programs</output>
         </div>
         <div id="program-library-grid" class="program-library-grid"></div>
         <p id="library-empty" class="library-empty" hidden>No matching program. Try a broader topic.</p>
@@ -181,7 +181,7 @@
       <li><b>Program Studio</b> → write or paste normal program text, insert
         commands, see shared byte usage, and run or continue editing with the calculator keys.
         All four slots and active drafts are autosaved on this device. The <b>HKDSE Library</b>
-        provides the seven S5 programs plus complex simultaneous and line-circle solvers, and six four-slot packs, with overwrite confirmation,
+        provides the seven S5 programs plus complex simultaneous, line-circle and quadratic solvers, and six four-slot packs, with overwrite confirmation,
         Undo, and versioned export/import backup.</li>
       <li>In BASE mode: x² = DEC, ^ = HEX, log = BIN, ln = OCT, and x⁻¹ opens
         the LOGIC menu.</li>
@@ -208,6 +208,6 @@
   </section>
 </main>
 
-<script type="module" src="js/main.js?v=studio-v6"></script>
+<script type="module" src="js/main.js?v=studio-v7"></script>
 </body>
 </html>

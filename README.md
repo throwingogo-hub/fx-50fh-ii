@@ -7,8 +7,8 @@ scientific calculator that the HKEAA approves for the HKDSE.
 
 Program Studio includes a searchable, memory-aware **HKDSE Program Library**:
 the seven programs from the printed S5 list plus complex-number versions of the
-simultaneous and line-circle solvers, six four-slot packs, protected installs,
-one-step undo and versioned export/import backup. The complete reference and
+simultaneous, line-circle and quadratic solvers, six four-slot packs, protected
+installs, one-step undo and versioned export/import backup. The complete reference and
 manual-copy source remains in [programs.md](programs.md). A matching bilingual,
 print-ready edition is available as the
 [curated S5 Program Library PDF](output/pdf/fx-50fh-ii-s5-program-library.pdf).
@@ -108,7 +108,7 @@ checkout can use any static-file server.
 
 ## Tests
 
-407 checks, including the guide's CMPLX chapter and complex-number edge
+412 checks, including the guide's CMPLX chapter and complex-number edge
 cases, worked examples, operating limits, REPLAY/history
 navigation, Program Studio text/recovery/backup, all seven S5 programs and
 their documented examples, generated-guide parity, and exhaustive LCD menu-layout/glyph coverage derived from the user's guide, driven

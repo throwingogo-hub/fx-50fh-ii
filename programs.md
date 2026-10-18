@@ -1,13 +1,13 @@
 # S5 CASIO fx-50FH program set
 
 These are the seven programs from the S5 program list, plus complex-number
-variant of Programs 2 and 5. They are available in the web calculator's
+variant of Programs 2, 5 and a quadratic counterpart. They are available in the web calculator's
 **Program Studio → HKDSE Library**. Nothing installs automatically: a single
 program always asks for a destination slot, and an occupied slot or a pack
 needs a second confirmation before anything is replaced.
 
-Every heading shows the exact Program Studio byte count. The nine programs total
-**1427B**, more than the shared **680-byte** program memory, so install the ones
+Every heading shows the exact Program Studio byte count. The ten programs total
+**1538B**, more than the shared **680-byte** program memory, so install the ones
 you need or one of the ready-made packs.
 
 ## Install from the in-app Library
@@ -439,5 +439,51 @@ C²-4(X²+BX+A)→M
 X◢
 (-C-√(M))÷2◢
 Lbl 2
+```
+
+## P10 — Simultaneous Equations (Quadratic, Complex) (111B)
+
+**Use it to** Solve two simultaneous equations that are quadratic in x — a curve and a line, or two curves — and return complex intersections when they do not meet in the real plane.
+
+**Input.** A, B, C of y = Ax² + Bx + C, then D, X, Y of y = Dx² + Xx + Y. A straight line is the case D = 0.
+
+**Output.** x1, y1, x2, y2; complex answers show the real part first and Re-Im for the imaginary part.
+
+### Example
+
+```text
+Where do y = x² + 2x + 3 and y = x meet?
+
+TYPE   1  EXE   2  EXE   3  EXE   0  EXE   1  EXE   0  EXE
+GET    -0.5 - 1.658312395i   x1
+       -0.5 - 1.658312395i   y1
+       -0.5 + 1.658312395i   x2
+       -0.5 + 1.658312395i   y2
+
+NOTE   The line misses the parabola, so the intersection points are a complex
+       conjugate pair; SHIFT EXE shows each imaginary part. A line that does
+       meet the curve gives real answers: y = x² and y = 2x + 3
+       (1, 0, 0, 0, 2, 3) gives (-1, 1) and (3, 9).
+       Set D = 0 for a straight line. A must differ from D.
+```
+
+### Copy
+
+```text
+?→A
+?→B
+?→C
+?→D
+?→X
+?→Y
+A-D→D
+B-X→X
+C-Y→M
+(-X-√(X²-4DM))÷(2D)→Y
+Y◢
+A Y²+B Y+C◢
+(-X+√(X²-4DM))÷(2D)→Y
+Y◢
+A Y²+B Y+C◢
 ```
 
