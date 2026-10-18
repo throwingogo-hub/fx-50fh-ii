@@ -6,9 +6,10 @@ scientific calculator that the HKEAA approves for the HKDSE.
 **[Open the calculator →](https://throwingogo-hub.github.io/fx-50fh-ii/)**
 
 Program Studio includes a searchable, memory-aware **HKDSE Program Library**:
-the seven programs from the printed S5 list plus four complex-number solvers
-(simultaneous, line-circle, quadratic and two-curve), six four-slot packs,
-protected installs, one-step undo and versioned export/import backup. The complete reference and
+the seven programs from the printed S5 list plus five complex-number solvers
+(simultaneous, line-circle, a combined one, quadratic and two-curve), six
+four-slot packs, protected installs, one-step undo and versioned export/import
+backup. The complete reference and
 manual-copy source remains in [programs.md](programs.md). A matching bilingual,
 print-ready edition is available as the
 [curated S5 Program Library PDF](output/pdf/fx-50fh-ii-s5-program-library.pdf).

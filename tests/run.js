@@ -888,9 +888,9 @@ for (let i = 0; i < CONSTANTS.length; i++) {
   const guide = readFileSync(new URL('../programs.md', import.meta.url), 'utf8')
     .replace(/\r\n/g, '\n');
   const starts = [...guide.matchAll(/^## (P\d+)[^\n]*\((\d+)B\)/gm)];
-  check('program guide exposes byte counts for all 11 library programs', starts.length, 11);
-  check('canonical program catalog exposes all 11 library programs', PROGRAMS.length, 11);
-  check('canonical program ids are unique', new Set(PROGRAMS.map(program => program.id)).size, 11);
+  check('program guide exposes byte counts for all 12 library programs', starts.length, 12);
+  check('canonical program catalog exposes all 12 library programs', PROGRAMS.length, 12);
+  check('canonical program ids are unique', new Set(PROGRAMS.map(program => program.id)).size, 12);
   check('every catalog program has searchable metadata and an example', PROGRAMS.every(program =>
     program.title && program.category && program.summary && program.inputs && program.outputs && program.example && program.source), true);
   for (let i = 0; i < starts.length; i++) {
@@ -907,9 +907,9 @@ for (let i = 0; i < CONSTANTS.length; i++) {
     pack.programIds.length === 4 && pack.programIds.every(id => PROGRAM_BY_ID.has(id))), true);
   check('all recommended packs fit the authentic 680-byte memory', PROGRAM_PACKS.every(pack => packBytes(pack) <= 680), true);
   check('Core pack is 316 bytes', packBytes(PROGRAM_PACKS.find(pack => pack.id === 'core')), 316);
-  check('the catalog is the printed S5 set plus four complex solvers', PROGRAMS.map(program => program.id).join(','), 'P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,P11');
+  check('the catalog is the printed S5 set plus four complex solvers', PROGRAMS.map(program => program.id).join(','), 'P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,P11,P12');
   check('catalog search finds quadratic by topic', filterProgramCatalog('discriminant').map(program => program.id).join(','), 'P1');
-  check('catalog search finds the line-circle solvers', filterProgramCatalog('line circle').map(program => program.id).join(','), 'P5,P9');
+  check('catalog search finds the line-circle solvers', filterProgramCatalog('line circle').map(program => program.id).join(','), 'P5,P9,P12');
   check('catalog category filter isolates coordinate programs', filterProgramCatalog('', 'Coordinate').map(program => program.id).join(','), 'P4,P5,P6,P9,P11');
 }
 {
@@ -976,7 +976,15 @@ for (let i = 0; i < CONSTANTS.length; i++) {
       ['P11 two circles with a vertical radical axis', 'P11', [1, -4, -6, 9, -10, -6, 25],
         [[2.666666667, 0], [1.114381917, 0], [2.666666667, 0], [4.885618083, 0]]],
       ['P11 two circles that miss', 'P11', [1, 0, 0, -25, -20, 0, 91],
-        [[5.8, 0], [0, -2.939387691], [5.8, 0], [0, 2.939387691]]]
+        [[5.8, 0], [0, -2.939387691], [5.8, 0], [0, 2.939387691]]],
+      ['P12 combined mode 1 real', 'P12', [1, 1, 1, 1, 2, -1, 5],
+        [[2, 0], [-1, 0]]],
+      ['P12 combined mode 1 complex', 'P12', [1, { re: 1, im: 1 }, 1, 2, 1, -1, { re: 0, im: 1 }],
+        [[1, 0], [1, -1]]],
+      ['P12 combined mode 2 line and circle', 'P12', [2, 1, 7, -40, -2, -4, -20],
+        [[-2, 0], [6, 0], [5, 0], [5, 0]]],
+      ['P12 combined mode 2 vertical line', 'P12', [2, 1, 0, -4, -6, -6, 8],
+        [[4, 0], [0, 0], [4, 0], [6, 0]]]
     ];
     for (const [name, id, inputs, want] of cases) {
       const got = runComplexProgram(id, inputs);

@@ -1,13 +1,13 @@
 # S5 CASIO fx-50FH program set
 
 These are the seven programs from the S5 program list, plus complex-number
-variant of Programs 2, 5 plus two quadratic-curve solvers. They are available in the web calculator's
+variant of Programs 2, 5 plus a combined solver and two quadratic-curve solvers. They are available in the web calculator's
 **Program Studio → HKDSE Library**. Nothing installs automatically: a single
 program always asks for a destination slot, and an occupied slot or a pack
 needs a second confirmation before anything is replaced.
 
-Every heading shows the exact Program Studio byte count. The eleven programs total
-**1787B**, more than the shared **680-byte** program memory, so install the ones
+Every heading shows the exact Program Studio byte count. The twelve programs total
+**2060B**, more than the shared **680-byte** program memory, so install the ones
 you need or one of the ready-made packs.
 
 ## Install from the in-app Library
@@ -551,5 +551,70 @@ C²-4×A×D→B
 M◢
 (-C+√(B))÷(2×A)◢
 Lbl 2
+```
+
+## P12 — Simultaneous Equations and Line-Circle (Combined) (273B)
+
+**Use it to** Solve either of the two jobs the paper keeps asking for, from one program: a 2×2 linear system, or a straight line meeting a circle — both complex-capable.
+
+**Mode 1** solves Ax + By = C and Dx + Xy = Y. Enter 1, then A, B, C, D, X, Y.
+
+**Mode 2** solves Ax + By + C = 0 with x² + y² + Dx + Xy + Y = 0. Enter 2, then A, B, C, D, X, Y.
+
+**Output.** Mode 1: x, then y. Mode 2: x₁, y₁, x₂, y₂. Complex answers show the real part first and Re-Im for the imaginary part.
+
+### Example
+
+```text
+Mode 1 - simultaneous linear equations (complex allowed):
+  1  EXE   1  EXE   1  EXE   1  EXE   2  EXE   (-)1  EXE   5  EXE
+  → x = 2, y = -1     (Ax+By=C and Dx+Xy=Y)
+
+Mode 2 - line Ax + By + C = 0 with circle x² + y² + Dx + Xy + Y = 0:
+  2  EXE   1  EXE   7  EXE   (-)40  EXE   (-)2  EXE   (-)4  EXE   (-)20  EXE
+  → (-2, 6) and (5, 5)
+
+NOTE   Mode 2 returns complex points when the line misses the circle:
+       2, 1, 1, -10, 0, 0, -25 gives (5 - 3.535533906i, 5 + 3.535533906i)
+       and its conjugate. A vertical line has its own branch:
+       2, 1, 0, -4, -6, -6, 8 gives (4, 0) and (4, 6).
+       Mode 1 takes a+bi coefficients and answers, exactly like P8.
+```
+
+### Copy
+
+```text
+?→M
+?→A
+?→B
+?→C
+?→D
+?→X
+?→Y
+M=2⇒Goto 2
+(X×C-B×Y)÷(X×A-B×D)→M◢
+C÷B-A×M÷B
+Goto 9
+Lbl 2
+B=0⇒Goto 3
+A²+B²→M
+2×A×C+D×B²-X×A×B→D
+C²-X×B×C+Y×B²→X
+D²-4×M×X→Y
+(-D-√(Y))÷(2×M)→X
+X◢
+(-A×X-C)÷B◢
+(-D+√(Y))÷(2×M)→X
+X◢
+(-A×X-C)÷B◢
+Goto 9
+Lbl 3
+-C÷A→M
+X²-4×(M²+Y+D×M)→D
+M◢
+(-X-√(D))÷2◢
+M◢
+(-X+√(D))÷2◢
+Lbl 9
 ```
 

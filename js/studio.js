@@ -5,7 +5,7 @@
 import { Program, PROGRAM_MEMORY } from './program.js';
 import { bytesOf } from './tokens.js';
 import { formatProgramText, parseProgramText } from './program-codec.js';
-import { PROGRAMS, PROGRAM_PACKS, PROGRAM_BY_ID } from './program-catalog.generated.js?v=studio-v8';
+import { PROGRAMS, PROGRAM_PACKS, PROGRAM_BY_ID } from './program-catalog.generated.js?v=studio-v9';
 
 const STORAGE_KEY = 'fx50fhii.program-studio.v3';
 const LEGACY_STORAGE_KEY = 'fx50fhii.program-studio.v2';

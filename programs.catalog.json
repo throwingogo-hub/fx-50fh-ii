@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "prefix": "# S5 CASIO fx-50FH program set\n\nThese are the seven programs from the S5 program list, plus complex-number\nvariant of Programs 2, 5 plus two quadratic-curve solvers. They are available in the web calculator's\n**Program Studio → HKDSE Library**. Nothing installs automatically: a single\nprogram always asks for a destination slot, and an occupied slot or a pack\nneeds a second confirmation before anything is replaced.\n\nEvery heading shows the exact Program Studio byte count. The eleven programs total\n**1787B**, more than the shared **680-byte** program memory, so install the ones\nyou need or one of the ready-made packs.\n\n## Install from the in-app Library\n\n1. Open Program Studio and choose **HKDSE Library**.\n2. Search by topic or choose a category.\n3. Select the destination P1-P4 slot, then press **Install**.\n4. If the slot already contains a program, confirm the replacement once more.\n5. For a complete setup, choose one of the memory-safe four-slot packs.\n\nProgram Studio keeps one-step Undo after a Library, pack or backup install. Use\n**Export all** to download a versioned JSON backup before larger changes.\n\n## Install manually\n\n1. Open Program Studio's **Editor** and select P1, P2, P3 or P4.\n2. Set **Run mode** to the mode printed beside that program (COMP for six of\n   the programs, CMPLX for P8 and REG for P7).\n3. Copy the entire matching code block below and paste it into **source**.\n4. Wait for **Structure OK**; the slot is saved automatically on this device.\n\n## Run a program\n\n- In Program Studio, select its slot and press **Run on calculator**; or\n- On the calculator home screen, press **Prog**, then 1, 2, 3 or 4.\n\nWhen the display shows A?, B? or another variable prompt, type the requested\nvalue and press **EXE**. Each answer pauses on screen; press **EXE** again for the\nnext one. The last value appears as the program ends.\n\nFor a negative input on the physical calculator use the (-) key. On the web\nkeypad the ordinary - key works as a negative sign too, both at a program\nprompt and on the calculation line.\n",
+  "prefix": "# S5 CASIO fx-50FH program set\n\nThese are the seven programs from the S5 program list, plus complex-number\nvariant of Programs 2, 5 plus a combined solver and two quadratic-curve solvers. They are available in the web calculator's\n**Program Studio → HKDSE Library**. Nothing installs automatically: a single\nprogram always asks for a destination slot, and an occupied slot or a pack\nneeds a second confirmation before anything is replaced.\n\nEvery heading shows the exact Program Studio byte count. The twelve programs total\n**2060B**, more than the shared **680-byte** program memory, so install the ones\nyou need or one of the ready-made packs.\n\n## Install from the in-app Library\n\n1. Open Program Studio and choose **HKDSE Library**.\n2. Search by topic or choose a category.\n3. Select the destination P1-P4 slot, then press **Install**.\n4. If the slot already contains a program, confirm the replacement once more.\n5. For a complete setup, choose one of the memory-safe four-slot packs.\n\nProgram Studio keeps one-step Undo after a Library, pack or backup install. Use\n**Export all** to download a versioned JSON backup before larger changes.\n\n## Install manually\n\n1. Open Program Studio's **Editor** and select P1, P2, P3 or P4.\n2. Set **Run mode** to the mode printed beside that program (COMP for six of\n   the programs, CMPLX for P8 and REG for P7).\n3. Copy the entire matching code block below and paste it into **source**.\n4. Wait for **Structure OK**; the slot is saved automatically on this device.\n\n## Run a program\n\n- In Program Studio, select its slot and press **Run on calculator**; or\n- On the calculator home screen, press **Prog**, then 1, 2, 3 or 4.\n\nWhen the display shows A?, B? or another variable prompt, type the requested\nvalue and press **EXE**. Each answer pauses on screen; press **EXE** again for the\nnext one. The last value appears as the program ends.\n\nFor a negative input on the physical calculator use the (-) key. On the web\nkeypad the ordinary - key works as a negative sign too, both at a program\nprompt and on the calculation line.\n",
   "packs": [
     {
       "id": "core",
@@ -59,13 +59,13 @@
     },
     {
       "id": "complex",
-      "name": "Complex",
-      "description": "All four complex solvers: simultaneous, line-circle, quadratic and two-curve intersections.",
+      "name": "Complex and combined",
+      "description": "The combined linear + line-circle solver, the two curve solvers and the circle tool.",
       "programIds": [
-        "P8",
-        "P9",
+        "P12",
+        "P11",
         "P10",
-        "P11"
+        "P4"
       ]
     }
   ],
@@ -319,6 +319,30 @@
       "copyHeading": "Copy",
       "after": "\n\n",
       "guideBody": "**Use it to** Find where two quadratic curves meet — two circles, two ellipses of the same shape, or a circle and a same-shape ellipse — with complex intersection points when they do not meet.\n\n**Before you start** write both equations in the form x² + p·y² + cx + dy + e = 0, i.e. divide each equation by its x² coefficient. Two circles already have p = 1, so nothing needs changing.\n\n**Input.** p, c₁, d₁, e₁ (first curve) then c₂, d₂, e₂ (second curve).\n\n**Output.** x₁, y₁, x₂, y₂; complex answers show the real part first and Re-Im for the imaginary part.\n\n### Example\n\n```text\nTwo circles that never meet:  x² + y² = 25  and  x² + y² − 20x + 91 = 0.\nNormalise both to x² + p y² + c₁x + d₁y + e₁ = 0 (p = 1 for circles).\n\nTYPE   1  EXE   0  EXE   0  EXE   (-)25  EXE   (-)20  EXE   0  EXE   91  EXE\nGET    5.8                 x₁\n       0 - 2.939387691i   y₁\n       5.8                 x₂\n       0 + 2.939387691i   y₂\n\nNOTE   The circles are too far apart, so the two intersection points are a\n       complex conjugate pair; SHIFT EXE shows each imaginary part.\n       Curves that do meet give real answers: x²+y²−4x−6y+9 = 0 with\n       x²+y²−10x−6y+25 = 0  (1, -4, -6, 9, -10, -6, 25)  gives (2.667, 1.114)\n       and (2.667, 4.886). The two equations must share the same x² and y²\n       coefficients — divide both by that x² coefficient first.\n```"
+    },
+    {
+      "id": "P12",
+      "label": "P12",
+      "title": "Simultaneous Equations and Line-Circle (Combined)",
+      "mode": "CMPLX",
+      "category": "Algebra",
+      "topics": [
+        "simultaneous equations",
+        "line circle",
+        "intersection",
+        "complex",
+        "combined",
+        "two in one"
+      ],
+      "summary": "One program, two jobs: a 2x2 linear system or a line meeting a circle, both complex-capable.",
+      "inputs": "Mode 1 or 2, then A, B, C, D, X, Y (mode 1: Ax+By=C and Dx+Xy=Y; mode 2: Ax+By+C=0 and x²+y²+Dx+Xy+Y=0).",
+      "outputs": "Mode 1: x, y. Mode 2: x1, y1, x2, y2. Complex answers show the real part first and Re-Im for the imaginary part.",
+      "example": "Mode 1 - simultaneous linear equations (complex allowed):\n  1  EXE   1  EXE   1  EXE   1  EXE   2  EXE   (-)1  EXE   5  EXE\n  → x = 2, y = -1     (Ax+By=C and Dx+Xy=Y)\n\nMode 2 - line Ax + By + C = 0 with circle x² + y² + Dx + Xy + Y = 0:\n  2  EXE   1  EXE   7  EXE   (-)40  EXE   (-)2  EXE   (-)4  EXE   (-)20  EXE\n  → (-2, 6) and (5, 5)\n\nNOTE   Mode 2 returns complex points when the line misses the circle:\n       2, 1, 1, -10, 0, 0, -25 gives (5 - 3.535533906i, 5 + 3.535533906i)\n       and its conjugate. A vertical line has its own branch:\n       2, 1, 0, -4, -6, -6, 8 gives (4, 0) and (4, 6).\n       Mode 1 takes a+bi coefficients and answers, exactly like P8.",
+      "source": "?→M\n?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\nM=2⇒Goto 2\n(X×C-B×Y)÷(X×A-B×D)→M◢\nC÷B-A×M÷B\nGoto 9\nLbl 2\nB=0⇒Goto 3\nA²+B²→M\n2×A×C+D×B²-X×A×B→D\nC²-X×B×C+Y×B²→X\nD²-4×M×X→Y\n(-D-√(Y))÷(2×M)→X\nX◢\n(-A×X-C)÷B◢\n(-D+√(Y))÷(2×M)→X\nX◢\n(-A×X-C)÷B◢\nGoto 9\nLbl 3\n-C÷A→M\nX²-4×(M²+Y+D×M)→D\nM◢\n(-X-√(D))÷2◢\nM◢\n(-X+√(D))÷2◢\nLbl 9",
+      "bytes": 273,
+      "copyHeading": "Copy",
+      "after": "\n\n",
+      "guideBody": "**Use it to** Solve either of the two jobs the paper keeps asking for, from one program: a 2×2 linear system, or a straight line meeting a circle — both complex-capable.\n\n**Mode 1** solves Ax + By = C and Dx + Xy = Y. Enter 1, then A, B, C, D, X, Y.\n\n**Mode 2** solves Ax + By + C = 0 with x² + y² + Dx + Xy + Y = 0. Enter 2, then A, B, C, D, X, Y.\n\n**Output.** Mode 1: x, then y. Mode 2: x₁, y₁, x₂, y₂. Complex answers show the real part first and Re-Im for the imaginary part.\n\n### Example\n\n```text\nMode 1 - simultaneous linear equations (complex allowed):\n  1  EXE   1  EXE   1  EXE   1  EXE   2  EXE   (-)1  EXE   5  EXE\n  → x = 2, y = -1     (Ax+By=C and Dx+Xy=Y)\n\nMode 2 - line Ax + By + C = 0 with circle x² + y² + Dx + Xy + Y = 0:\n  2  EXE   1  EXE   7  EXE   (-)40  EXE   (-)2  EXE   (-)4  EXE   (-)20  EXE\n  → (-2, 6) and (5, 5)\n\nNOTE   Mode 2 returns complex points when the line misses the circle:\n       2, 1, 1, -10, 0, 0, -25 gives (5 - 3.535533906i, 5 + 3.535533906i)\n       and its conjugate. A vertical line has its own branch:\n       2, 1, 0, -4, -6, -6, 8 gives (4, 0) and (4, 6).\n       Mode 1 takes a+bi coefficients and answers, exactly like P8.\n```"
     }
   ]
 }

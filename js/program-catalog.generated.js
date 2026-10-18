@@ -207,6 +207,26 @@ export const PROGRAMS = Object.freeze([
     "example": "Two circles that never meet:  x² + y² = 25  and  x² + y² − 20x + 91 = 0.\nNormalise both to x² + p y² + c₁x + d₁y + e₁ = 0 (p = 1 for circles).\n\nTYPE   1  EXE   0  EXE   0  EXE   (-)25  EXE   (-)20  EXE   0  EXE   91  EXE\nGET    5.8                 x₁\n       0 - 2.939387691i   y₁\n       5.8                 x₂\n       0 + 2.939387691i   y₂\n\nNOTE   The circles are too far apart, so the two intersection points are a\n       complex conjugate pair; SHIFT EXE shows each imaginary part.\n       Curves that do meet give real answers: x²+y²−4x−6y+9 = 0 with\n       x²+y²−10x−6y+25 = 0  (1, -4, -6, 9, -10, -6, 25)  gives (2.667, 1.114)\n       and (2.667, 4.886). The two equations must share the same x² and y²\n       coefficients — divide both by that x² coefficient first.",
     "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\n?→M\nB-X→X\nC-Y→Y\nD-M→M\nY=0⇒Goto 1\n-X÷Y→X\n-M÷Y→M\nA×M²+D+C×M→D\nM×2×A×X+C×X+B→B\n1+A×X²→Y\nB²-4×Y×D→A\n(-B-√(A))÷(2×Y)→C◢\nX×C+M◢\n(-B+√(A))÷(2×Y)→C◢\nX×C+M◢\nGoto 2\nLbl 1\n-M÷X→M\nM²+D+B×M→D\nM◢\nC²-4×A×D→B\n(-C-√(B))÷(2×A)◢\nM◢\n(-C+√(B))÷(2×A)◢\nLbl 2",
     "bytes": 249
+  },
+  {
+    "id": "P12",
+    "title": "Simultaneous Equations and Line-Circle (Combined)",
+    "mode": "CMPLX",
+    "category": "Algebra",
+    "topics": [
+      "simultaneous equations",
+      "line circle",
+      "intersection",
+      "complex",
+      "combined",
+      "two in one"
+    ],
+    "summary": "One program, two jobs: a 2x2 linear system or a line meeting a circle, both complex-capable.",
+    "inputs": "Mode 1 or 2, then A, B, C, D, X, Y (mode 1: Ax+By=C and Dx+Xy=Y; mode 2: Ax+By+C=0 and x²+y²+Dx+Xy+Y=0).",
+    "outputs": "Mode 1: x, y. Mode 2: x1, y1, x2, y2. Complex answers show the real part first and Re-Im for the imaginary part.",
+    "example": "Mode 1 - simultaneous linear equations (complex allowed):\n  1  EXE   1  EXE   1  EXE   1  EXE   2  EXE   (-)1  EXE   5  EXE\n  → x = 2, y = -1     (Ax+By=C and Dx+Xy=Y)\n\nMode 2 - line Ax + By + C = 0 with circle x² + y² + Dx + Xy + Y = 0:\n  2  EXE   1  EXE   7  EXE   (-)40  EXE   (-)2  EXE   (-)4  EXE   (-)20  EXE\n  → (-2, 6) and (5, 5)\n\nNOTE   Mode 2 returns complex points when the line misses the circle:\n       2, 1, 1, -10, 0, 0, -25 gives (5 - 3.535533906i, 5 + 3.535533906i)\n       and its conjugate. A vertical line has its own branch:\n       2, 1, 0, -4, -6, -6, 8 gives (4, 0) and (4, 6).\n       Mode 1 takes a+bi coefficients and answers, exactly like P8.",
+    "source": "?→M\n?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\nM=2⇒Goto 2\n(X×C-B×Y)÷(X×A-B×D)→M◢\nC÷B-A×M÷B\nGoto 9\nLbl 2\nB=0⇒Goto 3\nA²+B²→M\n2×A×C+D×B²-X×A×B→D\nC²-X×B×C+Y×B²→X\nD²-4×M×X→Y\n(-D-√(Y))÷(2×M)→X\nX◢\n(-A×X-C)÷B◢\n(-D+√(Y))÷(2×M)→X\nX◢\n(-A×X-C)÷B◢\nGoto 9\nLbl 3\n-C÷A→M\nX²-4×(M²+Y+D×M)→D\nM◢\n(-X-√(D))÷2◢\nM◢\n(-X+√(D))÷2◢\nLbl 9",
+    "bytes": 273
   }
 ]);
 
@@ -268,13 +288,13 @@ export const PROGRAM_PACKS = Object.freeze([
   },
   {
     "id": "complex",
-    "name": "Complex",
-    "description": "All four complex solvers: simultaneous, line-circle, quadratic and two-curve intersections.",
+    "name": "Complex and combined",
+    "description": "The combined linear + line-circle solver, the two curve solvers and the circle tool.",
     "programIds": [
-      "P8",
-      "P9",
+      "P12",
+      "P11",
       "P10",
-      "P11"
+      "P4"
     ]
   }
 ]);

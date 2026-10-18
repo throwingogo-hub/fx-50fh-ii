@@ -93,7 +93,7 @@ function bootstrap() {
 
 function loadCatalog() {
   const catalog = JSON.parse(read(catalogPath));
-  if (catalog.version !== 1 || catalog.programs?.length !== 11) throw new Error('invalid program catalog');
+  if (catalog.version !== 1 || catalog.programs?.length !== 12) throw new Error('invalid program catalog');
   const ids = new Set();
   for (const program of catalog.programs) {
     if (ids.has(program.id)) throw new Error(`duplicate program id ${program.id}`);
