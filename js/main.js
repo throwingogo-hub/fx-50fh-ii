@@ -2,10 +2,10 @@
 // hotspot per real key, a canvas laid exactly over the glass, and the physical
 // keyboard mapped onto the same key ids.
 
-import { KEYS, SHELL_W, SHELL_H, PC_KEYS } from './keymap.js?v=s5-v1';
+import { KEYS, SHELL_W, SHELL_H, PC_KEYS } from './keymap.js?v=studio-v2';
 import { LCD, GLASS } from './lcd.js';
-import { Machine } from './machine.js?v=s5-v1';
-import { setupProgramStudio } from './studio.js?v=s5-v1';
+import { Machine } from './machine.js?v=studio-v2';
+import { setupProgramStudio } from './studio.js?v=studio-v2';
 
 const shell = document.getElementById('shell');
 const canvas = document.getElementById('lcd');
