@@ -226,8 +226,10 @@ export class Machine {
         if (!alpha && !shift && this.screen === 'result') return this.toggleDms();
         break;
       case 'ENG':
-        // The guide states that CMPLX does not support engineering notation.
+        // In CMPLX the ENG key is unused by engineering notation, so it types
+        // the imaginary unit directly; elsewhere it shifts the exponent.
         if (!alpha) {
+          if (this.mode === 'CMPLX' && !shift) break;
           if (this.mode !== 'CMPLX') this.engShift(shift ? -1 : 1);
           return;
         }
@@ -266,10 +268,10 @@ export class Machine {
     if (shift && id === 'NEG' && this.mode !== 'CMPLX') {
       return 'The angle sign is CMPLX only — press MODE then 2.';
     }
-    if (!alpha && !shift && id === 'ENG' && this.mode === 'CMPLX') {
-      return 'ENG is not available in CMPLX mode.';
+    if (!alpha && shift && id === 'ENG' && this.mode === 'CMPLX') {
+      return 'ENG and left-ENG are not available in CMPLX mode.';
     }
-    if (!alpha && !shift && id === 'ENG' && !this.result && !this.tokens.length) {
+    if (!alpha && !shift && id === 'ENG' && this.mode !== 'CMPLX' && !this.result && !this.tokens.length) {
       return 'ENG works on a displayed result. For i, press ALPHA then ENG in CMPLX mode.';
     }
     return '';
@@ -283,6 +285,7 @@ export class Machine {
     if (alpha && VAR_KEYS[id]) return tok('var' + VAR_KEYS[id]);
     if (alpha && id === 'LN') return tok('napier');
     if (alpha && id === 'ENG') return this.mode === 'CMPLX' ? tok('imag') : null;
+    if (!alpha && !shift && id === 'ENG' && this.mode === 'CMPLX') return tok('imag');
 
     if (inBase && HEX_KEYS[id] && !shift && !alpha) {
       if (this.activeBase() !== 16) return null;
@@ -1495,6 +1498,7 @@ export class Machine {
     if (asNum(this.vars.M)) ind.add('M');
     if (this.pending === 'sto') ind.add('STO');
     if (this.pending === 'rcl') ind.add('RCL');
+    if (this.mode === 'CMPLX') ind.add('CMPLX');
     if (this.mode === 'SD') ind.add('SD');
     if (this.mode === 'REG') ind.add('REG');
     if (this.mode === 'PRGM') ind.add('PRG');

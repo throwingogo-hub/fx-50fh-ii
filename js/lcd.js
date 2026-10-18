@@ -33,7 +33,7 @@ const BG1 = '#cfdcda';
 
 // Indicator strip, laid out left to right the way Casio prints it.
 export const INDICATORS = [
-  'S', 'A', 'M', 'STO', 'RCL', 'SD', 'REG', 'FMLA', 'PRG',
+  'CMPLX', 'S', 'A', 'M', 'STO', 'RCL', 'SD', 'REG', 'FMLA', 'PRG',
   'D', 'R', 'G', 'FIX', 'SCI', 'i', '∠', 'R⇔I', '▮', 'Disp'
 ];
 
@@ -77,12 +77,20 @@ export class LCD {
   }
 
   // ---- indicator strip ----------------------------------------------------
+  // Only the lit symbols are drawn, packed from the left. A busy state (S, M,
+  // STO, CMPLX, D, FIX, i, R⇔I) would otherwise run past the glass, so the dot
+  // pitch shrinks when the lit run is wider than the strip.
   #indicators(lit) {
-    const c = this.ctx;
+    const shown = INDICATORS.filter((label) => lit.has(label));
+    if (!shown.length) return;
+    const gap = 14;
+    const chars = shown.reduce((n, label) => n + label.length, 0);
+    const room = GLASS.w - 16 - gap * (shown.length - 1);
+    const dot = Math.min(M.indDot, Math.max(1.9, room / (6 * chars - 1)));
     let x = 8;
-    for (const label of INDICATORS) {
-      const w = this.#smallText(x, M.indY - GLASS.y, label, lit.has(label), M.indDot);
-      x += w + 7;
+    for (const label of shown) {
+      const w = this.#smallText(x, M.indY - GLASS.y, label, true, dot);
+      x += w + gap;
     }
   }
 

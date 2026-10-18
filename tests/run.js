@@ -589,11 +589,16 @@ te('(-1)^0.5 stays a Math ERROR outside CMPLX', '[MODE]1(0-1)[POW]0.5)=', 'Math 
   check('▶a+bi puts the i symbol back', m.view().indicators.has('i'), true);
 }
 {
-  // ENG is not available in CMPLX mode (guide p. E-25).
+  // In CMPLX the ENG key types i; engineering notation is unavailable there.
   const m = new Machine();
   send(m, '[MODE]21' + '234=');
+  check('CMPLX mode lights the CMPLX indicator', m.view().indicators.has('CMPLX'), true);
   send(m, '[ENG]');
-  check('ENG leaves a CMPLX result alone', shown(m), '1234');
+  check('ENG types i in CMPLX instead of engineering notation', m.view().line1, 'i');
+  check('ENG does not switch a CMPLX result to engineering notation', m.view().line2, '');
+  const comp = new Machine();
+  send(comp, '1234=');
+  check('COMP mode does not light the CMPLX indicator', comp.view().indicators.has('CMPLX'), false);
 }
 {
   // The imaginary part of Ans is cleared on leaving CMPLX (guide p. E-15).

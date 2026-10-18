@@ -47,7 +47,9 @@ Everything the keyboard is printed with is implemented:
   `Abs`, `arg`, `▶a+bi` and `▶r∠θ`, with the `R⇔I` symbol lit on every
   complex result and `Re⇔Im` (`SHIFT EXE`) toggling between the real part and
   the imaginary part `i` — or, in polar format, between `r` and `θ` under the
-  `∠` symbol. Complex results keep Casio's precision: an integer power is
+  `∠` symbol. In CMPLX the glass shows `CMPLX` at the top, and `ENG` alone
+  types `i` (the red `ALPHA ENG` legend still works). Complex results keep
+  Casio's precision: an integer power is
   repeated multiplication, so `i³` is `-i` and `(1+i)²` is `2i` with no
   trigonometric residue, right angles such as `5∠90` land exactly on an axis,
   and `√(-4)` is `2i`. As the guide requires, `√(`, `^(` and `∛(` work in

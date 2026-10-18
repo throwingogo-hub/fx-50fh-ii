@@ -70,7 +70,7 @@ export const KEYS = [
   ]),
   ...row6(R.fn3, [
     { id: 'RCL', base: 'RCL', shift: 'STO' },
-    { id: 'ENG', base: 'ENG', shift: '◀ENG', alpha: 'i' },
+    { id: 'ENG', base: 'ENG', shift: '◀ENG', alpha: 'i', cmplx: 'i' },
     { id: 'LPAR', base: '(', shift: '%', cmplx: 'arg(' },
     { id: 'RPAR', base: ')', shift: 'Abs(', alpha: 'X' },
     { id: 'COMMA', base: ',', shift: ':', alpha: 'Y', cmplx: 'Conjg(' },
