@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "prefix": "# S5 CASIO fx-50FH program set\n\nThese are the seven programs from the S5 program list, plus complex-number\nvariant of Programs 2, 5 and a quadratic counterpart. They are available in the web calculator's\n**Program Studio → HKDSE Library**. Nothing installs automatically: a single\nprogram always asks for a destination slot, and an occupied slot or a pack\nneeds a second confirmation before anything is replaced.\n\nEvery heading shows the exact Program Studio byte count. The ten programs total\n**1538B**, more than the shared **680-byte** program memory, so install the ones\nyou need or one of the ready-made packs.\n\n## Install from the in-app Library\n\n1. Open Program Studio and choose **HKDSE Library**.\n2. Search by topic or choose a category.\n3. Select the destination P1-P4 slot, then press **Install**.\n4. If the slot already contains a program, confirm the replacement once more.\n5. For a complete setup, choose one of the memory-safe four-slot packs.\n\nProgram Studio keeps one-step Undo after a Library, pack or backup install. Use\n**Export all** to download a versioned JSON backup before larger changes.\n\n## Install manually\n\n1. Open Program Studio's **Editor** and select P1, P2, P3 or P4.\n2. Set **Run mode** to the mode printed beside that program (COMP for six of\n   the programs, CMPLX for P8 and REG for P7).\n3. Copy the entire matching code block below and paste it into **source**.\n4. Wait for **Structure OK**; the slot is saved automatically on this device.\n\n## Run a program\n\n- In Program Studio, select its slot and press **Run on calculator**; or\n- On the calculator home screen, press **Prog**, then 1, 2, 3 or 4.\n\nWhen the display shows A?, B? or another variable prompt, type the requested\nvalue and press **EXE**. Each answer pauses on screen; press **EXE** again for the\nnext one. The last value appears as the program ends.\n\nFor a negative input on the physical calculator use the (-) key. On the web\nkeypad the ordinary - key works as a negative sign too, both at a program\nprompt and on the calculation line.\n",
+  "prefix": "# S5 CASIO fx-50FH program set\n\nThese are the seven programs from the S5 program list, plus complex-number\nvariant of Programs 2, 5 plus two quadratic-curve solvers. They are available in the web calculator's\n**Program Studio → HKDSE Library**. Nothing installs automatically: a single\nprogram always asks for a destination slot, and an occupied slot or a pack\nneeds a second confirmation before anything is replaced.\n\nEvery heading shows the exact Program Studio byte count. The eleven programs total\n**1787B**, more than the shared **680-byte** program memory, so install the ones\nyou need or one of the ready-made packs.\n\n## Install from the in-app Library\n\n1. Open Program Studio and choose **HKDSE Library**.\n2. Search by topic or choose a category.\n3. Select the destination P1-P4 slot, then press **Install**.\n4. If the slot already contains a program, confirm the replacement once more.\n5. For a complete setup, choose one of the memory-safe four-slot packs.\n\nProgram Studio keeps one-step Undo after a Library, pack or backup install. Use\n**Export all** to download a versioned JSON backup before larger changes.\n\n## Install manually\n\n1. Open Program Studio's **Editor** and select P1, P2, P3 or P4.\n2. Set **Run mode** to the mode printed beside that program (COMP for six of\n   the programs, CMPLX for P8 and REG for P7).\n3. Copy the entire matching code block below and paste it into **source**.\n4. Wait for **Structure OK**; the slot is saved automatically on this device.\n\n## Run a program\n\n- In Program Studio, select its slot and press **Run on calculator**; or\n- On the calculator home screen, press **Prog**, then 1, 2, 3 or 4.\n\nWhen the display shows A?, B? or another variable prompt, type the requested\nvalue and press **EXE**. Each answer pauses on screen; press **EXE** again for the\nnext one. The last value appears as the program ends.\n\nFor a negative input on the physical calculator use the (-) key. On the web\nkeypad the ordinary - key works as a negative sign too, both at a program\nprompt and on the calculation line.\n",
   "packs": [
     {
       "id": "core",
@@ -60,12 +60,12 @@
     {
       "id": "complex",
       "name": "Complex",
-      "description": "The three complex solvers - simultaneous, line-circle and quadratic - beside the real linear solver.",
+      "description": "All four complex solvers: simultaneous, line-circle, quadratic and two-curve intersections.",
       "programIds": [
         "P8",
         "P9",
         "P10",
-        "P2"
+        "P11"
       ]
     }
   ],
@@ -296,6 +296,29 @@
       "copyHeading": "Copy",
       "after": "\n\n",
       "guideBody": "**Use it to** Solve two simultaneous equations that are quadratic in x — a curve and a line, or two curves — and return complex intersections when they do not meet in the real plane.\n\n**Input.** A, B, C of y = Ax² + Bx + C, then D, X, Y of y = Dx² + Xx + Y. A straight line is the case D = 0.\n\n**Output.** x1, y1, x2, y2; complex answers show the real part first and Re-Im for the imaginary part.\n\n### Example\n\n```text\nWhere do y = x² + 2x + 3 and y = x meet?\n\nTYPE   1  EXE   2  EXE   3  EXE   0  EXE   1  EXE   0  EXE\nGET    -0.5 - 1.658312395i   x1\n       -0.5 - 1.658312395i   y1\n       -0.5 + 1.658312395i   x2\n       -0.5 + 1.658312395i   y2\n\nNOTE   The line misses the parabola, so the intersection points are a complex\n       conjugate pair; SHIFT EXE shows each imaginary part. A line that does\n       meet the curve gives real answers: y = x² and y = 2x + 3\n       (1, 0, 0, 0, 2, 3) gives (-1, 1) and (3, 9).\n       Set D = 0 for a straight line. A must differ from D.\n```"
+    },
+    {
+      "id": "P11",
+      "label": "P11",
+      "title": "Intersections of Two Quadratic Curves (Complex)",
+      "mode": "CMPLX",
+      "category": "Coordinate",
+      "topics": [
+        "two circles",
+        "conic intersection",
+        "radical axis",
+        "complex",
+        "simultaneous quadratic"
+      ],
+      "summary": "Solve two quadratic curves that share the same x² and y² coefficients, with complex intersections.",
+      "inputs": "p, c1, d1, e1 of x² + p·y² + c1x + d1y + e1 = 0, then c2, d2, e2 of the second curve.",
+      "outputs": "x1, y1, x2, y2; complex answers show the real part first and Re-Im for the imaginary part.",
+      "example": "Two circles that never meet:  x² + y² = 25  and  x² + y² − 20x + 91 = 0.\nNormalise both to x² + p y² + c₁x + d₁y + e₁ = 0 (p = 1 for circles).\n\nTYPE   1  EXE   0  EXE   0  EXE   (-)25  EXE   (-)20  EXE   0  EXE   91  EXE\nGET    5.8                 x₁\n       0 - 2.939387691i   y₁\n       5.8                 x₂\n       0 + 2.939387691i   y₂\n\nNOTE   The circles are too far apart, so the two intersection points are a\n       complex conjugate pair; SHIFT EXE shows each imaginary part.\n       Curves that do meet give real answers: x²+y²−4x−6y+9 = 0 with\n       x²+y²−10x−6y+25 = 0  (1, -4, -6, 9, -10, -6, 25)  gives (2.667, 1.114)\n       and (2.667, 4.886). The two equations must share the same x² and y²\n       coefficients — divide both by that x² coefficient first.",
+      "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\n?→M\nB-X→X\nC-Y→Y\nD-M→M\nY=0⇒Goto 1\n-X÷Y→X\n-M÷Y→M\nA×M²+D+C×M→D\nM×2×A×X+C×X+B→B\n1+A×X²→Y\nB²-4×Y×D→A\n(-B-√(A))÷(2×Y)→C◢\nX×C+M◢\n(-B+√(A))÷(2×Y)→C◢\nX×C+M◢\nGoto 2\nLbl 1\n-M÷X→M\nM²+D+B×M→D\nM◢\nC²-4×A×D→B\n(-C-√(B))÷(2×A)◢\nM◢\n(-C+√(B))÷(2×A)◢\nLbl 2",
+      "bytes": 249,
+      "copyHeading": "Copy",
+      "after": "\n\n",
+      "guideBody": "**Use it to** Find where two quadratic curves meet — two circles, two ellipses of the same shape, or a circle and a same-shape ellipse — with complex intersection points when they do not meet.\n\n**Before you start** write both equations in the form x² + p·y² + cx + dy + e = 0, i.e. divide each equation by its x² coefficient. Two circles already have p = 1, so nothing needs changing.\n\n**Input.** p, c₁, d₁, e₁ (first curve) then c₂, d₂, e₂ (second curve).\n\n**Output.** x₁, y₁, x₂, y₂; complex answers show the real part first and Re-Im for the imaginary part.\n\n### Example\n\n```text\nTwo circles that never meet:  x² + y² = 25  and  x² + y² − 20x + 91 = 0.\nNormalise both to x² + p y² + c₁x + d₁y + e₁ = 0 (p = 1 for circles).\n\nTYPE   1  EXE   0  EXE   0  EXE   (-)25  EXE   (-)20  EXE   0  EXE   91  EXE\nGET    5.8                 x₁\n       0 - 2.939387691i   y₁\n       5.8                 x₂\n       0 + 2.939387691i   y₂\n\nNOTE   The circles are too far apart, so the two intersection points are a\n       complex conjugate pair; SHIFT EXE shows each imaginary part.\n       Curves that do meet give real answers: x²+y²−4x−6y+9 = 0 with\n       x²+y²−10x−6y+25 = 0  (1, -4, -6, 9, -10, -6, 25)  gives (2.667, 1.114)\n       and (2.667, 4.886). The two equations must share the same x² and y²\n       coefficients — divide both by that x² coefficient first.\n```"
     }
   ]
 }

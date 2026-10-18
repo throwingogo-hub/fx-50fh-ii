@@ -1,13 +1,13 @@
 # S5 CASIO fx-50FH program set
 
 These are the seven programs from the S5 program list, plus complex-number
-variant of Programs 2, 5 and a quadratic counterpart. They are available in the web calculator's
+variant of Programs 2, 5 plus two quadratic-curve solvers. They are available in the web calculator's
 **Program Studio → HKDSE Library**. Nothing installs automatically: a single
 program always asks for a destination slot, and an occupied slot or a pack
 needs a second confirmation before anything is replaced.
 
-Every heading shows the exact Program Studio byte count. The ten programs total
-**1538B**, more than the shared **680-byte** program memory, so install the ones
+Every heading shows the exact Program Studio byte count. The eleven programs total
+**1787B**, more than the shared **680-byte** program memory, so install the ones
 you need or one of the ready-made packs.
 
 ## Install from the in-app Library
@@ -485,5 +485,71 @@ A Y²+B Y+C◢
 (-X+√(X²-4DM))÷(2D)→Y
 Y◢
 A Y²+B Y+C◢
+```
+
+## P11 — Intersections of Two Quadratic Curves (Complex) (249B)
+
+**Use it to** Find where two quadratic curves meet — two circles, two ellipses of the same shape, or a circle and a same-shape ellipse — with complex intersection points when they do not meet.
+
+**Before you start** write both equations in the form x² + p·y² + cx + dy + e = 0, i.e. divide each equation by its x² coefficient. Two circles already have p = 1, so nothing needs changing.
+
+**Input.** p, c₁, d₁, e₁ (first curve) then c₂, d₂, e₂ (second curve).
+
+**Output.** x₁, y₁, x₂, y₂; complex answers show the real part first and Re-Im for the imaginary part.
+
+### Example
+
+```text
+Two circles that never meet:  x² + y² = 25  and  x² + y² − 20x + 91 = 0.
+Normalise both to x² + p y² + c₁x + d₁y + e₁ = 0 (p = 1 for circles).
+
+TYPE   1  EXE   0  EXE   0  EXE   (-)25  EXE   (-)20  EXE   0  EXE   91  EXE
+GET    5.8                 x₁
+       0 - 2.939387691i   y₁
+       5.8                 x₂
+       0 + 2.939387691i   y₂
+
+NOTE   The circles are too far apart, so the two intersection points are a
+       complex conjugate pair; SHIFT EXE shows each imaginary part.
+       Curves that do meet give real answers: x²+y²−4x−6y+9 = 0 with
+       x²+y²−10x−6y+25 = 0  (1, -4, -6, 9, -10, -6, 25)  gives (2.667, 1.114)
+       and (2.667, 4.886). The two equations must share the same x² and y²
+       coefficients — divide both by that x² coefficient first.
+```
+
+### Copy
+
+```text
+?→A
+?→B
+?→C
+?→D
+?→X
+?→Y
+?→M
+B-X→X
+C-Y→Y
+D-M→M
+Y=0⇒Goto 1
+-X÷Y→X
+-M÷Y→M
+A×M²+D+C×M→D
+M×2×A×X+C×X+B→B
+1+A×X²→Y
+B²-4×Y×D→A
+(-B-√(A))÷(2×Y)→C◢
+X×C+M◢
+(-B+√(A))÷(2×Y)→C◢
+X×C+M◢
+Goto 2
+Lbl 1
+-M÷X→M
+M²+D+B×M→D
+M◢
+C²-4×A×D→B
+(-C-√(B))÷(2×A)◢
+M◢
+(-C+√(B))÷(2×A)◢
+Lbl 2
 ```
 

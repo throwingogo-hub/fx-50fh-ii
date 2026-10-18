@@ -188,6 +188,25 @@ export const PROGRAMS = Object.freeze([
     "example": "Where do y = x² + 2x + 3 and y = x meet?\n\nTYPE   1  EXE   2  EXE   3  EXE   0  EXE   1  EXE   0  EXE\nGET    -0.5 - 1.658312395i   x1\n       -0.5 - 1.658312395i   y1\n       -0.5 + 1.658312395i   x2\n       -0.5 + 1.658312395i   y2\n\nNOTE   The line misses the parabola, so the intersection points are a complex\n       conjugate pair; SHIFT EXE shows each imaginary part. A line that does\n       meet the curve gives real answers: y = x² and y = 2x + 3\n       (1, 0, 0, 0, 2, 3) gives (-1, 1) and (3, 9).\n       Set D = 0 for a straight line. A must differ from D.",
     "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\nA-D→D\nB-X→X\nC-Y→M\n(-X-√(X²-4DM))÷(2D)→Y\nY◢\nA Y²+B Y+C◢\n(-X+√(X²-4DM))÷(2D)→Y\nY◢\nA Y²+B Y+C◢",
     "bytes": 111
+  },
+  {
+    "id": "P11",
+    "title": "Intersections of Two Quadratic Curves (Complex)",
+    "mode": "CMPLX",
+    "category": "Coordinate",
+    "topics": [
+      "two circles",
+      "conic intersection",
+      "radical axis",
+      "complex",
+      "simultaneous quadratic"
+    ],
+    "summary": "Solve two quadratic curves that share the same x² and y² coefficients, with complex intersections.",
+    "inputs": "p, c1, d1, e1 of x² + p·y² + c1x + d1y + e1 = 0, then c2, d2, e2 of the second curve.",
+    "outputs": "x1, y1, x2, y2; complex answers show the real part first and Re-Im for the imaginary part.",
+    "example": "Two circles that never meet:  x² + y² = 25  and  x² + y² − 20x + 91 = 0.\nNormalise both to x² + p y² + c₁x + d₁y + e₁ = 0 (p = 1 for circles).\n\nTYPE   1  EXE   0  EXE   0  EXE   (-)25  EXE   (-)20  EXE   0  EXE   91  EXE\nGET    5.8                 x₁\n       0 - 2.939387691i   y₁\n       5.8                 x₂\n       0 + 2.939387691i   y₂\n\nNOTE   The circles are too far apart, so the two intersection points are a\n       complex conjugate pair; SHIFT EXE shows each imaginary part.\n       Curves that do meet give real answers: x²+y²−4x−6y+9 = 0 with\n       x²+y²−10x−6y+25 = 0  (1, -4, -6, 9, -10, -6, 25)  gives (2.667, 1.114)\n       and (2.667, 4.886). The two equations must share the same x² and y²\n       coefficients — divide both by that x² coefficient first.",
+    "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\n?→M\nB-X→X\nC-Y→Y\nD-M→M\nY=0⇒Goto 1\n-X÷Y→X\n-M÷Y→M\nA×M²+D+C×M→D\nM×2×A×X+C×X+B→B\n1+A×X²→Y\nB²-4×Y×D→A\n(-B-√(A))÷(2×Y)→C◢\nX×C+M◢\n(-B+√(A))÷(2×Y)→C◢\nX×C+M◢\nGoto 2\nLbl 1\n-M÷X→M\nM²+D+B×M→D\nM◢\nC²-4×A×D→B\n(-C-√(B))÷(2×A)◢\nM◢\n(-C+√(B))÷(2×A)◢\nLbl 2",
+    "bytes": 249
   }
 ]);
 
@@ -250,12 +269,12 @@ export const PROGRAM_PACKS = Object.freeze([
   {
     "id": "complex",
     "name": "Complex",
-    "description": "The three complex solvers - simultaneous, line-circle and quadratic - beside the real linear solver.",
+    "description": "All four complex solvers: simultaneous, line-circle, quadratic and two-curve intersections.",
     "programIds": [
       "P8",
       "P9",
       "P10",
-      "P2"
+      "P11"
     ]
   }
 ]);
