@@ -524,6 +524,16 @@ t('sqrt(-2) keeps ten digits', '[MODE]2[SQRT]0-2)=@[EXE]', '1.414213562');
 te('sqrt of a complex argument is not supported', '[MODE]2[SQRT]3+4#[ENG])=', 'Math ERROR');
 te('sqrt(-1) stays a Math ERROR outside CMPLX', '[MODE]1[SQRT]0-1)=', 'Math ERROR');
 {
+  // A CMPLX-only key in COMP mode explains itself instead of doing nothing.
+  const m = new Machine();
+  send(m, '#[ENG]');
+  check('i outside CMPLX inserts nothing', m.tokens.length, 0);
+  check('i outside CMPLX raises a hint', Boolean(m.notice && /CMPLX/.test(m.notice.text)), true);
+  send(m, '[MODE]2');
+  send(m, '#[ENG]');
+  check('i inserts once CMPLX is selected', m.tokens.map(t => t.id).join(','), 'imag');
+}
+{
   const m = new Machine();
   send(m, '[MODE]2#[ENG][POW]3)=');
   check('i^3 is -i, real part', complexParts(m).join(','), '0,-1');

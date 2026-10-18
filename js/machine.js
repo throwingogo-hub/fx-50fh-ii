@@ -54,6 +54,8 @@ export class Machine {
     this.prog = null;
     this.message = null;
     this.off = false;
+    this.notice = null;
+    this.noticeSeq = 0;
   }
 
   // ==========================================================================
@@ -85,6 +87,7 @@ export class Machine {
   // ==========================================================================
   // key entry point
   press(id) {
+    this.notice = null;
     if (this.off) {
       if (id === 'ON') this.pressOn();
       return;
@@ -243,8 +246,33 @@ export class Machine {
         break;
     }
 
+    const hint = this.keyHint(id, shift, alpha);
+    if (hint) {
+      this.notice = { id: ++this.noticeSeq, text: hint };
+      return;
+    }
+
     const t = this.tokenFor(id, shift, alpha);
     if (t) this.insertToken(t);
+  }
+
+  // A key that the current mode cannot use should say why instead of doing
+  // nothing: the i and angle keys live on the same keycaps as ENG and (-), and
+  // a silent miss reads as a broken keyboard.
+  keyHint(id, shift, alpha) {
+    if (alpha && id === 'ENG' && this.mode !== 'CMPLX') {
+      return 'i works in CMPLX mode — press MODE then 2, then ALPHA then ENG.';
+    }
+    if (shift && id === 'NEG' && this.mode !== 'CMPLX') {
+      return 'The angle sign is CMPLX only — press MODE then 2.';
+    }
+    if (!alpha && !shift && id === 'ENG' && this.mode === 'CMPLX') {
+      return 'ENG is not available in CMPLX mode.';
+    }
+    if (!alpha && !shift && id === 'ENG' && !this.result && !this.tokens.length) {
+      return 'ENG works on a displayed result. For i, press ALPHA then ENG in CMPLX mode.';
+    }
+    return '';
   }
 
   // ==========================================================================

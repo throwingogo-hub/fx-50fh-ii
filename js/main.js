@@ -2,16 +2,32 @@
 // hotspot per real key, a canvas laid exactly over the glass, and the physical
 // keyboard mapped onto the same key ids.
 
-import { KEYS, SHELL_W, SHELL_H, PC_KEYS } from './keymap.js?v=studio-v2';
+import { KEYS, SHELL_W, SHELL_H, PC_KEYS } from './keymap.js?v=studio-v3';
 import { LCD, GLASS } from './lcd.js';
-import { Machine } from './machine.js?v=studio-v2';
-import { setupProgramStudio } from './studio.js?v=studio-v2';
+import { Machine } from './machine.js?v=studio-v3';
+import { setupProgramStudio } from './studio.js?v=studio-v3';
 
 const shell = document.getElementById('shell');
 const canvas = document.getElementById('lcd');
 const accessibleDisplay = document.getElementById('lcd-accessible');
+const modeChip = document.getElementById('mode-chip');
+const hintEl = document.getElementById('key-hint');
 const machine = new Machine();
 const lcd = new LCD(canvas);
+
+// A key the current mode refuses explains itself instead of doing nothing.
+let hintTimer = null;
+function showHint(text) {
+  hintEl.textContent = text;
+  hintEl.classList.add('show');
+  clearTimeout(hintTimer);
+  hintTimer = setTimeout(() => hintEl.classList.remove('show'), 5600);
+  const modeKey = buttons.get('MODE');
+  if (modeKey) {
+    modeKey.classList.add('attention');
+    setTimeout(() => modeKey.classList.remove('attention'), 1500);
+  }
+}
 
 const pct = (v, total) => (v / total) * 100 + '%';
 
@@ -50,6 +66,10 @@ for (const k of KEYS) {
 
 let blink = true;
 let dirty = true;
+let lastNotice = 0;
+let lastModeLabel = '';
+
+modeChip.addEventListener('click', () => tap('MODE'));
 
 const studioController = setupProgramStudio(machine, () => {
   blink = true;
@@ -118,6 +138,15 @@ function describeView(v) {
 
 function frame(now) {
   if (now - lastBlink > 480) { blink = !blink; lastBlink = now; dirty = true; }
+  if (machine.notice && machine.notice.id !== lastNotice) {
+    lastNotice = machine.notice.id;
+    showHint(machine.notice.text);
+  }
+  const modeLabel = `${machine.mode} · ${machine.setup.angle}`;
+  if (modeLabel !== lastModeLabel) {
+    lastModeLabel = modeLabel;
+    modeChip.textContent = modeLabel;
+  }
   if (dirty) {
     const v = machine.view();
     v.blinkOn = blink;

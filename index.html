@@ -5,11 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>CASIO fx-50FH II — web</title>
 <meta name="description" content="A 1:1 working web recreation of the CASIO fx-50FH II (H.K.E.A.A. approved) programmable scientific calculator: all six modes, 23 built-in formulas, 40 scientific constants, base-n, statistics and the BASIC-like program mode.">
-<link rel="stylesheet" href="css/style.css?v=studio-v2">
+<link rel="stylesheet" href="css/style.css?v=studio-v3">
 </head>
 <body>
 
 <main>
+  <p id="key-hint" class="key-hint" role="status" aria-live="polite"></p>
   <div id="workspace">
     <div id="calculator-column">
       <div id="stage">
@@ -17,6 +18,11 @@
           <canvas id="lcd" aria-hidden="true"></canvas>
           <output id="lcd-accessible" class="sr-only" aria-live="polite" aria-atomic="true"></output>
         </div>
+      </div>
+
+      <div id="mode-bar" class="mode-bar">
+        <button id="mode-chip" type="button" title="Current mode — opens the MODE menu">COMP · Deg</button>
+        <span class="mode-tip">MODE → 2 = CMPLX · ALPHA ENG = i</span>
       </div>
 
       <nav id="utility-nav" aria-label="Calculator tools">
@@ -181,6 +187,9 @@
         the LOGIC menu.</li>
       <li>In SD/REG: M+ is DT, SHIFT M+ is CL, SHIFT 1 is S-SUM,
         SHIFT 2 is S-VAR, and ▼ browses the entered samples.</li>
+      <li><b>Complex numbers:</b> press <b>MODE</b> then <b>2</b>, then
+        <b>ALPHA ENG</b> for i; <b>SHIFT EXE</b> switches Re⇔Im. The mode chip
+        under the keypad opens the same menu.</li>
       <li>In CMPLX: <b>ALPHA ENG</b> is i, <b>SHIFT (-)</b> is ∠,
         <b>SHIFT EXE</b> is Re⇔Im, <b>SHIFT (</b> is arg(, <b>SHIFT )</b> is
         Abs(, <b>SHIFT ,</b> is Conjg(, <b>SHIFT +</b> is ▶r∠θ and
@@ -198,6 +207,6 @@
   </section>
 </main>
 
-<script type="module" src="js/main.js?v=studio-v2"></script>
+<script type="module" src="js/main.js?v=studio-v3"></script>
 </body>
 </html>

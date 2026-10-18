@@ -129,6 +129,11 @@ The physical keyboard is mapped: digits and operators are literal, `Enter` is
 `EXE`, `Backspace` is `DEL`, `Escape` is `AC`, arrow keys drive `REPLAY`, and
 `Space` and `Tab` latch `SHIFT` and `ALPHA`. Everything else is clickable.
 
+A mode chip under the keypad shows the current mode and opens the `MODE` menu
+when clicked, and a key the current mode cannot use (for example `ALPHA ENG`,
+which is `i`, outside CMPLX) explains itself in a short message instead of
+doing nothing.
+
 ## Provenance and licensing
 
 The calculator's behaviour was reconstructed from CASIO's published user's
