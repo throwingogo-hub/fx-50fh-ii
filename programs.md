@@ -1,13 +1,13 @@
 # S5 CASIO fx-50FH program set
 
 These are the seven programs from the S5 program list, plus complex-number
-variant of Programs 2, 5 plus a combined solver and two quadratic-curve solvers. They are available in the web calculator's
+versions of Programs 2 and 5, a combined solver and two quadratic-curve solvers. They are available in the web calculator's
 **Program Studio → HKDSE Library**. Nothing installs automatically: a single
 program always asks for a destination slot, and an occupied slot or a pack
 needs a second confirmation before anything is replaced.
 
 Every heading shows the exact Program Studio byte count. The twelve programs total
-**2060B**, more than the shared **680-byte** program memory, so install the ones
+**1414B**, more than the shared **680-byte** program memory, so install the ones
 you need or one of the ready-made packs.
 
 ## Install from the in-app Library
@@ -24,8 +24,8 @@ Program Studio keeps one-step Undo after a Library, pack or backup install. Use
 ## Install manually
 
 1. Open Program Studio's **Editor** and select P1, P2, P3 or P4.
-2. Set **Run mode** to the mode printed beside that program (COMP for six of
-   the programs, CMPLX for P8 and REG for P7).
+2. Set **Run mode** to the mode printed beside that program (COMP for P1-P7,
+   CMPLX for P8-P12).
 3. Copy the entire matching code block below and paste it into **source**.
 4. Wait for **Structure OK**; the slot is saved automatically on this device.
 
@@ -41,7 +41,7 @@ next one. The last value appears as the program ends.
 For a negative input on the physical calculator use the (-) key. On the web
 keypad the ordinary - key works as a negative sign too, both at a program
 prompt and on the calculation line.
-## P1 — Quadratic: Vertex, Optimum and Roots (61B)
+## P1 — Quadratic: Vertex, Optimum and Roots (43B)
 
 **Use it to** Read the vertex, the optimum value and both real roots of any quadratic in one run.
 
@@ -71,11 +71,10 @@ NOTE   The second root appears when the program finishes; press EXE once
 ?→A
 ?→B
 ?→C
-B²-4AC→D
--B÷(2A)◢
--D÷(4A)◢
-(√(D)-B)÷(2A)◢
--B÷A-Ans
+-B÷2÷A→X◢
+C-AX²◢
+X+√(X²-C÷A◢
+2X-Ans
 ```
 
 ## P2 — Simultaneous Linear Equations in Two Unknowns (51B)
@@ -109,11 +108,12 @@ NOTE   The six values are read as A, B, C, D, X, Y. Put the constant of each
 ?→D
 ?→X
 ?→Y
-(XC-BY)÷(XA-BD)→M◢
-C÷B-AM÷B
+XA-BD→M
+(XC-BY)÷M◢
+(AY-CD)÷M
 ```
 
-## P3 — Cubic Equations (273B)
+## P3 — Cubic Equations (174B)
 
 **Use it to** Return every real root of a cubic without guessing a factor first.
 
@@ -133,7 +133,7 @@ GET    -1, -2, -3   the three roots
 
 NOTE   Three pauses means three distinct real roots. One pause means one real
        root and a complex conjugate pair, which this program does not print.
-       A repeated root is printed once. Example: 2, 7, 5, 1 gives -0.5, -0.382 and -2.62.
+       A double root is printed once. Example: 2, 7, 5, 1 gives -0.382, -0.5 and -2.62.
 ```
 
 ### Copy
@@ -142,32 +142,28 @@ NOTE   Three pauses means three distinct real roots. One pause means one real
 ?→A
 ?→B
 ?→C
-?→M
-2×B³÷(27×A³)-B×C÷(3×A²)+M÷A→D
-C÷A-B²÷(3×A²)→X
-B÷(3×A)→Y
-(D÷2)²+(X÷3)³→M
+?→D
+B÷3÷A→Y
+C÷3÷A-Y²→X
+(YC-D)÷2÷A-Y³→D
+D²+X³→M
 M<0⇒Goto 1
-M=0⇒Goto 2
-∛((-D÷2+√(M)))+∛((-D÷2-√(M)))-Y◢
-Goto 9
+M>0⇒Goto 2
+-Y-∛(D◢
 Lbl 2
-∛((-D÷2))→A
-2×A-Y◢
-A=0⇒Goto 9
--A-Y◢
-Goto 9
+-Y+∛(D+√(M))+∛(D-√(M
+Goto 3
 Lbl 1
 Deg
-cos⁻¹((3×D÷(2×X))×√((-3÷X)))÷3→M
-2×√((-X÷3))→A
-A×cos(M)-Y◢
-A×cos(M - 120)-Y◢
-A×cos(M - 240)-Y◢
-Lbl 9
+2√(-X→X
+cos⁻¹(8D÷X³)÷3→M
+Xcos(M)-Y◢
+Xcos(M-120)-Y◢
+Xcos(M+120)-Y
+Lbl 3
 ```
 
-## P4 — Centre and Radius of a Circle (38B)
+## P4 — Centre and Radius of a Circle (35B)
 
 **Use it to** Complete the square instantly for x² + y² + Cx + By + A = 0.
 
@@ -197,10 +193,10 @@ NOTE   The radius appears when the program finishes. Math ERROR at that step
 ?→C
 -A÷2→X◢
 -B÷2→Y◢
-√(X²+Y²-C)
+√(X²+Y²-C
 ```
 
-## P5 — Intersection Points of a Straight Line and a Circle (201B)
+## P5 — Intersection Points of a Straight Line and a Circle (110B)
 
 **Use it to** Substitute the line into the circle and print both intersection points.
 
@@ -217,8 +213,8 @@ TYPE   1  EXE   7  EXE   40  EXE   (-)2  EXE   (-)4  EXE   (-)20  EXE
 GET    5, 5      first intersection point
        -2, 6     second intersection point
 
-       A vertical line also works: x = 4 and x² + y² - 6x - 6y + 8 = 0
-       (TYPE 1, 0, 4, -6, -6, 8) gives (4, 6) and (4, 0).
+       A vertical line needs no special case: x = 4 and x² + y² - 6x - 6y + 8 = 0
+       (TYPE 1, 0, 4, -6, -6, 8) gives (4, 0) and (4, 6).
 
 NOTE   Input order is the line first, then the circle. A line that misses the
        circle gives Math ERROR because the discriminant is negative.
@@ -233,27 +229,18 @@ NOTE   Input order is the line first, then the circle. A line that misses the
 ?→C
 ?→B
 ?→A
-X=0⇒Goto 1
-Y²+CDY+AD²→A
--2XY-CDX+BD²→B
+-C÷2→C
+-B÷2→B
 D²+X²→M
-(-B-√(B²-4AM))÷(2M)→C
-(Y-CX)÷D◢
-C◢
-(-B+√(B²-4AM))÷(2M)→C
-(Y-CX)÷D◢
-C◢
-Goto 2
-Lbl 1
-Y÷D→X◢
-C²-4(X²+BX+A)→M
-(-C+√(M))÷2◢
-X◢
-(-C-√(M))÷2◢
-Lbl 2
+(Y-DC-XB)÷M→Y
+√((C²+B²-A)÷M-Y²→A
+C+YD+AX◢
+B+YX-AD◢
+C+YD-AX◢
+B+YX+AD
 ```
 
-## P6 — Centre, Radius and Equation from Three Given Points (166B)
+## P6 — Centre, Radius and Equation from Three Given Points (148B)
 
 **Use it to** Build the circle through three points and print its equation in general form.
 
@@ -288,17 +275,17 @@ C-A→C
 D-B→D
 X-A→X
 Y-B→Y
-(C(X²+Y²)-X(C²+D²))÷2÷(CY-DX)→M
-((C²+D²)Y-(X²+Y²)D)÷2÷(CY-DX)→C
-A+C→X
-B+M→Y
-X◢Y◢
-√((X-A)²+(Y-B)²)→M◢
--2X◢-2Y◢
+((C²+D²)Y-(X²+Y²)D)÷2÷(CY-DX→M
+(C(X²+Y²)-X(C²+D²))÷2÷(CY-DX→C
+A+M→X◢
+B+C→Y◢
+√(M²+C²→M◢
+-2X◢
+-2Y◢
 X²+Y²-M²
 ```
 
-## P7 — Centres of a Triangle (385B)
+## P7 — Centres of a Triangle (243B)
 
 **Use it to** All four triangle centres from the three vertex coordinates.
 
@@ -317,36 +304,35 @@ GET    12, 3      centroid G
        12, 16     orthocentre H
        12, -3.5   circumcentre O
 
-NOTE   This program runs in REG mode and reads the vertices in input order.
-       If Math ERROR appears, enter the origin first, then the other two
-       vertices: 0, 0, 6, 0, 0, 6 gives G(2, 2), I(1.757, 1.757), H(0, 0), O(3, 3).
+NOTE   Run it in COMP mode. The vertices may be entered in any order:
+       0, 0, 6, 0, 0, 6 gives G(2, 2), I(1.757, 1.757), H(0, 0), O(3, 3).
+       Collinear points give Math ERROR because they form no triangle.
 ```
 
 ### Copy
 
 ```text
-ClrStat
 ?→A
 ?→B
-A,B DT
 ?→C
 ?→D
-C,D DT
 ?→X
 ?→Y
-X,Y DT
-Σx÷3◢
-Σy÷3◢
-√((C-X)²+(D-Y)²)+√((X-A)²+(Y-B)²)+√((A-C)²+(B-D)²)→M
-(√((C-X)²+(D-Y)²)×A+√((X-A)²+(Y-B)²)×C+√((A-C)²+(B-D)²)×X)÷M◢
-(√((C-X)²+(D-Y)²)×B+√((X-A)²+(Y-B)²)×D+√((A-C)²+(B-D)²)×Y)÷M◢
-2×(A×(D-Y)+C×(Y-B)+X×(B-D))→M
-Pol(((A²+B²)×(D-Y)+(C²+D²)×(Y-B)+(X²+Y²)×(B-D))÷M,((A²+B²)×(X-C)+(C²+D²)×(A-X)+(X²+Y²)×(C-A))÷M)
-Rec(X,Y)
-Σx-2X◢
-Σy-2Y◢
-X◢
-Y◢
+(A+C+X)÷3◢
+(B+D+Y)÷3◢
+C-A→C
+D-B→D
+X-A→X
+Y-B→Y
+√((C-X)²+(D-Y)²)+√(X²+Y²)+√(C²+D²→M
+A+(C√(X²+Y²)+X√(C²+D²))÷M◢
+B+(D√(X²+Y²)+Y√(C²+D²))÷M◢
+((C²+D²)Y-(X²+Y²)D)÷2÷(CY-DX→M
+A+C+X-2M◢
+(C(X²+Y²)-X(C²+D²))÷2÷(CY-DX→C
+B+D+Y-2C◢
+A+M◢
+B+C
 ```
 
 ## P8 — Simultaneous Equations (Complex) (51B)
@@ -382,11 +368,12 @@ NOTE   Run the program in CMPLX mode — i is ALPHA ENG. Every coefficient may
 ?→D
 ?→X
 ?→Y
-(XC-BY)÷(XA-BD)→M◢
-C÷B-AM÷B
+XA-BD→M
+(XC-BY)÷M◢
+(AY-CD)÷M
 ```
 
-## P9 — Intersections of a Line and a Circle (Complex) (201B)
+## P9 — Intersections of a Line and a Circle (Complex) (110B)
 
 **Use it to** Find where a line meets a circle, even when they do not meet in the real plane — the answers come back as a complex conjugate pair.
 
@@ -421,27 +408,18 @@ NOTE   The line misses the circle, so the intersections are a complex
 ?→C
 ?→B
 ?→A
-X=0⇒Goto 1
-Y²+CDY+AD²→A
--2XY-CDX+BD²→B
+-C÷2→C
+-B÷2→B
 D²+X²→M
-(-B-√(B²-4AM))÷(2M)→C
-(Y-CX)÷D◢
-C◢
-(-B+√(B²-4AM))÷(2M)→C
-(Y-CX)÷D◢
-C◢
-Goto 2
-Lbl 1
-Y÷D→X◢
-C²-4(X²+BX+A)→M
-(-C+√(M))÷2◢
-X◢
-(-C-√(M))÷2◢
-Lbl 2
+(Y-DC-XB)÷M→Y
+√((C²+B²-A)÷M-Y²→A
+C+YD+AX◢
+B+YX-AD◢
+C+YD-AX◢
+B+YX+AD
 ```
 
-## P10 — Simultaneous Equations (Quadratic, Complex) (111B)
+## P10 — Simultaneous Equations (Quadratic, Complex) (91B)
 
 **Use it to** Solve two simultaneous equations that are quadratic in x — a curve and a line, or two curves — and return complex intersections when they do not meet in the real plane.
 
@@ -478,16 +456,16 @@ NOTE   The line misses the parabola, so the intersection points are a complex
 ?→Y
 A-D→D
 B-X→X
-C-Y→M
-(-X-√(X²-4DM))÷(2D)→Y
-Y◢
-A Y²+B Y+C◢
-(-X+√(X²-4DM))÷(2D)→Y
-Y◢
-A Y²+B Y+C◢
+C-Y→Y
+-X÷2÷D→M
+√(M²-Y÷D→D
+M-D→X◢
+AX²+BX+C◢
+M+D→X◢
+AX²+BX+C
 ```
 
-## P11 — Intersections of Two Quadratic Curves (Complex) (249B)
+## P11 — Intersections of Two Quadratic Curves (Complex) (195B)
 
 **Use it to** Find where two quadratic curves meet — two circles, two ellipses of the same shape, or a circle and a same-shape ellipse — with complex intersection points when they do not meet.
 
@@ -533,27 +511,26 @@ D-M→M
 Y=0⇒Goto 1
 -X÷Y→X
 -M÷Y→M
-A×M²+D+C×M→D
-M×2×A×X+C×X+B→B
-1+A×X²→Y
-B²-4×Y×D→A
-(-B-√(A))÷(2×Y)→C◢
-X×C+M◢
-(-B+√(A))÷(2×Y)→C◢
-X×C+M◢
+1+AX²→Y
+-(2AMX+CX+B)÷2÷Y→B
+√(B²-(AM²+CM+D)÷Y→D
+B-D→C◢
+XC+M◢
+B+D→C◢
+XC+M
 Goto 2
 Lbl 1
 -M÷X→M
-M²+D+B×M→D
+-C÷2÷A→X
+√(X²-(M²+BM+D)÷A→Y
 M◢
-C²-4×A×D→B
-(-C-√(B))÷(2×A)◢
+X-Y◢
 M◢
-(-C+√(B))÷(2×A)◢
+X+Y
 Lbl 2
 ```
 
-## P12 — Simultaneous Equations and Line-Circle (Combined) (273B)
+## P12 — Simultaneous Equations and Line-Circle (Combined) (163B)
 
 **Use it to** Solve either of the two jobs the paper keeps asking for, from one program: a 2×2 linear system, or a straight line meeting a circle — both complex-capable.
 
@@ -572,11 +549,11 @@ Mode 1 - simultaneous linear equations (complex allowed):
 
 Mode 2 - line Ax + By + C = 0 with circle x² + y² + Dx + Xy + Y = 0:
   2  EXE   1  EXE   7  EXE   (-)40  EXE   (-)2  EXE   (-)4  EXE   (-)20  EXE
-  → (-2, 6) and (5, 5)
+  → (5, 5) and (-2, 6)
 
 NOTE   Mode 2 returns complex points when the line misses the circle:
-       2, 1, 1, -10, 0, 0, -25 gives (5 - 3.535533906i, 5 + 3.535533906i)
-       and its conjugate. A vertical line has its own branch:
+       2, 1, 1, -10, 0, 0, -25 gives (5 + 3.535533906i, 5 - 3.535533906i)
+       and its conjugate. A vertical line works too:
        2, 1, 0, -4, -6, -6, 8 gives (4, 0) and (4, 6).
        Mode 1 takes a+bi coefficients and answers, exactly like P8.
 ```
@@ -591,30 +568,21 @@ NOTE   Mode 2 returns complex points when the line misses the circle:
 ?→D
 ?→X
 ?→Y
-M=2⇒Goto 2
-(X×C-B×Y)÷(X×A-B×D)→M◢
-C÷B-A×M÷B
-Goto 9
-Lbl 2
-B=0⇒Goto 3
+M=2⇒Goto 1
+XA-BD→M
+(XC-BY)÷M◢
+(AY-CD)÷M
+Goto 2
+Lbl 1
+-D÷2→D
+-X÷2→X
 A²+B²→M
-2×A×C+D×B²-X×A×B→D
-C²-X×B×C+Y×B²→X
-D²-4×M×X→Y
-(-D-√(Y))÷(2×M)→X
-X◢
-(-A×X-C)÷B◢
-(-D+√(Y))÷(2×M)→X
-X◢
-(-A×X-C)÷B◢
-Goto 9
-Lbl 3
--C÷A→M
-X²-4×(M²+Y+D×M)→D
-M◢
-(-X-√(D))÷2◢
-M◢
-(-X+√(D))÷2◢
-Lbl 9
+(-C-AD-BX)÷M→C
+√((D²+X²-Y)÷M-C²→Y
+D+CA+YB◢
+X+CB-YA◢
+D+CA-YB◢
+X+CB+YA
+Lbl 2
 ```
 

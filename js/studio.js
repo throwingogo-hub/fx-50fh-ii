@@ -4,8 +4,8 @@
 
 import { Program, PROGRAM_MEMORY } from './program.js';
 import { bytesOf } from './tokens.js';
-import { formatProgramText, parseProgramText } from './program-codec.js';
-import { PROGRAMS, PROGRAM_PACKS, PROGRAM_BY_ID } from './program-catalog.generated.js?v=studio-v9';
+import { formatProgramText, parseProgramText } from './program-codec.js?v=studio-v10';
+import { PROGRAMS, PROGRAM_PACKS, PROGRAM_BY_ID } from './program-catalog.generated.js?v=studio-v10';
 
 const STORAGE_KEY = 'fx50fhii.program-studio.v3';
 const LEGACY_STORAGE_KEY = 'fx50fhii.program-studio.v2';
@@ -127,6 +127,22 @@ export function setupProgramStudio(machine, onMachineChange) {
 
   function programFor(slot) { return machine.programs[slot]; }
 
+  // What the calculator holds for a slot, including an open key-editor draft.
+  function machineSignature(slot) {
+    const program = programFor(slot);
+    const tokens = machine.prog?.stage === 'edit' && machine.prog.slot === slot
+      ? machine.prog.tokens
+      : program?.tokens;
+    return `${program?.mode || ''}|${(tokens || []).map(token => token.id).join(' ')}`;
+  }
+  let machineSeen = [];
+  const rememberMachine = () => { machineSeen = drafts.map((_, slot) => machineSignature(slot)); };
+  // Every Studio-made change is already reflected in its drafts.
+  const notifyMachine = () => { rememberMachine(); onMachineChange(); };
+
+  // A slot holds something when either its draft or the calculator has text.
+  const slotOccupied = slot => Boolean(drafts[slot]?.source.trim() || programFor(slot)?.tokens.length);
+
   function deriveDraft(slot) {
     const program = programFor(slot);
     const activeTokens = machine.prog?.stage === 'edit' && machine.prog.slot === slot
@@ -151,7 +167,7 @@ export function setupProgramStudio(machine, onMachineChange) {
       : deriveDraft(index));
     selected = clampSlot(state.selected);
     showSlot(selected);
-    onMachineChange();
+    notifyMachine();
     return true;
   }
 
@@ -248,7 +264,7 @@ export function setupProgramStudio(machine, onMachineChange) {
     drafts[selected] = { mode: mode.value, source: source.value };
     if (commit && storable) {
       machine.setStudioProgram(selected, mode.value, parsed.tokenIds);
-      onMachineChange();
+      notifyMachine();
     }
     persist();
     renderSlots();
@@ -272,7 +288,16 @@ export function setupProgramStudio(machine, onMachineChange) {
     librarySlot.value = String(selected);
   }
 
+  // A pending debounced edit belongs to the slot it was typed in.
+  function flushPendingInput() {
+    if (!inputTimer) return;
+    clearTimeout(inputTimer);
+    inputTimer = 0;
+    inspectEditor(true);
+  }
+
   function showSlot(slot) {
+    if (clampSlot(slot) !== selected) flushPendingInput();
     clearArmed = false;
     clearTimeout(clearTimer);
     selected = clampSlot(slot);
@@ -373,7 +398,7 @@ export function setupProgramStudio(machine, onMachineChange) {
   }
 
   function installProgram(program, slot, button) {
-    const occupied = Boolean(drafts[slot]?.source.trim());
+    const occupied = slotOccupied(slot);
     if (occupied && !requireReplacementConfirmation(`program:${program.id}:${slot}`, button, `Replace ${slotName(slot)}?`)) return;
     const parsed = parseProgramText(program.source, program.mode);
     const total = totalBytesWith(slot, parsed.bytes);
@@ -389,14 +414,14 @@ export function setupProgramStudio(machine, onMachineChange) {
     selected = slot;
     showSlot(slot);
     persist();
-    onMachineChange();
+    notifyMachine();
     libraryStatus.textContent = `${program.title} installed in ${slotName(slot)}. Undo is available in Editor.`;
     saveState.textContent = 'installed';
     renderLibrary();
   }
 
   function installPack(pack, button) {
-    const occupied = drafts.some(draft => draft?.source.trim());
+    const occupied = drafts.some((_, slot) => slotOccupied(slot));
     if (occupied && !requireReplacementConfirmation(`pack:${pack.id}`, button, 'Replace all four?')) return;
     const entries = pack.programIds.map(id => {
       const program = PROGRAM_BY_ID.get(id);
@@ -418,7 +443,7 @@ export function setupProgramStudio(machine, onMachineChange) {
     selected = 0;
     showSlot(0);
     persist();
-    onMachineChange();
+    notifyMachine();
     libraryStatus.textContent = `${pack.name} installed across P1–P4. Undo is available in Editor.`;
     saveState.textContent = 'pack installed';
     renderLibrary();
@@ -599,7 +624,7 @@ export function setupProgramStudio(machine, onMachineChange) {
     selected = 0;
     showSlot(0);
     persist();
-    onMachineChange();
+    notifyMachine();
     feedback.textContent = 'Backup restored across all four slots. Undo is available.';
     saveState.textContent = 'restored';
     renderLibrary();
@@ -607,6 +632,7 @@ export function setupProgramStudio(machine, onMachineChange) {
 
   loadStorage();
   for (let i = 0; i < drafts.length; i++) if (!drafts[i]) drafts[i] = deriveDraft(i);
+  rememberMachine();
   buildPalette();
   showSlot(selected);
   renderLibrary();
@@ -657,7 +683,7 @@ export function setupProgramStudio(machine, onMachineChange) {
     drafts[selected] = { mode: mode.value, source: source.value };
     persist(); // raw text is recoverable even before it becomes valid
     clearTimeout(inputTimer);
-    inputTimer = setTimeout(() => inspectEditor(true), 120);
+    inputTimer = setTimeout(() => { inputTimer = 0; inspectEditor(true); }, 120);
   });
 
   mode.addEventListener('change', () => inspectEditor(true));
@@ -722,16 +748,21 @@ export function setupProgramStudio(machine, onMachineChange) {
     const state = inspectEditor(true);
     if (action === 'run' && !state.runnable) return;
     if (action === 'edit-calculator' && !state.storable) return;
+    if (action === 'run' || action === 'edit-calculator') {
+      // The keyboard now belongs to the calculator: Enter must reach EXE
+      // rather than press this button a second time.
+      if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+    }
     if (action === 'run') {
       machine.prog = null;
       machine.mode = 'COMP';
       machine.error = null;
       machine.runProgram(selected);
-      onMachineChange();
+      notifyMachine();
       document.getElementById('stage').scrollIntoView({ behavior: scrollBehavior(), block: 'start' });
     } else if (action === 'edit-calculator') {
       machine.editProgramSlot(selected);
-      onMachineChange();
+      notifyMachine();
       document.getElementById('stage').scrollIntoView({ behavior: scrollBehavior(), block: 'start' });
     } else if (action === 'clear') {
       if (!clearArmed) {
@@ -744,7 +775,7 @@ export function setupProgramStudio(machine, onMachineChange) {
       machine.clearStudioProgram(selected);
       drafts[selected] = { mode: 'COMP', source: '' };
       showSlot(selected);
-      onMachineChange();
+      notifyMachine();
       renderLibrary();
     }
   });
@@ -754,8 +785,18 @@ export function setupProgramStudio(machine, onMachineChange) {
   return {
     persist,
     syncFromMachine() {
-      if (document.activeElement === source && !lastValid) { persist(); return; }
-      for (let i = 0; i < drafts.length; i++) drafts[i] = deriveDraft(i);
+      // Only slots the calculator itself changed are re-read; every other
+      // draft, valid or not, stays exactly as the user left it.
+      let changed = false;
+      for (let i = 0; i < drafts.length; i++) {
+        const signature = machineSignature(i);
+        if (signature === machineSeen[i]) continue;
+        machineSeen[i] = signature;
+        drafts[i] = deriveDraft(i);
+        changed = true;
+      }
+      if (!changed) return;
+      if (inputTimer) { clearTimeout(inputTimer); inputTimer = 0; }
       showSlot(selected);
       persist();
       if (currentView === 'library') renderLibrary();

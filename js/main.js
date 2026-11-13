@@ -2,10 +2,10 @@
 // hotspot per real key, a canvas laid exactly over the glass, and the physical
 // keyboard mapped onto the same key ids.
 
-import { KEYS, SHELL_W, SHELL_H, PC_KEYS } from './keymap.js?v=studio-v9';
-import { LCD, GLASS } from './lcd.js?v=studio-v9';
-import { Machine } from './machine.js?v=studio-v9';
-import { setupProgramStudio } from './studio.js?v=studio-v9';
+import { KEYS, SHELL_W, SHELL_H, PC_KEYS } from './keymap.js?v=studio-v10';
+import { LCD, GLASS } from './lcd.js?v=studio-v10';
+import { Machine } from './machine.js?v=studio-v10';
+import { setupProgramStudio } from './studio.js?v=studio-v10';
 
 const shell = document.getElementById('shell');
 const canvas = document.getElementById('lcd');
@@ -112,8 +112,18 @@ shell.addEventListener('click', (e) => {
 
 // ---- physical keyboard ------------------------------------------------------
 window.addEventListener('keydown', (e) => {
-  if (e.target.closest('textarea, input, select, [contenteditable="true"]')) return;
-  if (e.metaKey || e.ctrlKey) return;
+  const target = e.target instanceof Element ? e.target : document.body;
+  if (target.closest('textarea, input, select, [contenteditable="true"]')) return;
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  // A focused page control keeps its own Enter/Space (and a tab list its
+  // arrows) instead of having them turned into EXE, SHIFT or REPLAY.
+  const control = target.closest('button, a[href], summary, [role="tab"]');
+  if (control && !control.classList.contains('key')) {
+    if (e.key === 'Enter' || e.key === ' ') return;
+    if (control.closest('[role="tablist"]') && /^(Arrow|Home$|End$)/.test(e.key)) return;
+  }
+  // On a focused calculator key, Enter presses that key, as its click would.
+  if (control?.classList.contains('key') && (e.key === 'Enter' || e.key === ' ')) return;
   let m = PC_KEYS[e.key];
   if (m === undefined && e.key.length === 1) m = PC_KEYS[e.key.toLowerCase()];
   if (m === undefined) return;

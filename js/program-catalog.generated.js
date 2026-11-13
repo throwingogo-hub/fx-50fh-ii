@@ -20,8 +20,8 @@ export const PROGRAMS = Object.freeze([
     "inputs": "a, b and c of ax² + bx + c = 0, in that order.",
     "outputs": "Vertex x, the optimum value (vertex y), then the two real roots.",
     "example": "Solve f(x) = x² + 2x − 15 and describe its graph.\n\nTYPE   1  EXE   2  EXE   (-)15  EXE\nGET    -1      vertex x-coordinate (h)\n       -16     minimum value (k)\n       3       first root\n       -5      second root\n\nNOTE   The second root appears when the program finishes; press EXE once\n       more if the display is still showing the first root. If Math ERROR\n       appears at the first root, b² - 4ac < 0 and the roots are not real.",
-    "source": "?→A\n?→B\n?→C\nB²-4AC→D\n-B÷(2A)◢\n-D÷(4A)◢\n(√(D)-B)÷(2A)◢\n-B÷A-Ans",
-    "bytes": 61
+    "source": "?→A\n?→B\n?→C\n-B÷2÷A→X◢\nC-AX²◢\nX+√(X²-C÷A◢\n2X-Ans",
+    "bytes": 43
   },
   {
     "id": "P2",
@@ -38,7 +38,7 @@ export const PROGRAMS = Object.freeze([
     "inputs": "A, B, C of Ax + By = C, then D, X, Y of Dx + Xy = Y.",
     "outputs": "x, then y.",
     "example": "Solve  x + y = 1  and  2x - y = 5.\n\nTYPE   1  EXE   1  EXE   1  EXE   2  EXE   (-)1  EXE   5  EXE\nGET    2      x\n       -1     y\n\nNOTE   The six values are read as A, B, C, D, X, Y. Put the constant of each\n       equation on the right-hand side before you start. If the determinant\n       XA - BD is zero the lines are parallel or identical, and Math ERROR is shown.",
-    "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\n(XC-BY)÷(XA-BD)→M◢\nC÷B-AM÷B",
+    "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\nXA-BD→M\n(XC-BY)÷M◢\n(AY-CD)÷M",
     "bytes": 51
   },
   {
@@ -55,10 +55,10 @@ export const PROGRAMS = Object.freeze([
     ],
     "summary": "Return every real root of a cubic without guessing a factor first.",
     "inputs": "a, b, c and d of ax³ + bx² + cx + d = 0.",
-    "outputs": "The distinct real roots, one pause each.",
-    "example": "Factorise x³ + 6x² + 11x + 6 = 0.\n\nTYPE   1  EXE   6  EXE   11  EXE   6  EXE\nGET    -1, -2, -3   the three roots\n\n       so  x³ + 6x² + 11x + 6 = (x + 1)(x + 2)(x + 3).\n\nNOTE   Three pauses means three distinct real roots. One pause means one real\n       root and a complex conjugate pair, which this program does not print.\n       A repeated root is printed once. Example: 2, 7, 5, 1 gives -0.5, -0.382 and -2.62.",
-    "source": "?→A\n?→B\n?→C\n?→M\n2×B³÷(27×A³)-B×C÷(3×A²)+M÷A→D\nC÷A-B²÷(3×A²)→X\nB÷(3×A)→Y\n(D÷2)²+(X÷3)³→M\nM<0⇒Goto 1\nM=0⇒Goto 2\n∛((-D÷2+√(M)))+∛((-D÷2-√(M)))-Y◢\nGoto 9\nLbl 2\n∛((-D÷2))→A\n2×A-Y◢\nA=0⇒Goto 9\n-A-Y◢\nGoto 9\nLbl 1\nDeg\ncos⁻¹((3×D÷(2×X))×√((-3÷X)))÷3→M\n2×√((-X÷3))→A\nA×cos(M)-Y◢\nA×cos(M - 120)-Y◢\nA×cos(M - 240)-Y◢\nLbl 9",
-    "bytes": 273
+    "outputs": "The real roots, one pause each; a double root is printed once.",
+    "example": "Factorise x³ + 6x² + 11x + 6 = 0.\n\nTYPE   1  EXE   6  EXE   11  EXE   6  EXE\nGET    -1, -2, -3   the three roots\n\n       so  x³ + 6x² + 11x + 6 = (x + 1)(x + 2)(x + 3).\n\nNOTE   Three pauses means three distinct real roots. One pause means one real\n       root and a complex conjugate pair, which this program does not print.\n       A double root is printed once. Example: 2, 7, 5, 1 gives -0.382, -0.5 and -2.62.",
+    "source": "?→A\n?→B\n?→C\n?→D\nB÷3÷A→Y\nC÷3÷A-Y²→X\n(YC-D)÷2÷A-Y³→D\nD²+X³→M\nM<0⇒Goto 1\nM>0⇒Goto 2\n-Y-∛(D◢\nLbl 2\n-Y+∛(D+√(M))+∛(D-√(M\nGoto 3\nLbl 1\nDeg\n2√(-X→X\ncos⁻¹(8D÷X³)÷3→M\nXcos(M)-Y◢\nXcos(M-120)-Y◢\nXcos(M+120)-Y\nLbl 3",
+    "bytes": 174
   },
   {
     "id": "P4",
@@ -75,8 +75,8 @@ export const PROGRAMS = Object.freeze([
     "inputs": "C, B and A of x² + y² + Cx + By + A = 0.",
     "outputs": "Centre x, centre y, then the radius.",
     "example": "Find the centre and radius of x² + y² + 4x - 8y + 3 = 0.\n\nTYPE   4  EXE   (-)8  EXE   3  EXE\nGET    -2           x-coordinate of the centre\n       4            y-coordinate of the centre\n       4.123105626  radius = √17\n\nNOTE   The radius appears when the program finishes. Math ERROR at that step\n       means x² + y² + Cx + By + A = 0 is not a real circle.",
-    "source": "?→A\n?→B\n?→C\n-A÷2→X◢\n-B÷2→Y◢\n√(X²+Y²-C)",
-    "bytes": 38
+    "source": "?→A\n?→B\n?→C\n-A÷2→X◢\n-B÷2→Y◢\n√(X²+Y²-C",
+    "bytes": 35
   },
   {
     "id": "P5",
@@ -92,9 +92,9 @@ export const PROGRAMS = Object.freeze([
     "summary": "Substitute the line into the circle and print both intersection points.",
     "inputs": "D, X, Y of the line Dx + Xy = Y, then C, B, A of x² + y² + Cx + By + A = 0.",
     "outputs": "x1, y1, x2, y2.",
-    "example": "Where does x + 7y = 40 meet x² + y² - 2x - 4y - 20 = 0?\n\nTYPE   1  EXE   7  EXE   40  EXE   (-)2  EXE   (-)4  EXE   (-)20  EXE\nGET    5, 5      first intersection point\n       -2, 6     second intersection point\n\n       A vertical line also works: x = 4 and x² + y² - 6x - 6y + 8 = 0\n       (TYPE 1, 0, 4, -6, -6, 8) gives (4, 6) and (4, 0).\n\nNOTE   Input order is the line first, then the circle. A line that misses the\n       circle gives Math ERROR because the discriminant is negative.",
-    "source": "?→D\n?→X\n?→Y\n?→C\n?→B\n?→A\nX=0⇒Goto 1\nY²+CDY+AD²→A\n-2XY-CDX+BD²→B\nD²+X²→M\n(-B-√(B²-4AM))÷(2M)→C\n(Y-CX)÷D◢\nC◢\n(-B+√(B²-4AM))÷(2M)→C\n(Y-CX)÷D◢\nC◢\nGoto 2\nLbl 1\nY÷D→X◢\nC²-4(X²+BX+A)→M\n(-C+√(M))÷2◢\nX◢\n(-C-√(M))÷2◢\nLbl 2",
-    "bytes": 201
+    "example": "Where does x + 7y = 40 meet x² + y² - 2x - 4y - 20 = 0?\n\nTYPE   1  EXE   7  EXE   40  EXE   (-)2  EXE   (-)4  EXE   (-)20  EXE\nGET    5, 5      first intersection point\n       -2, 6     second intersection point\n\n       A vertical line needs no special case: x = 4 and x² + y² - 6x - 6y + 8 = 0\n       (TYPE 1, 0, 4, -6, -6, 8) gives (4, 0) and (4, 6).\n\nNOTE   Input order is the line first, then the circle. A line that misses the\n       circle gives Math ERROR because the discriminant is negative.",
+    "source": "?→D\n?→X\n?→Y\n?→C\n?→B\n?→A\n-C÷2→C\n-B÷2→B\nD²+X²→M\n(Y-DC-XB)÷M→Y\n√((C²+B²-A)÷M-Y²→A\nC+YD+AX◢\nB+YX-AD◢\nC+YD-AX◢\nB+YX+AD",
+    "bytes": 110
   },
   {
     "id": "P6",
@@ -111,13 +111,13 @@ export const PROGRAMS = Object.freeze([
     "inputs": "x1, y1, x2, y2, x3, y3.",
     "outputs": "Centre x, centre y, radius, then -2h, -2k and h² + k² - r² for the equation.",
     "example": "Find the circle through (5, 2), (2, 3) and (6, -5).\n\nTYPE   5  EXE   2  EXE   2  EXE   3  EXE   6  EXE   (-)5  EXE\nGET    2, -2        centre (h, k)\n       5            radius\n       -4, 4, -17   the equation x² + y² - 4x + 4y - 17 = 0\n\nNOTE   Enter the six coordinates in point order. Collinear points give\n       Math ERROR because no circle passes through them.",
-    "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\nC-A→C\nD-B→D\nX-A→X\nY-B→Y\n(C(X²+Y²)-X(C²+D²))÷2÷(CY-DX)→M\n((C²+D²)Y-(X²+Y²)D)÷2÷(CY-DX)→C\nA+C→X\nB+M→Y\nX◢Y◢\n√((X-A)²+(Y-B)²)→M◢\n-2X◢-2Y◢\nX²+Y²-M²",
-    "bytes": 166
+    "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\nC-A→C\nD-B→D\nX-A→X\nY-B→Y\n((C²+D²)Y-(X²+Y²)D)÷2÷(CY-DX→M\n(C(X²+Y²)-X(C²+D²))÷2÷(CY-DX→C\nA+M→X◢\nB+C→Y◢\n√(M²+C²→M◢\n-2X◢\n-2Y◢\nX²+Y²-M²",
+    "bytes": 148
   },
   {
     "id": "P7",
     "title": "Centres of a Triangle",
-    "mode": "REG",
+    "mode": "COMP",
     "category": "Geometry",
     "topics": [
       "centroid",
@@ -129,9 +129,9 @@ export const PROGRAMS = Object.freeze([
     "summary": "All four triangle centres from the three vertex coordinates.",
     "inputs": "x1, y1, x2, y2, x3, y3.",
     "outputs": "Centroid, incentre, orthocentre, then circumcentre.",
-    "example": "Take the triangle with vertices O(0, 0), A(24, 0) and B(12, 9).\n\nTYPE   0  EXE   0  EXE   24  EXE   0  EXE   12  EXE   9  EXE\nGET    12, 3      centroid G\n       12, 4      incentre I\n       12, 16     orthocentre H\n       12, -3.5   circumcentre O\n\nNOTE   This program runs in REG mode and reads the vertices in input order.\n       If Math ERROR appears, enter the origin first, then the other two\n       vertices: 0, 0, 6, 0, 0, 6 gives G(2, 2), I(1.757, 1.757), H(0, 0), O(3, 3).",
-    "source": "ClrStat\n?→A\n?→B\nA,B DT\n?→C\n?→D\nC,D DT\n?→X\n?→Y\nX,Y DT\nΣx÷3◢\nΣy÷3◢\n√((C-X)²+(D-Y)²)+√((X-A)²+(Y-B)²)+√((A-C)²+(B-D)²)→M\n(√((C-X)²+(D-Y)²)×A+√((X-A)²+(Y-B)²)×C+√((A-C)²+(B-D)²)×X)÷M◢\n(√((C-X)²+(D-Y)²)×B+√((X-A)²+(Y-B)²)×D+√((A-C)²+(B-D)²)×Y)÷M◢\n2×(A×(D-Y)+C×(Y-B)+X×(B-D))→M\nPol(((A²+B²)×(D-Y)+(C²+D²)×(Y-B)+(X²+Y²)×(B-D))÷M,((A²+B²)×(X-C)+(C²+D²)×(A-X)+(X²+Y²)×(C-A))÷M)\nRec(X,Y)\nΣx-2X◢\nΣy-2Y◢\nX◢\nY◢",
-    "bytes": 385
+    "example": "Take the triangle with vertices O(0, 0), A(24, 0) and B(12, 9).\n\nTYPE   0  EXE   0  EXE   24  EXE   0  EXE   12  EXE   9  EXE\nGET    12, 3      centroid G\n       12, 4      incentre I\n       12, 16     orthocentre H\n       12, -3.5   circumcentre O\n\nNOTE   Run it in COMP mode. The vertices may be entered in any order:\n       0, 0, 6, 0, 0, 6 gives G(2, 2), I(1.757, 1.757), H(0, 0), O(3, 3).\n       Collinear points give Math ERROR because they form no triangle.",
+    "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\n(A+C+X)÷3◢\n(B+D+Y)÷3◢\nC-A→C\nD-B→D\nX-A→X\nY-B→Y\n√((C-X)²+(D-Y)²)+√(X²+Y²)+√(C²+D²→M\nA+(C√(X²+Y²)+X√(C²+D²))÷M◢\nB+(D√(X²+Y²)+Y√(C²+D²))÷M◢\n((C²+D²)Y-(X²+Y²)D)÷2÷(CY-DX→M\nA+C+X-2M◢\n(C(X²+Y²)-X(C²+D²))÷2÷(CY-DX→C\nB+D+Y-2C◢\nA+M◢\nB+C",
+    "bytes": 243
   },
   {
     "id": "P8",
@@ -148,7 +148,7 @@ export const PROGRAMS = Object.freeze([
     "inputs": "A, B, C of Ax + By = C then D, X, Y of Dx + Xy = Y; each may be a+bi.",
     "outputs": "x, then y; complex answers show the real part first and Re-Im for the imaginary part.",
     "example": "Solve  (1 + i)x + y = 2  and  x − y = i.\n\nTYPE   1+i  EXE   1  EXE   2  EXE   1  EXE   (-)1  EXE   i  EXE\nGET    1      x — a real number, so Re⇔Im shows 0\n       1      y, real part\n       -1     y, imaginary part (press SHIFT EXE)\n\nNOTE   Run the program in CMPLX mode — i is ALPHA ENG. Every coefficient may\n       be real or complex, and either answer may be complex. At a paused\n       answer, SHIFT EXE turns the display over to the imaginary part.\n       A zero determinant XA - BD gives Math ERROR.",
-    "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\n(XC-BY)÷(XA-BD)→M◢\nC÷B-AM÷B",
+    "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\nXA-BD→M\n(XC-BY)÷M◢\n(AY-CD)÷M",
     "bytes": 51
   },
   {
@@ -167,8 +167,8 @@ export const PROGRAMS = Object.freeze([
     "inputs": "D, X, Y of the line Dx + Xy = Y, then C, B, A of x² + y² + Cx + By + A = 0.",
     "outputs": "x1, y1, x2, y2; complex answers show the real part first and Re-Im for the imaginary part.",
     "example": "Where does x + y = 10 meet x² + y² = 25?\n\nTYPE   1  EXE   1  EXE   10  EXE   0  EXE   0  EXE   (-)25  EXE\nGET    5 + 3.535533906i   x1\n       5 - 3.535533906i   y1\n       5 - 3.535533906i   x2\n       5 + 3.535533906i   y2\n\nNOTE   The line misses the circle, so the intersections are a complex\n       conjugate pair. Each answer shows its real part first; SHIFT EXE\n       shows the imaginary part. A line that does meet the circle prints\n       real numbers exactly as the real line-circle program does:\n       1, 7, 40, -2, -4, -20 gives (5, 5) and (-2, 6).",
-    "source": "?→D\n?→X\n?→Y\n?→C\n?→B\n?→A\nX=0⇒Goto 1\nY²+CDY+AD²→A\n-2XY-CDX+BD²→B\nD²+X²→M\n(-B-√(B²-4AM))÷(2M)→C\n(Y-CX)÷D◢\nC◢\n(-B+√(B²-4AM))÷(2M)→C\n(Y-CX)÷D◢\nC◢\nGoto 2\nLbl 1\nY÷D→X◢\nC²-4(X²+BX+A)→M\n(-C+√(M))÷2◢\nX◢\n(-C-√(M))÷2◢\nLbl 2",
-    "bytes": 201
+    "source": "?→D\n?→X\n?→Y\n?→C\n?→B\n?→A\n-C÷2→C\n-B÷2→B\nD²+X²→M\n(Y-DC-XB)÷M→Y\n√((C²+B²-A)÷M-Y²→A\nC+YD+AX◢\nB+YX-AD◢\nC+YD-AX◢\nB+YX+AD",
+    "bytes": 110
   },
   {
     "id": "P10",
@@ -186,8 +186,8 @@ export const PROGRAMS = Object.freeze([
     "inputs": "A, B, C of y = Ax² + Bx + C, then D, X, Y of y = Dx² + Xx + Y (D = 0 for a straight line).",
     "outputs": "x1, y1, x2, y2; complex answers show the real part first and Re-Im for the imaginary part.",
     "example": "Where do y = x² + 2x + 3 and y = x meet?\n\nTYPE   1  EXE   2  EXE   3  EXE   0  EXE   1  EXE   0  EXE\nGET    -0.5 - 1.658312395i   x1\n       -0.5 - 1.658312395i   y1\n       -0.5 + 1.658312395i   x2\n       -0.5 + 1.658312395i   y2\n\nNOTE   The line misses the parabola, so the intersection points are a complex\n       conjugate pair; SHIFT EXE shows each imaginary part. A line that does\n       meet the curve gives real answers: y = x² and y = 2x + 3\n       (1, 0, 0, 0, 2, 3) gives (-1, 1) and (3, 9).\n       Set D = 0 for a straight line. A must differ from D.",
-    "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\nA-D→D\nB-X→X\nC-Y→M\n(-X-√(X²-4DM))÷(2D)→Y\nY◢\nA Y²+B Y+C◢\n(-X+√(X²-4DM))÷(2D)→Y\nY◢\nA Y²+B Y+C◢",
-    "bytes": 111
+    "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\nA-D→D\nB-X→X\nC-Y→Y\n-X÷2÷D→M\n√(M²-Y÷D→D\nM-D→X◢\nAX²+BX+C◢\nM+D→X◢\nAX²+BX+C",
+    "bytes": 91
   },
   {
     "id": "P11",
@@ -205,8 +205,8 @@ export const PROGRAMS = Object.freeze([
     "inputs": "p, c1, d1, e1 of x² + p·y² + c1x + d1y + e1 = 0, then c2, d2, e2 of the second curve.",
     "outputs": "x1, y1, x2, y2; complex answers show the real part first and Re-Im for the imaginary part.",
     "example": "Two circles that never meet:  x² + y² = 25  and  x² + y² − 20x + 91 = 0.\nNormalise both to x² + p y² + c₁x + d₁y + e₁ = 0 (p = 1 for circles).\n\nTYPE   1  EXE   0  EXE   0  EXE   (-)25  EXE   (-)20  EXE   0  EXE   91  EXE\nGET    5.8                 x₁\n       0 - 2.939387691i   y₁\n       5.8                 x₂\n       0 + 2.939387691i   y₂\n\nNOTE   The circles are too far apart, so the two intersection points are a\n       complex conjugate pair; SHIFT EXE shows each imaginary part.\n       Curves that do meet give real answers: x²+y²−4x−6y+9 = 0 with\n       x²+y²−10x−6y+25 = 0  (1, -4, -6, 9, -10, -6, 25)  gives (2.667, 1.114)\n       and (2.667, 4.886). The two equations must share the same x² and y²\n       coefficients — divide both by that x² coefficient first.",
-    "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\n?→M\nB-X→X\nC-Y→Y\nD-M→M\nY=0⇒Goto 1\n-X÷Y→X\n-M÷Y→M\nA×M²+D+C×M→D\nM×2×A×X+C×X+B→B\n1+A×X²→Y\nB²-4×Y×D→A\n(-B-√(A))÷(2×Y)→C◢\nX×C+M◢\n(-B+√(A))÷(2×Y)→C◢\nX×C+M◢\nGoto 2\nLbl 1\n-M÷X→M\nM²+D+B×M→D\nM◢\nC²-4×A×D→B\n(-C-√(B))÷(2×A)◢\nM◢\n(-C+√(B))÷(2×A)◢\nLbl 2",
-    "bytes": 249
+    "source": "?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\n?→M\nB-X→X\nC-Y→Y\nD-M→M\nY=0⇒Goto 1\n-X÷Y→X\n-M÷Y→M\n1+AX²→Y\n-(2AMX+CX+B)÷2÷Y→B\n√(B²-(AM²+CM+D)÷Y→D\nB-D→C◢\nXC+M◢\nB+D→C◢\nXC+M\nGoto 2\nLbl 1\n-M÷X→M\n-C÷2÷A→X\n√(X²-(M²+BM+D)÷A→Y\nM◢\nX-Y◢\nM◢\nX+Y\nLbl 2",
+    "bytes": 195
   },
   {
     "id": "P12",
@@ -224,9 +224,9 @@ export const PROGRAMS = Object.freeze([
     "summary": "One program, two jobs: a 2x2 linear system or a line meeting a circle, both complex-capable.",
     "inputs": "Mode 1 or 2, then A, B, C, D, X, Y (mode 1: Ax+By=C and Dx+Xy=Y; mode 2: Ax+By+C=0 and x²+y²+Dx+Xy+Y=0).",
     "outputs": "Mode 1: x, y. Mode 2: x1, y1, x2, y2. Complex answers show the real part first and Re-Im for the imaginary part.",
-    "example": "Mode 1 - simultaneous linear equations (complex allowed):\n  1  EXE   1  EXE   1  EXE   1  EXE   2  EXE   (-)1  EXE   5  EXE\n  → x = 2, y = -1     (Ax+By=C and Dx+Xy=Y)\n\nMode 2 - line Ax + By + C = 0 with circle x² + y² + Dx + Xy + Y = 0:\n  2  EXE   1  EXE   7  EXE   (-)40  EXE   (-)2  EXE   (-)4  EXE   (-)20  EXE\n  → (-2, 6) and (5, 5)\n\nNOTE   Mode 2 returns complex points when the line misses the circle:\n       2, 1, 1, -10, 0, 0, -25 gives (5 - 3.535533906i, 5 + 3.535533906i)\n       and its conjugate. A vertical line has its own branch:\n       2, 1, 0, -4, -6, -6, 8 gives (4, 0) and (4, 6).\n       Mode 1 takes a+bi coefficients and answers, exactly like P8.",
-    "source": "?→M\n?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\nM=2⇒Goto 2\n(X×C-B×Y)÷(X×A-B×D)→M◢\nC÷B-A×M÷B\nGoto 9\nLbl 2\nB=0⇒Goto 3\nA²+B²→M\n2×A×C+D×B²-X×A×B→D\nC²-X×B×C+Y×B²→X\nD²-4×M×X→Y\n(-D-√(Y))÷(2×M)→X\nX◢\n(-A×X-C)÷B◢\n(-D+√(Y))÷(2×M)→X\nX◢\n(-A×X-C)÷B◢\nGoto 9\nLbl 3\n-C÷A→M\nX²-4×(M²+Y+D×M)→D\nM◢\n(-X-√(D))÷2◢\nM◢\n(-X+√(D))÷2◢\nLbl 9",
-    "bytes": 273
+    "example": "Mode 1 - simultaneous linear equations (complex allowed):\n  1  EXE   1  EXE   1  EXE   1  EXE   2  EXE   (-)1  EXE   5  EXE\n  → x = 2, y = -1     (Ax+By=C and Dx+Xy=Y)\n\nMode 2 - line Ax + By + C = 0 with circle x² + y² + Dx + Xy + Y = 0:\n  2  EXE   1  EXE   7  EXE   (-)40  EXE   (-)2  EXE   (-)4  EXE   (-)20  EXE\n  → (5, 5) and (-2, 6)\n\nNOTE   Mode 2 returns complex points when the line misses the circle:\n       2, 1, 1, -10, 0, 0, -25 gives (5 + 3.535533906i, 5 - 3.535533906i)\n       and its conjugate. A vertical line works too:\n       2, 1, 0, -4, -6, -6, 8 gives (4, 0) and (4, 6).\n       Mode 1 takes a+bi coefficients and answers, exactly like P8.",
+    "source": "?→M\n?→A\n?→B\n?→C\n?→D\n?→X\n?→Y\nM=2⇒Goto 1\nXA-BD→M\n(XC-BY)÷M◢\n(AY-CD)÷M\nGoto 2\nLbl 1\n-D÷2→D\n-X÷2→X\nA²+B²→M\n(-C-AD-BX)÷M→C\n√((D²+X²-Y)÷M-C²→Y\nD+CA+YB◢\nX+CB-YA◢\nD+CA-YB◢\nX+CB+YA\nLbl 2",
+    "bytes": 163
   }
 ]);
 
@@ -278,23 +278,23 @@ export const PROGRAM_PACKS = Object.freeze([
   {
     "id": "exam",
     "name": "Exam mix",
-    "description": "Quadratic, simultaneous equations, line-circle intersections and circle from three points.",
+    "description": "Quadratic, the combined simultaneous/line-circle solver, circle from three points and triangle centres.",
     "programIds": [
       "P1",
-      "P2",
-      "P5",
-      "P6"
+      "P12",
+      "P6",
+      "P7"
     ]
   },
   {
     "id": "complex",
     "name": "Complex and combined",
-    "description": "The combined linear + line-circle solver, the two curve solvers and the circle tool.",
+    "description": "The combined linear + line-circle solver, both curve solvers and the cubic.",
     "programIds": [
       "P12",
       "P11",
       "P10",
-      "P4"
+      "P3"
     ]
   }
 ]);

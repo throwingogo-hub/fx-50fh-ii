@@ -4,6 +4,8 @@
 
 import { K, TOK, tok, bytesOf } from './tokens.js';
 
+const DEGREE_UNIT = '\u1D52';
+
 const ASCII_ALIASES = [
   ['whileend', 'pWhileEnd'], ['whlend', 'pWhileEnd'],
   ['clrmemory', 'pClrMemory'], ['clrmem', 'pClrMemory'], ['clrstat', 'pClrStat'],
@@ -12,7 +14,10 @@ const ASCII_ALIASES = [
   ['sinh^-1(', 'asinh'], ['cosh^-1(', 'acosh'], ['tanh^-1(', 'atanh'],
   ['sin^-1(', 'asin'], ['cos^-1(', 'acos'], ['tan^-1(', 'atan'],
   ['sqrt(', 'sqrt'], ['cbrt(', 'cbrt'], ['pi', 'pi'],
-  ['->', 'pAsg'], ['=>', 'pJump']
+  ['->', 'pAsg'], ['=>', 'pJump'], ['\u0233', 'ybar'],
+  // ° is the sexagesimal key; the DRG▶ degree unit shares its glyph, so the
+  // Studio writes that one as a modifier o to keep the two apart.
+  ['°', 'dms'], [DEGREE_UNIT, 'degU']
 ];
 
 const AMBIGUOUS_IDS = new Set([
@@ -22,9 +27,12 @@ const AMBIGUOUS_IDS = new Set([
   'regA', 'regB', 'regC', 'regR', 'Sn', 'dms', 'degU'
 ]);
 
-function aliases() {
+function buildAliases() {
   const out = ASCII_ALIASES.map(([label, id]) => ({ label, id }));
   for (const [id, spec] of Object.entries(TOK)) {
+    // Scientific constants share letters with variables (h, F, R…), so the
+    // Studio writes each one in brackets: [h], [mp], [μ0].
+    if (spec.sci) out.push({ label: `[${spec.s}]`, id, exact: true });
     const label = spec.s.trim();
     if (AMBIGUOUS_IDS.has(id) || label.length < 2) continue;
     out.push({ label, id });
@@ -32,13 +40,30 @@ function aliases() {
   const seen = new Set();
   return out
     .sort((a, b) => b.label.length - a.label.length)
-    .filter(({ label }) => {
-      const key = label.toLocaleLowerCase();
+    .filter(({ label, exact }) => {
+      // μN and μn are different constants, so bracketed names keep their case.
+      const key = exact ? label : label.toLocaleLowerCase();
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
     });
 }
+
+// Scientific constants are registered after this module loads, so the word
+// list is rebuilt whenever the token table has grown.
+let wordCache = null;
+let wordCacheSize = -1;
+function words() {
+  const size = Object.keys(TOK).length;
+  if (size !== wordCacheSize) {
+    wordCache = buildAliases();
+    wordCacheSize = size;
+  }
+  return wordCache;
+}
+// Word commands such as Ans or Goto must not run into a following letter.
+const isWordEnd = (text) => /[A-Za-z]$/.test(text) && text.length > 1;
+const startsWordChar = (text) => /^[A-Za-z0-9]/.test(text);
 
 function singleToken(ch, mode, previous) {
   if (ch >= '0' && ch <= '9') return ch;
@@ -76,7 +101,7 @@ function singleToken(ch, mode, previous) {
   if (ch === 'i') return 'imag';
 
   if (ch === '-') {
-    const unary = !previous || [K.OPEN, K.SEP, K.INFIX, K.POW, K.PRE, K.PROG].includes(previous.k);
+    const unary = !previous || [K.OPEN, K.FN, K.SEP, K.INFIX, K.POW, K.PRE, K.PROG].includes(previous.k);
     return unary ? 'neg' : 'sub';
   }
 
@@ -90,11 +115,13 @@ export function parseProgramText(source, mode = 'COMP') {
   const text = String(source || '').replace(/\r\n?/g, '\n');
   const tokenIds = [];
   const errors = [];
-  const words = aliases();
+  const wordList = words();
   let i = 0;
 
+  // ◢ already ends a statement, so a separator straight after it (or after
+  // another separator) would only waste a byte of program memory.
   const push = (id) => {
-    if (id === ':' && tokenIds[tokenIds.length - 1] === ':') return;
+    if (id === ':' && [':', 'pOut'].includes(tokenIds[tokenIds.length - 1])) return;
     tokenIds.push(id);
   };
 
@@ -104,12 +131,18 @@ export function parseProgramText(source, mode = 'COMP') {
     if (/\s/u.test(ch)) { i++; continue; }
 
     let matched = false;
-    for (const entry of words) {
+    for (const entry of wordList) {
       const candidate = text.slice(i, i + entry.label.length);
-      if (candidate.toLocaleLowerCase() !== entry.label.toLocaleLowerCase()) continue;
+      if (entry.exact ? candidate !== entry.label
+        : candidate.toLocaleLowerCase() !== entry.label.toLocaleLowerCase()) continue;
       const last = entry.label[entry.label.length - 1];
       const next = text[i + entry.label.length] || '';
-      if (/\p{L}|\p{N}/u.test(last) && /\p{L}|\p{N}/u.test(next)) continue;
+      // A lowercase letter would continue the word ("Ansx"); a variable or digit
+      // starts a new token, so "AnsA" and "5nCr2" read as typed on the keys.
+      if (/[A-Za-z]/.test(last) && /[a-z]/.test(next)) continue;
+      // M+ and M- only ever end a statement; elsewhere "M-Y" is M minus Y.
+      if ((entry.id === 'pMplus' || entry.id === 'pMminus')
+        && !/^[ \t]*(?:$|[\n:◢])/.test(text.slice(i + entry.label.length))) continue;
       push(entry.id);
       i += entry.label.length;
       matched = true;
@@ -136,12 +169,40 @@ export function parseProgramText(source, mode = 'COMP') {
   return { tokenIds, tokens, bytes: bytesOf(tokens), errors };
 }
 
+function tokenText(token) {
+  if (token.id === ':') return '\n';
+  if (token.id === 'pOut') return '◢\n';
+  if (token.id === 'degU') return DEGREE_UNIT;
+  if (token.id === 'nCr' || token.id === 'nPr') return token.id;
+  if (token.sci) return `[${token.s}]`;
+  return token.s;
+}
+
+// A space is needed where two symbols would otherwise read as one longer word,
+// e.g. Ans followed by A, or x̂ followed by 1 (which would read as x̂1).
+function needsSpace(before, after) {
+  if (!before || !after || /\s$/.test(before) || /^\s/.test(after)) return false;
+  if (isWordEnd(before) && startsWordChar(after)) return true;
+  const joined = (before + after).toLocaleLowerCase();
+  const head = before.toLocaleLowerCase();
+  return words().some(({ label }) => label.length > head.length
+    && joined.startsWith(label.toLocaleLowerCase()));
+}
+
 /** One calculator statement per line, with native symbols retained. */
 export function formatProgramText(tokens) {
-  return (tokens || [])
-    .map((token) => token.id === ':' ? '\n' : token.s)
-    .join('')
+  let text = '';
+  let previous = '';
+  for (const token of tokens || []) {
+    const next = tokenText(token);
+    if (needsSpace(previous, next)) text += ' ';
+    text += next;
+    previous = next;
+  }
+  return text
     .split('\n')
     .map((line) => line.trim())
-    .join('\n');
+    .join('\n')
+    .replace(/\n{2,}/g, '\n')
+    .trimEnd();
 }

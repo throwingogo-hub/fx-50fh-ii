@@ -109,7 +109,7 @@ checkout can use any static-file server.
 
 ## Tests
 
-417 checks, including the guide's CMPLX chapter and complex-number edge
+441 checks, including the guide's CMPLX chapter and complex-number edge
 cases, worked examples, operating limits, REPLAY/history
 navigation, Program Studio text/recovery/backup, all seven S5 programs and
 their documented examples, generated-guide parity, and exhaustive LCD menu-layout/glyph coverage derived from the user's guide, driven

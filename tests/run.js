@@ -85,6 +85,8 @@ function runCatalogProgram(id, inputs) {
   }
   if (guard >= 10000) throw new Error(`${id} did not finish`);
   if (inputIndex !== inputs.length) throw new Error(`${id} used ${inputIndex}/${inputs.length} inputs`);
+  // The answer left on screen when the program ends counts as the last output.
+  if (state.value) outputs.push(state.value.re);
   return outputs;
 }
 
@@ -877,6 +879,40 @@ for (let i = 0; i < CONSTANTS.length; i++) {
   check('Program Studio recognizes loop commands', parsed.tokenIds.includes('pFor') && parsed.tokenIds.includes('pNext'), true);
 }
 {
+  {
+    const minus = parseProgramText('cos(M-120)\n3M-\n2M+', 'COMP');
+    check('Program Studio reads M-120 as M minus 120, not the M- command', minus.tokenIds.join(','),
+      'cos,varM,sub,1,2,0,),:,3,pMminus,:,2,pMplus');
+    check('Program Studio reads a minus after a function as a negative sign',
+      parseProgramText('√(-X', 'COMP').tokenIds.join(','), 'sqrt,neg,varX');
+    const pause = parseProgramText('X◢\nY◢\n1', 'COMP');
+    check('a line break after ◢ costs no separator byte', pause.tokenIds.join(','), 'varX,pOut,varY,pOut,1');
+    check('◢ programs round-trip through Studio text', formatProgramText(pause.tokens), 'X◢\nY◢\n1');
+    check('Program Studio accepts a precomposed ȳ', parseProgramText('\u0233', 'REG').tokenIds.join(','), 'ybar');
+    // Every token a key can write must survive tokens -> Studio text -> tokens
+    // next to the operands it is usually typed beside.
+    const drifted = [];
+    for (const mode of ['COMP', 'CMPLX', 'BASE', 'SD', 'REG']) {
+      const operands = mode === 'BASE' ? ['1', 'varX', 'Ans'] : ['1', 'varA', 'Ans', 'varX', 'pi'];
+      for (const id of Object.keys(TOK)) {
+        if (id.startsWith('fv_') || ['neg', 'pMplus', 'pMminus'].includes(id)) continue;
+        if (/^(hex|base)/.test(id) ? mode !== 'BASE' : (/^var[ABCD]$/.test(id) || id === 'EXP') && mode === 'BASE') continue;
+        if (/^reg[ABCR]$/.test(id) && mode !== 'REG') continue;
+        if (id === 'Sn' && mode !== 'SD' && mode !== 'REG') continue;
+        for (const left of operands) for (const right of operands) {
+          const ids = [left, id, right];
+          const text = formatProgramText(ids.map(tok));
+          const back = parseProgramText(text, mode);
+          if (back.errors.length || back.tokenIds.join(',') !== ids.join(',')) drifted.push(`${mode} ${id} ${JSON.stringify(text)}`);
+        }
+      }
+    }
+    check('every token round-trips through Studio text', drifted.slice(0, 5).join(' | '), '');
+    check('Ans followed by a variable keeps both tokens',
+      formatProgramText(parseProgramText('AnsA', 'COMP').tokens), 'Ans A');
+    check('x⁻¹ and degree marks are readable in Studio text',
+      parseProgramText('X⁻¹+30°+2\u1D52', 'COMP').tokenIds.join(','), 'varX,recip,add,3,0,dms,add,2,degU');
+  }
   const parsed = parseProgramText('5 nCr 2\n5 nPr 2', 'COMP');
   check('Program Studio accepts copyable nCr and nPr names', parsed.errors.length, 0);
   check('Program Studio maps nCr and nPr to calculator tokens', parsed.tokenIds.join(','),
@@ -906,7 +942,7 @@ for (let i = 0; i < CONSTANTS.length; i++) {
   check('all recommended packs contain four real programs', PROGRAM_PACKS.every(pack =>
     pack.programIds.length === 4 && pack.programIds.every(id => PROGRAM_BY_ID.has(id))), true);
   check('all recommended packs fit the authentic 680-byte memory', PROGRAM_PACKS.every(pack => packBytes(pack) <= 680), true);
-  check('Core pack is 316 bytes', packBytes(PROGRAM_PACKS.find(pack => pack.id === 'core')), 316);
+  check('Core pack is 277 bytes', packBytes(PROGRAM_PACKS.find(pack => pack.id === 'core')), 277);
   check('the catalog is the printed S5 set plus four complex solvers', PROGRAMS.map(program => program.id).join(','), 'P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,P11,P12');
   check('catalog search finds quadratic by topic', filterProgramCatalog('discriminant').map(program => program.id).join(','), 'P1');
   check('catalog search finds the line-circle solvers', filterProgramCatalog('line circle').map(program => program.id).join(','), 'P5,P9,P12');
@@ -938,18 +974,26 @@ for (let i = 0; i < CONSTANTS.length; i++) {
 }
 {
   const cases = [
-    ['P1 quadratic vertex and roots', 'P1', [1, 2, -15], [-1, -16, 3]],
-    ['P1 repeated-root quadratic', 'P1', [1, -2, 1], [1, 0, 1]],
-    ['P2 simultaneous equations', 'P2', [1, 1, 1, 2, -1, 5], [2]],
+    ['P1 quadratic vertex and roots', 'P1', [1, 2, -15], [-1, -16, 3, -5]],
+    ['P1 repeated-root quadratic', 'P1', [1, -2, 1], [1, 0, 1, 1]],
+    ['P1 downward quadratic', 'P1', [-1, 2, 15], [1, 16, 5, -3]],
+    ['P2 simultaneous equations', 'P2', [1, 1, 1, 2, -1, 5], [2, -1]],
+    ['P2 first equation without y', 'P2', [2, 0, 4, 1, 1, 3], [2, 1]],
     ['P3 cubic with three real roots', 'P3', [1, 6, 11, 6], [-1, -2, -3]],
     ['P3 cubic with one real root', 'P3', [1, 2, 2, 1], [-1]],
     ['P3 cubic with irrational roots', 'P3', [2, 7, 5, 1], [-0.381966011250119, -0.5, -2.6180339887499]],
-    ['P4 centre and radius', 'P4', [4, -8, 3], [-2, 4]],
+    ['P3 cubic with a double root', 'P3', [1, 0, -3, 2], [1, -2]],
+    ['P3 cubic with a triple root', 'P3', [1, -3, 3, -1], [1, 1]],
+    ['P3 pure cube', 'P3', [1, 0, 0, -8], [2]],
+    ['P4 centre and radius', 'P4', [4, -8, 3], [-2, 4, Math.sqrt(17)]],
     ['P5 line and circle intersections', 'P5', [1, 7, 40, -2, -4, -20], [5, 5, -2, 6]],
-    ['P5 vertical line and circle', 'P5', [1, 0, 4, -6, -6, 8], [4, 6, 4, 0]],
-    ['P6 circle through three points', 'P6', [5, 2, 2, 3, 6, -5], [2, -2, 5, -4, 4]],
+    ['P5 vertical line and circle', 'P5', [1, 0, 4, -6, -6, 8], [4, 0, 4, 6]],
+    ['P5 horizontal line and circle', 'P5', [0, 1, 2, 0, 0, -25], [Math.sqrt(21), 2, -Math.sqrt(21), 2]],
+    ['P6 circle through three points', 'P6', [5, 2, 2, 3, 6, -5], [2, -2, 5, -4, 4, -17]],
     ['P7 triangle centres', 'P7', [0, 0, 24, 0, 12, 9], [12, 3, 12, 4, 12, 16, 12, -3.5]],
-    ['P7 right triangle at the origin', 'P7', [0, 0, 6, 0, 0, 6], [2, 2, 1.75735931288071, 1.75735931288071, 0, 0, 3, 3]]
+    ['P7 right triangle at the origin', 'P7', [0, 0, 6, 0, 0, 6], [2, 2, 1.75735931288071, 1.75735931288071, 0, 0, 3, 3]],
+    ['P7 scalene triangle away from the origin', 'P7', [3, 1, 24, 5, 12, 9],
+      [13, 5, 12.6654719935103, 5.75787077818223, 9.6969696969697, 21.0909090909091, 14.6515151515152, -3.04545454545455]]
   ];
   for (const [name, id, inputs, outputs] of cases) nearMany('program library: ' + name, runCatalogProgram(id, inputs), outputs, 1e-8);
 
@@ -982,9 +1026,13 @@ for (let i = 0; i < CONSTANTS.length; i++) {
       ['P12 combined mode 1 complex', 'P12', [1, { re: 1, im: 1 }, 1, 2, 1, -1, { re: 0, im: 1 }],
         [[1, 0], [1, -1]]],
       ['P12 combined mode 2 line and circle', 'P12', [2, 1, 7, -40, -2, -4, -20],
-        [[-2, 0], [6, 0], [5, 0], [5, 0]]],
+        [[5, 0], [5, 0], [-2, 0], [6, 0]]],
       ['P12 combined mode 2 vertical line', 'P12', [2, 1, 0, -4, -6, -6, 8],
-        [[4, 0], [0, 0], [4, 0], [6, 0]]]
+        [[4, 0], [0, 0], [4, 0], [6, 0]]],
+      ['P12 combined mode 2 complex points', 'P12', [2, 1, 1, -10, 0, 0, -25],
+        [[5, 3.535533906], [5, -3.535533906], [5, -3.535533906], [5, 3.535533906]]],
+      ['P11 two circles with a slanted radical axis', 'P11', [1, 0, 0, -25, -2, -2, -23],
+        [[-3, 0], [4, 0], [4, 0], [-3, 0]]]
     ];
     for (const [name, id, inputs, want] of cases) {
       const got = runComplexProgram(id, inputs);
